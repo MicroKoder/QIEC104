@@ -29,13 +29,15 @@ SOURCES += \
         mainwindow.cpp \
     iec104driver.cpp \
     csetting.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    ctools.cpp
 
 HEADERS += \
         mainwindow.h \
     iec104driver.h \
     csetting.h \
-    settingsdialog.h
+    settingsdialog.h \
+    ctools.h
 
 FORMS += \
         mainwindow.ui \

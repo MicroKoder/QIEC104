@@ -42,10 +42,12 @@ void IEC104Driver::OnTestTimer()
 void IEC104Driver::Send_ConfirmPacks(){
     uint count = (uint)N_R+1;
     char pack[] ={0x68, 0x04, 0x01, 0x00, char(count<<1),char(count>>7)};
-    buf = QByteArray(pack,6);
-    sock->write(buf);
-
+    //buf = QByteArray(pack,6);
+    //sock->write(buf);
+    sock->write(pack, 6);
     lastAPCICount = N_R;
+    emit Message(CTools::BytesToString(pack,6));
+    emit Message("<-- Confirm");
 }
 
 bool IEC104Driver::isStartAct(QByteArray data)
@@ -103,6 +105,7 @@ void IEC104Driver::SendTestCon()
 {
     //char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
     buf = QByteArray(testFrCon, 6);
+
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,6);
         emit Message("<-- TestCon");
@@ -137,6 +140,10 @@ void IEC104Driver::SendSyncTime()
 
 }
 
+uint ParseAPCInum(QByteArray &data){
+   return ((unsigned char)data[2] + (((unsigned char)data[3])<<8));
+}
+
 void IEC104Driver::OpenConnection(CSetting *settings)
 {
     if (sock->isOpen())
@@ -169,28 +176,26 @@ void IEC104Driver::OnDisconnected()
 void IEC104Driver::OnSockReadyRead(int)
 {
     QByteArray buf= sock->readAll();
-    QString str =QTime::currentTime().toString()+" [";
-    foreach(char c, buf)
-    {
-        str += QString::number((unsigned char)c,16)+" ";
-    }
-    str += "]";
+    QString str =QTime::currentTime().toString()+" -->[";
+    //foreach(char c, buf)
+    //{
+    //    str += QString::number((unsigned char)c,16)+" ";
+   // }
+//    str += "]";
 
-    emit Message(str);
+    emit Message(QTime::currentTime().toString()+" -->" + CTools::BytesToString(&buf));
 
     if (buf.count()==6){
         if (isTestAct(buf))
         {
-            str = "--> TestAct";
-            emit Message(str);
+            emit Message("--> TestAct");
 
             SendTestCon();
             return;
         }
         if(isTestCon(buf))
         {
-            str = "--> TestCon";
-            emit Message(str);
+            emit Message("--> TestCon");
             return;
         }
         if(isStartCon(buf))
@@ -199,6 +204,15 @@ void IEC104Driver::OnSockReadyRead(int)
             return;
         }
     }//if count 6
+
+
+    N_R = ParseAPCInum(buf);
+    //Квитирование сообщений
+   if ((N_R - lastAPCICount)>=8){
+       Send_ConfirmPacks();
+    }
+
+
 
 }
 

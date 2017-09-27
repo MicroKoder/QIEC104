@@ -5,6 +5,7 @@
 #include <QTImer>
 #include <QDataStream>
 #include <csetting.h>
+#include <ctools.h>
 
 namespace IEC104
 {
