@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file alias="icon_connect">icons/connect.png</file>
+        <file alias="icon_disconnect">icons/disconnect.png</file>
+        <file alias="icon_open">icons/open.png</file>
+        <file alias="icon_settings">icons/settings.png</file>
+        <file alias="icon_timer">icons/timer.png</file>
+        <file alias="icon_erase">icons/Erase.png</file>
+    </qresource>
+</RCC>
