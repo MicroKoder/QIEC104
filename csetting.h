@@ -11,6 +11,8 @@ public:
     quint16 t1;
     quint16 t2;
     quint16 t3;
+    quint16 k;
+    quint16 w;
     CSetting();
 };
 

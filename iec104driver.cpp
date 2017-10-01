@@ -140,9 +140,7 @@ void IEC104Driver::SendSyncTime()
 
 }
 
-uint ParseAPCInum(QByteArray &data){
-   return ((unsigned char)data[2] + (((unsigned char)data[3])<<8));
-}
+
 
 void IEC104Driver::OpenConnection(CSetting *settings)
 {
@@ -206,7 +204,7 @@ void IEC104Driver::OnSockReadyRead(int)
     }//if count 6
 
 
-    N_R = ParseAPCInum(buf);
+    N_R = CTools::ParseAPCInum(buf);
     //Квитирование сообщений
    if ((N_R - lastAPCICount)>=8){
        Send_ConfirmPacks();
@@ -219,4 +217,5 @@ void IEC104Driver::OnSockReadyRead(int)
 void IEC104Driver::displayError(QAbstractSocket::SocketError)
 {
     QMessageBox::information(0, tr("IEC104 client"), sock->errorString(),QMessageBox::Ok,QMessageBox::NoButton);
+    emit Disconnected();
 }

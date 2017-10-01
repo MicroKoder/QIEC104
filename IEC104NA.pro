@@ -30,14 +30,20 @@ SOURCES += \
     iec104driver.cpp \
     csetting.cpp \
     settingsdialog.cpp \
-    ctools.cpp
+    ctools.cpp \
+    tablemodel.cpp \
+    cp56time.cpp \
+    ciecsignal.cpp
 
 HEADERS += \
         mainwindow.h \
     iec104driver.h \
     csetting.h \
     settingsdialog.h \
-    ctools.h
+    ctools.h \
+    tablemodel.h \
+    cp56time.h \
+    ciecsignal.h
 
 FORMS += \
         mainwindow.ui \

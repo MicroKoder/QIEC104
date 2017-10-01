@@ -24,3 +24,7 @@ QString CTools::BytesToString(char *bytes, quint16 len)
     QByteArray b(bytes,len);
     return BytesToString(&b);
 }
+
+uint CTools::ParseAPCInum(QByteArray &data){
+   return ((unsigned char)data[2] + (((unsigned char)data[3])<<8));
+}

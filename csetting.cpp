@@ -9,4 +9,7 @@ CSetting::CSetting()
     t1 = 15;
     t2 = 10;
     t3 = 5;
+
+    k = 12;
+    w = 8;
 }
