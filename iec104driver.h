@@ -11,6 +11,8 @@ namespace IEC104
 {
     class IEC104Driver;
 }
+
+///Класс - синглтон
 class IEC104Driver:public QObject
 {
     Q_OBJECT
@@ -19,7 +21,13 @@ private:
     QTcpSocket *sock;
     uint count;
     uint lastAPCICount;
-    uint N_R;
+    quint16 N_R;
+    QByteArray buf;
+    CSetting* settings;
+
+    IEC104Driver();
+    IEC104Driver(IEC104Driver *other);
+    static IEC104Driver *instance;
 
     void SendFullRequest();
     void SendRequestCounter();
@@ -29,38 +37,38 @@ private:
     void SendTestCon();
     void Send_ConfirmPacks();
 
-    static IEC104Driver *hinstance;
+
     void SendStart();
     bool isStartAct(QByteArray data);
     bool isStartCon(QByteArray data);
     bool isTestAct(QByteArray data);
     bool isTestCon(QByteArray data);
-    QByteArray buf;
 
 public:
-    quint16 t0;
-    quint16 t1;
-    quint16 t2;
-    quint16 t3; //test timeout
-    uint w;
-    uint k;
     static IEC104Driver* GetInstance();
+    void SetSettings(CSetting* settings);
+    CSetting* GetSettings();
 
-    IEC104Driver();
-    IEC104Driver(IEC104Driver *other);
-    void OpenConnection(CSetting *settings);
     void CloseConnection();
 signals:
     void Connected();
     void Disconnected();
-    void Message(QString);
-public slots:
 
+    ///вывод сообщения в лог
+    void Message(QString);
+
+    /// декодированный сигнал
+    void IECSignalReceived(CIECSignal*);
+private slots:
     void OnConnected();
     void OnDisconnected();
     void OnSockReadyRead(int);
     void displayError(QAbstractSocket::SocketError);
     void OnTestTimer();
+public slots:
+    void OpenConnection(CSetting *settings);
+    void Interrogation();
+    void ClockSynch();
 
 };
 

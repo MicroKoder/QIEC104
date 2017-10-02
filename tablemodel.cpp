@@ -2,7 +2,7 @@
 
 TableModel::TableModel()
 {
-    mData = new QMap<int, CTableModelItem>();
+    mData = new QMap<uint, CTableModelItem>();
 }
 
 int TableModel::rowCount(const QModelIndex &parent) const{
@@ -11,7 +11,7 @@ int TableModel::rowCount(const QModelIndex &parent) const{
 }
 
 int TableModel::columnCount(const QModelIndex &parent) const{
-   return 5;
+   return 6;
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const{
@@ -21,18 +21,25 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
         QVariant result;
         switch (index.column()){
             case 0:
-                result =  QVariant(pSignal.address);
+                result =  QVariant(pSignal.GetAddress());
                 break;  //адрес
             case 1:
                 result =  QVariant(pSignal.name);
-                break;  //адресbreak;  //название
+                break;  //название
             case 2:
-                result =  QVariant(pSignal.value);
+                if (pSignal.GetType()==30)
+                    result = QVariant(pSignal.value == 1 ? "true" : "false");
+                else
+                    result =  QVariant(pSignal.value);
+
                 break;  //значение
             case 3:
+                result =  QVariant(pSignal.GetType());
+                break;  //тип
+            case 4:
                 result = QVariant(uint(pSignal.quality));
                 break;  //качество
-            case 4:
+            case 5:
                 result = QVariant(pSignal.timestamp.GetTimeString());
                 break;  //метка времени
         };
@@ -41,12 +48,16 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
     return QVariant();
 }
 
-void TableModel::updateSignal(CIECSignal signal){
-    if (mData->keys().contains(signal.address)){
-        (*mData)[signal.address].quality = signal.quality;
-        (*mData)[signal.address].value = signal.value;
-        (*mData)[signal.address].timestamp = signal.timestamp;
+void TableModel::updateSignal(CIECSignal *pSignal){
+    if (!mData->keys().contains(pSignal->GetKey()))
+    {
+        mData->insert(pSignal->GetKey(), CTableModelItem(pSignal));
     }
+
+    (*mData)[pSignal->GetKey()].quality = pSignal->quality;
+    (*mData)[pSignal->GetKey()].value = pSignal->value;
+    (*mData)[pSignal->GetKey()].timestamp = pSignal->timestamp;
+    //(*mData)[pSignal->GetKey()] = (*pSignal);
 }
 void TableModel::redraw(){
     emit dataChanged(this->index(0,0),this->index(mData->count()-1,4));

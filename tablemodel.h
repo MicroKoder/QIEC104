@@ -12,20 +12,20 @@ public:
     CTableModelItem(){
 
     }
-    CTableModelItem(CIECSignal &signal, QString name = QString()){
-        this->address = signal.address;
+    CTableModelItem(CIECSignal *signal, QString name = QString()){
+        this->SetAddress(signal->GetAddress());
 
-        this->quality = signal.quality;
-        this->value = signal.value;
-        this->timestamp = signal.timestamp;
-        this->typeID = signal.typeID;
+        this->quality = signal->quality;
+        this->value = signal->value;
+        this->timestamp = signal->timestamp;
+        this->SetType(signal->GetType());
 
         this->name = name;
     }
-    CTableModelItem(int address, QString name= QString()){
-        this->address = address;
+    /*CTableModelItem(int address, QString name= QString()){
+        this->SetAddress(address);
         this->name = name;
-    }
+    }*/
     QString name;
 };
 
@@ -34,13 +34,13 @@ class TableModel : public QAbstractTableModel
 private:
 
 public:
-    QMap<int, CTableModelItem> *mData;
+    QMap<uint, CTableModelItem> *mData;
 
     TableModel();
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    void updateSignal(CIECSignal signal);
+    void updateSignal(CIECSignal *signal);
     void redraw();
 };
 

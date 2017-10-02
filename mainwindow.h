@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <csetting.h>
 #include <iec104driver.h>
+#include "tablemodel.h"
 #include <QLabel>
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     CSetting *settings;
     IEC104Driver *driver;
+    TableModel *tabmodel;
 
     ~MainWindow();
 
@@ -30,6 +32,9 @@ public slots:
     void OnConnected();
     void OnDisconnected();
     void LogReceived(QString);
+    void OnClearLogPressed();
+
+    void IECReceived(CIECSignal* tag);
 };
 
 #endif // MAINWINDOW_H

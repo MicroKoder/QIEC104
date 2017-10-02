@@ -20,6 +20,8 @@ SettingsDialog::SettingsDialog(CSetting *settings):
     ui->edit_t1->setText(QString::number(settings->t1));
     ui->edit_t2->setText(QString::number(settings->t2));
     ui->edit_t3->setText(QString::number(settings->t3));
+    ui->edit_k->setText(QString::number(settings->k));
+    ui->edit_w->setText(QString::number(settings->w));
 
    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
  //connect(ui->buttonBox,SIGNAL(rejected()), this, SLOT(reject());
@@ -40,5 +42,7 @@ void SettingsDialog::Accepted()
      settings->t1 = ui->edit_t1->text().toUInt();
      settings->t2 = ui->edit_t2->text().toUInt();
      settings->t3 = ui->edit_t3->text().toUInt();
+     settings->k = ui->edit_k->text().toUInt();
+     settings->w = ui->edit_w->text().toUInt();
      this->close();
 }

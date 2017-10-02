@@ -6,17 +6,57 @@
 
 class CIECSignal
 {
+    ///уникальный номер сигнала
+    uint key;
+
+    ///IOA
+    uint16_t address;
+
+    ///идентификатор типа
+    uchar typeID;
 public:
     CIECSignal();
+    CIECSignal(uint16_t addr, uchar type);
 
-    int address;    // адрес МЭК-104
-    QVariant value; //значение
-    unsigned long quality;  //качество
-    unsigned int typeID;      //идентификатор
+    uint GetKey()
+    {
+        return key;
+    }
 
+    void SetAddress(uint16_t ioa)
+    {
+        address = ioa;
+        key &= 0xFF0000;
+        key |= ioa;
+    }
+    void SetType(uchar type)
+    {
+        typeID = type;
+        key &=0x00FFFF;
+        key |= type<<16;
+    }
+
+    uint GetAddress()
+    {
+        return address;
+    }
+
+    uint GetType()
+    {
+        return typeID;
+    }
+
+    ///значение
+    QVariant value;
+
+    ///качество
+    unsigned long quality;
+
+    ///метка времени
     CP56Time timestamp;
-   static QList<CIECSignal> ParseData(QByteArray &data, uint *APCInum);
-   static QByteArray lostBytes;
+
+
+    QString GetValueString();
 };
 
 bool IsStartDTCon(QByteArray &data);

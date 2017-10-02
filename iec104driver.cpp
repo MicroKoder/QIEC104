@@ -2,20 +2,14 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTime>
-/*IEC104Driver* IEC104Driver::GetInstance()
-{
-    if (IEC104Driver::hinstance==NULL)
-    {
-        IEC104Driver::hinstance = new IEC104Driver();
-    }
-    return IEC104Driver::hinstance;
+#include <qlist>
 
-}
-*/
 static char testAct[] = {0x68, 0x04, 0x43, 0x00, 0x00, 0x00};
 static char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
 static char startCon[] = {0x68, 0x04, 0x0B, 0x00, 0x00, 0x00};
 static char StartDTAct[] ={0x68, 0x04, 0x07, 0x00, 0x00, 0x00};
+
+IEC104Driver* IEC104Driver::instance = NULL;
 
 IEC104Driver::IEC104Driver():
     sock(new QTcpSocket())
@@ -33,11 +27,54 @@ IEC104Driver::IEC104Driver():
   //  in.setDevice(sock);
 }
 
+void IEC104Driver::SendFullRequest()
+{
+
+}
+
+void IEC104Driver::SendRequestCounter()
+{
+
+}
+
+void IEC104Driver::SendRequestSingle()
+{
+
+}
+
+void IEC104Driver::SendSyncTime()
+{
+
+}
+
 void IEC104Driver::OnTestTimer()
 {
         SendTestAct();
 }
 
+void IEC104Driver::SendTestAct()
+{
+   // char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
+    buf = QByteArray(testAct, 6);
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,6);
+        emit Message("<-- TestAct");
+
+   //     sock->waitForBytesWritten();
+     //   pLog->append("testFRact");
+    }
+}
+
+void IEC104Driver::SendTestCon()
+{
+    //char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
+    buf = QByteArray(testFrCon, 6);
+
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,6);
+        emit Message("<-- TestCon");
+    }
+}
 
 void IEC104Driver::Send_ConfirmPacks(){
     uint count = (uint)N_R+1;
@@ -46,8 +83,17 @@ void IEC104Driver::Send_ConfirmPacks(){
     //sock->write(buf);
     sock->write(pack, 6);
     lastAPCICount = N_R;
-    emit Message(CTools::BytesToString(pack,6));
+    emit Message(IEC104Tools::BytesToString(pack,6));
     emit Message("<-- Confirm");
+}
+
+
+void IEC104Driver::SendStart()
+{
+    buf = QByteArray(StartDTAct,6);
+    sock->write(buf, 6);
+    emit Message("<-- StartAct");
+
 }
 
 bool IEC104Driver::isStartAct(QByteArray data)
@@ -88,58 +134,28 @@ bool IEC104Driver::isTestCon(QByteArray data)
 
 }
 
-void IEC104Driver::SendTestAct()
+IEC104Driver* IEC104Driver::GetInstance()
 {
-   // char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
-    buf = QByteArray(testAct, 6);
-    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
-        sock->write(buf,6);
-        emit Message("<-- TestAct");
+    if (IEC104Driver::instance==NULL)
+    {
+        IEC104Driver::instance = new IEC104Driver();
+    }
+    return IEC104Driver::instance;
+}
 
-   //     sock->waitForBytesWritten();
-     //   pLog->append("testFRact");
+
+void IEC104Driver::SetSettings(CSetting *settings)
+{
+    if (settings != NULL)
+    {
+        this->settings = settings;
     }
 }
 
-void IEC104Driver::SendTestCon()
+CSetting* IEC104Driver::GetSettings()
 {
-    //char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
-    buf = QByteArray(testFrCon, 6);
-
-    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
-        sock->write(buf,6);
-        emit Message("<-- TestCon");
-    }
+    return settings;
 }
-
-void IEC104Driver::SendStart()
-{
-    buf = QByteArray(StartDTAct,6);
-    sock->write(buf, 6);
-    emit Message("<-- StartAct");
-
-}
-
-void IEC104Driver::SendFullRequest()
-{
-
-}
-
-void IEC104Driver::SendRequestCounter()
-{
-
-}
-
-void IEC104Driver::SendRequestSingle()
-{
-
-}
-
-void IEC104Driver::SendSyncTime()
-{
-
-}
-
 
 
 void IEC104Driver::OpenConnection(CSetting *settings)
@@ -148,6 +164,7 @@ void IEC104Driver::OpenConnection(CSetting *settings)
         return;
 
     sock->open(QIODevice::ReadWrite);
+    this->settings = settings;
     sock->connectToHost(settings->IP,settings->Port);
     testTimer->setInterval(settings->t3*1000);
     emit Connected();
@@ -158,7 +175,7 @@ void IEC104Driver::CloseConnection()
 {
     sock->disconnectFromHost();
 }
-
+//==================================================== PRIVATE SLOTS =======================================================================
 void IEC104Driver::OnConnected()
 {
     SendStart();
@@ -175,13 +192,9 @@ void IEC104Driver::OnSockReadyRead(int)
 {
     QByteArray buf= sock->readAll();
     QString str =QTime::currentTime().toString()+" -->[";
-    //foreach(char c, buf)
-    //{
-    //    str += QString::number((unsigned char)c,16)+" ";
-   // }
-//    str += "]";
 
-    emit Message(QTime::currentTime().toString()+" -->" + CTools::BytesToString(&buf));
+
+    //emit Message(QTime::currentTime().toString()+" -->" + IEC104Tools::BytesToString(&buf));
 
     if (buf.count()==6){
         if (isTestAct(buf))
@@ -203,19 +216,36 @@ void IEC104Driver::OnSockReadyRead(int)
         }
     }//if count 6
 
-
-    N_R = CTools::ParseAPCInum(buf);
+    //N_R = IEC104Tools::ParseAPCInum(buf);
+    if (buf.length()>6)
+    {
+       QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R);
+       emit Message("count: " + QString::number(s->length()));
+       foreach (CIECSignal signal, (*s))
+       {
+           emit Message(signal.GetValueString());
+           emit IECSignalReceived(&signal);
+       }
+       delete s; //
+    }
     //Квитирование сообщений
-   if ((N_R - lastAPCICount)>=8){
+   if ((N_R - lastAPCICount)>=settings->w){
        Send_ConfirmPacks();
     }
-
-
-
 }
 
 void IEC104Driver::displayError(QAbstractSocket::SocketError)
 {
     QMessageBox::information(0, tr("IEC104 client"), sock->errorString(),QMessageBox::Ok,QMessageBox::NoButton);
     emit Disconnected();
+}
+
+void IEC104Driver::Interrogation()
+{
+
+}
+
+void IEC104Driver::ClockSynch()
+{
+
 }

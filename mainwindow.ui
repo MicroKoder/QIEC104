@@ -343,10 +343,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>clearLog</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnClearLogPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>17</x>
+     <y>398</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>971</x>
+     <y>71</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnConnectPressed()</slot>
   <slot>OnDisconnectPressed()</slot>
   <slot>OnSettingsPressed()</slot>
+  <slot>OnClearLogPressed()</slot>
  </slots>
 </ui>
