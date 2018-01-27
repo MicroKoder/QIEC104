@@ -111,7 +111,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
         uint val_u32;   //буфер для вычисления значения
         for (int i=0; i<count; i++)
         {            
-            CIECSignal signal;            
+            CIECSignal signal;
+            signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
             signal.SetAddress(addr);
             signal.timestamp = CP56Time();
             addr++;
@@ -283,6 +284,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
         {
             CIECSignal signal;
             uint addr;
+            signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
             switch (typeID)
             {
                 case 1:

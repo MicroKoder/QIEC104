@@ -265,8 +265,11 @@ void IEC104Driver::OnSockReadyRead()
            emit Message("SQ= " + QString::number(isSequence ? 1 : 0 ) + QString("; count: ") + QString::number(s->length()));
            foreach (CIECSignal signal, (*s))
            {
-               emit Message(signal.GetValueString());
-               emit IECSignalReceived(&signal);
+               if (signal.ASDU == settings->asdu)
+               {
+                emit Message(signal.GetValueString());
+                emit IECSignalReceived(&signal);
+               }
            }
            delete s; //
        }
