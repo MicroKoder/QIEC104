@@ -5,7 +5,12 @@
 class CP56Time{
   public:
     CP56Time();
-    CP56Time(QByteArray data,int s);
+    ///
+    /// \brief CP56Time
+    /// \param data - пакет данных содержащий метку времени
+    /// \param s - смещение
+    ///
+    CP56Time(QByteArray data,int offset);
     quint16 GetMS();
     char GetMinute();
     char GetHour();

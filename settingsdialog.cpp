@@ -1,14 +1,14 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
+ConnectionSettingsDialog::ConnectionSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
 }
 
-SettingsDialog::SettingsDialog(CSetting *settings):
+ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
     QDialog(0),
     ui(new Ui::SettingsDialog)
 {
@@ -22,6 +22,7 @@ SettingsDialog::SettingsDialog(CSetting *settings):
     ui->edit_t3->setText(QString::number(settings->t3));
     ui->edit_k->setText(QString::number(settings->k));
     ui->edit_w->setText(QString::number(settings->w));
+    ui->edit_asdu->setText(QString::number(settings->asdu));
 
    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
  //connect(ui->buttonBox,SIGNAL(rejected()), this, SLOT(reject());
@@ -29,12 +30,12 @@ SettingsDialog::SettingsDialog(CSetting *settings):
 
 }
 
-SettingsDialog::~SettingsDialog()
+ConnectionSettingsDialog::~ConnectionSettingsDialog()
 {
     delete ui;
 }
 
-void SettingsDialog::Accepted()
+void ConnectionSettingsDialog::Accepted()
 {
      settings->IP = ui->comboBox_ip->currentText();
      settings->Port = ui->comboBox_port->currentText().toUInt();
@@ -44,5 +45,6 @@ void SettingsDialog::Accepted()
      settings->t3 = ui->edit_t3->text().toUInt();
      settings->k = ui->edit_k->text().toUInt();
      settings->w = ui->edit_w->text().toUInt();
+     settings->asdu = ui->edit_asdu->text().toUInt();
      this->close();
 }

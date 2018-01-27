@@ -12,4 +12,6 @@ CSetting::CSetting()
 
     k = 12;
     w = 8;
+
+    asdu = 1;
 }

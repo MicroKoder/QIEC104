@@ -14,7 +14,8 @@ IEC104Driver* IEC104Driver::instance = NULL;
 IEC104Driver::IEC104Driver():
     sock(new QTcpSocket())
 {
-
+    N_R = 0;
+    N_T = 0;
     testTimer = new QTimer();
 
     testTimer->setSingleShot(false);
@@ -22,13 +23,34 @@ IEC104Driver::IEC104Driver():
 
     connect(sock,SIGNAL(connected()),this,SLOT(OnConnected()));
     connect(sock,SIGNAL(disconnected()),this, SLOT(OnDisconnected()));
-    connect(sock,SIGNAL(channelReadyRead(int)), this, SLOT(OnSockReadyRead(int)));
+    connect(sock,SIGNAL(readyRead()), this, SLOT(OnSockReadyRead()));
     connect(sock,SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
   //  in.setDevice(sock);
 }
 
-void IEC104Driver::SendFullRequest()
+///
+/// \brief IEC104Driver::SendFullRequest - general interrogation command
+/// \param ASDU
+/// \param requestDescription - описатель запроса (20 - общий, 21 - группа 1 и т.д.)
+///
+void IEC104Driver::SendFullRequest(quint16 ASDU, quint8 requestDescription)
 {
+    char temp[] = {0x68, 0xE,
+                   0x00, 0x00,
+                   char(N_T), char(N_T>>8),
+                   0x64, 0x01,
+                   0x06,0x00,    //причина передачи - активация
+                   char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                   0x00,0x00,0x00,
+                   char(requestDescription)
+                  };
+
+   QByteArray buf = QByteArray(temp, 16);
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,16);
+        emit Message("<-- General interrogation");
+        N_T ++;
+    }
 
 }
 
@@ -55,7 +77,7 @@ void IEC104Driver::OnTestTimer()
 void IEC104Driver::SendTestAct()
 {
    // char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
-    buf = QByteArray(testAct, 6);
+   QByteArray buf = QByteArray(testAct, 6);
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,6);
         emit Message("<-- TestAct");
@@ -68,7 +90,7 @@ void IEC104Driver::SendTestAct()
 void IEC104Driver::SendTestCon()
 {
     //char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
-    buf = QByteArray(testFrCon, 6);
+   QByteArray buf = QByteArray(testFrCon, 6);
 
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,6);
@@ -90,7 +112,7 @@ void IEC104Driver::Send_ConfirmPacks(){
 
 void IEC104Driver::SendStart()
 {
-    buf = QByteArray(StartDTAct,6);
+    QByteArray buf = QByteArray(StartDTAct,6);
     sock->write(buf, 6);
     emit Message("<-- StartAct");
 
@@ -184,19 +206,34 @@ void IEC104Driver::OnConnected()
 
 void IEC104Driver::OnDisconnected()
 {
+    sock->disconnectFromHost();
     sock->close();
     emit Disconnected();
 }
 
-void IEC104Driver::OnSockReadyRead(int)
+/*===================================================================================
+Format U:
+[0] 0x68
+[1] 0x4
+[2] ######11
+
+Format I:
+[0] 0x68
+[1] any
+[2] #######0
+=====================================================================================*/
+
+void IEC104Driver::OnSockReadyRead()
 {
     QByteArray buf= sock->readAll();
     QString str =QTime::currentTime().toString()+" -->[";
 
 
-    //emit Message(QTime::currentTime().toString()+" -->" + IEC104Tools::BytesToString(&buf));
+    emit Message(QTime::currentTime().toString()+" -->" + IEC104Tools::BytesToString(&buf));
 
-    if (buf.count()==6){
+
+    //----------------------------------- processing format U packages ---------------
+    if (buf.count()==6 && (buf[2]&0x3 == 0x3)){
         if (isTestAct(buf))
         {
             emit Message("--> TestAct");
@@ -216,19 +253,26 @@ void IEC104Driver::OnSockReadyRead(int)
         }
     }//if count 6
 
+    //-------------------------------- processing packages I (with num) -----------
     //N_R = IEC104Tools::ParseAPCInum(buf);
-    if (buf.length()>6)
+    if ((buf.length()>6) && ((buf[2]&0x1) == 0))
     {
        QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R);
-       emit Message("count: " + QString::number(s->length()));
-       foreach (CIECSignal signal, (*s))
+       if (s!=NULL)
        {
-           emit Message(signal.GetValueString());
-           emit IECSignalReceived(&signal);
+           bool isSequence = (buf[7]&0x80)>0;
+           //emit Message("count: " + QString::number(s->length()));
+           emit Message("SQ= " + QString::number(isSequence ? 1 : 0 ) + QString("; count: ") + QString::number(s->length()));
+           foreach (CIECSignal signal, (*s))
+           {
+               emit Message(signal.GetValueString());
+               emit IECSignalReceived(&signal);
+           }
+           delete s; //
        }
-       delete s; //
     }
-    //Квитирование сообщений
+
+    //send confirmation
    if ((N_R - lastAPCICount)>=settings->w){
        Send_ConfirmPacks();
     }
@@ -237,7 +281,7 @@ void IEC104Driver::OnSockReadyRead(int)
 void IEC104Driver::displayError(QAbstractSocket::SocketError)
 {
     QMessageBox::information(0, tr("IEC104 client"), sock->errorString(),QMessageBox::Ok,QMessageBox::NoButton);
-    emit Disconnected();
+    OnDisconnected();
 }
 
 void IEC104Driver::Interrogation()

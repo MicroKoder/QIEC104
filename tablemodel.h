@@ -31,8 +31,6 @@ public:
 
 class TableModel : public QAbstractTableModel
 {
-private:
-
 public:
     QMap<uint, CTableModelItem> *mData;
 
@@ -40,8 +38,20 @@ public:
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    void updateSignal(CIECSignal *signal);
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    bool insertRows(int position, int rows, const QModelIndex &index);
+    bool removeRows(int row, int count, const QModelIndex &parent);
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+
+    bool isSignalExist(CIECSignal *pSignal);
+    void updateSignal(CIECSignal *pSignal);
+    void appendSignal(CIECSignal *pSignal);
+
     void redraw();
+
+    bool bAllowAppend;      //разрешение на автоматическое добавление тэга в таблицу
+
 };
 
 #endif // TABLEMODEL_H

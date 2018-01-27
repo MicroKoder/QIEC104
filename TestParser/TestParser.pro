@@ -1,18 +1,21 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-09-25T06:11:36
+# Project created by QtCreator 2017-12-08T21:09:22
 #
 #-------------------------------------------------
 
-QT       += core gui
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-QT += network
+QT       += testlib
 
-TARGET = IEC104NA
+QT       -= gui
+
+TARGET = tst_testparsertest
+CONFIG   += console
+CONFIG   -= app_bundle
+
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
-# any feature of Qt which as been marked as deprecated (the exact warnings
+# any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -24,29 +27,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    iec104driver.cpp \
-    csetting.cpp \
-    settingsdialog.cpp \
-    ctools.cpp \
-    tablemodel.cpp \
-    cp56time.cpp \
-    ciecsignal.cpp
+        tst_testparsertest.cpp \ 
+    ../ctools.cpp \
+    ../cp56time.cpp \
+    ../ciecsignal.cpp
 
-HEADERS += \
-        mainwindow.h \
-    iec104driver.h \
-    csetting.h \
-    settingsdialog.h \
-    ctools.h \
-    tablemodel.h \
-    cp56time.h \
-    ciecsignal.h
-
-FORMS += \
-        mainwindow.ui \
-    settingsdialog.ui
-
-RESOURCES += \
-    resources.qrc
+DEFINES += SRCDIR=\\\"$$PWD/\\\"

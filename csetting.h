@@ -13,6 +13,7 @@ public:
     quint16 t3;
     quint16 k;
     quint16 w;
+    quint8 asdu;
     CSetting();
 };
 

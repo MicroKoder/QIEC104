@@ -2,7 +2,8 @@
 
 CP56Time::CP56Time()
 {
-
+    for (int i=0; i<7; i++)
+        rawData[i]=0;
 }
 
 
@@ -12,9 +13,9 @@ bool CP56Time::IsValid(){
     else return false;
 }
 
-CP56Time::CP56Time(QByteArray data, int s=0){
+CP56Time::CP56Time(QByteArray data, int offset=0){
     for(int i=0; i<7; i++){
-        rawData[i] = data[i+s];
+        rawData[i] = data[i+offset];
     }
 }
 quint16 CP56Time::GetMS(){

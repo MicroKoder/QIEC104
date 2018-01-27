@@ -8,14 +8,14 @@ namespace Ui {
 class SettingsDialog;
 }
 
-class SettingsDialog : public QDialog
+class ConnectionSettingsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(QWidget *parent = 0);
-    SettingsDialog(CSetting *settings);
-    ~SettingsDialog();
+    explicit ConnectionSettingsDialog(QWidget *parent = 0);
+    ConnectionSettingsDialog(CSetting *settings);
+    ~ConnectionSettingsDialog();
 public slots:
     void Accepted();
 private:

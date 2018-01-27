@@ -10,7 +10,7 @@ class IEC104Tools
     //декодирование одного сигнала из пакета данных
     static CIECSignal ParseSignal(QByteArray &data, uchar typeID, int n);
     //декодирование фрейма APCI
-    static QList<CIECSignal>* ParseFrame(QByteArray &data, quint16 *APCInum);
+    static QList<CIECSignal> ParseFrame(QByteArray &data, quint16 *APCInum);
     /// выделение счетчика пакетов
     static uint ParseAPCInum(QByteArray &data);
 public:

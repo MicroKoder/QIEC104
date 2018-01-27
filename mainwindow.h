@@ -27,6 +27,8 @@ private:
      QLabel *connectionStatusLabel;
 public slots:
     void OnConnectPressed(void);
+    void OnConnectAck(void);//
+
     void OnDisconnectPressed(void);
     void OnSettingsPressed(void);
     void OnConnected();
@@ -34,7 +36,11 @@ public slots:
     void LogReceived(QString);
     void OnClearLogPressed();
 
+    void MToolAdd();
+    void MToolRemove();
     void IECReceived(CIECSignal* tag);
+
+    void OnGIPressed(void); //general interrogation
 };
 
 #endif // MAINWINDOW_H

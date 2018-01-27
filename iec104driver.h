@@ -21,18 +21,19 @@ private:
     QTcpSocket *sock;
     uint count;
     uint lastAPCICount;
-    quint16 N_R;
-    QByteArray buf;
+    quint16 N_R;    //счетчик вх. пакетов
+    quint16 N_T;    //счетчик исх. пактов
+    //QByteArray buf;
     CSetting* settings;
 
     IEC104Driver();
     IEC104Driver(IEC104Driver *other);
     static IEC104Driver *instance;
 
-    void SendFullRequest();
-    void SendRequestCounter();
-    void SendRequestSingle();
-    void SendSyncTime();
+
+    void SendRequestCounter();  //101
+    void SendRequestSingle();   //
+    void SendSyncTime();        //103
     void SendTestAct();
     void SendTestCon();
     void Send_ConfirmPacks();
@@ -45,6 +46,7 @@ private:
     bool isTestCon(QByteArray data);
 
 public:
+    void SendFullRequest(quint16 ASDU, quint8 requestDescription); //общий опрос или general interrogation 100
     static IEC104Driver* GetInstance();
     void SetSettings(CSetting* settings);
     CSetting* GetSettings();
@@ -62,7 +64,7 @@ signals:
 private slots:
     void OnConnected();
     void OnDisconnected();
-    void OnSockReadyRead(int);
+    void OnSockReadyRead();
     void displayError(QAbstractSocket::SocketError);
     void OnTestTimer();
 public slots:

@@ -2,60 +2,86 @@
 #define CIECSIGNAL_H
 #include <QVariant>
 #include <QString>
-#include <cp56time.h>
+#include "cp56time.h"
 
 class CIECSignal
 {
-    ///уникальный номер сигнала
+    ///unique key for signal depends of IOA and type
     uint key;
 
     ///IOA
-    uint16_t address;
-
-    ///идентификатор типа
+    quint32 address;
+    ///IEC104 type
     uchar typeID;
 public:
     CIECSignal();
     CIECSignal(uint16_t addr, uchar type);
 
+    ///
+    /// \brief GetKey
+    /// returns unique key that depend of type and IOA
+    /// \return
+    ///
     uint GetKey()
     {
         return key;
     }
-
-    void SetAddress(uint16_t ioa)
+    ///
+    /// \brief SetAddress
+    /// set IOA address to signal
+    /// \param ioa
+    ///
+    void SetAddress(quint32 ioa)
     {
         address = ioa;
-        key &= 0xFF0000;
+        key &= 0xFF000000;
         key |= ioa;
     }
+
+    ///
+    /// \brief SetType
+    /// set IEC-104 type to signal
+    /// \param type
+    ///
     void SetType(uchar type)
     {
         typeID = type;
         key &=0x00FFFF;
-        key |= type<<16;
+        key |= type<<24;
     }
-
-    uint GetAddress()
+    ///
+    /// \brief GetAddress
+    /// return IOA address
+    /// \return
+    ///
+    quint32 GetAddress()
     {
         return address;
     }
-
+    ///
+    /// \brief GetType
+    /// return IEC104 type
+    /// \return
+    ///
     uint GetType()
     {
         return typeID;
     }
 
-    ///значение
+    ///value
     QVariant value;
 
-    ///качество
-    unsigned long quality;
+    ///IEC104 quality
+    uchar quality;
 
-    ///метка времени
+    ///7-byte time
     CP56Time timestamp;
 
-
+    uint ASDU;
+    ///
+    /// \brief GetValueString
+    /// \return value as string
+    ///
     QString GetValueString();
 };
 
