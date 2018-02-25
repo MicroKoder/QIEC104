@@ -5,6 +5,7 @@
 #include <QTImer>
 #include <QDataStream>
 #include <csetting.h>
+#include <qsettings>
 #include <ctools.h>
 
 namespace IEC104
@@ -46,11 +47,10 @@ private:
     bool isTestCon(QByteArray data);
 
 public:
-    void SendFullRequest(quint16 ASDU, quint8 requestDescription); //общий опрос или general interrogation 100
+    void SendFullRequest(quint16 ASDU, quint8 requestDescription); //general interrogation [100]
     static IEC104Driver* GetInstance();
     void SetSettings(CSetting* settings);
     CSetting* GetSettings();
-
     void CloseConnection();
 signals:
     void Connected();
@@ -69,6 +69,7 @@ private slots:
     void OnTestTimer();
 public slots:
     void OpenConnection(CSetting *settings);
+    void OpenConnection();
     void Interrogation();
     void ClockSynch();
 

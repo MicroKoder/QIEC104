@@ -193,6 +193,11 @@ void IEC104Driver::OpenConnection(CSetting *settings)
     return;
 }
 
+void IEC104Driver::OpenConnection()
+{
+    OpenConnection(settings);
+}
+
 void IEC104Driver::CloseConnection()
 {
     sock->disconnectFromHost();

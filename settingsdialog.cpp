@@ -30,6 +30,29 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
 
 }
 
+ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset=NULL):
+    QDialog(0),
+    ui(new Ui::SettingsDialog)
+{
+    ui->setupUi(this);
+    if (_qset != NULL)
+    {
+        qset = _qset;
+        qset->beginGroup("driver");
+        ui->comboBox_ip->setCurrentText(qset->value("ip","127.0.0.1").toString());
+        ui->comboBox_port->setCurrentText(qset->value("port", "2404").toString());
+        ui->edit_t0->setText(qset->value("t0", "10").toString());
+        ui->edit_t1->setText(qset->value("t1", "15").toString());
+        ui->edit_t2->setText(qset->value("t2", "10").toString());
+        ui->edit_t3->setText(qset->value("t3", "5").toString());
+        ui->edit_k->setText(qset->value("k", "12").toString());
+        ui->edit_w->setText(qset->value("w", "8").toString());
+        ui->edit_asdu->setText(qset->value("asdu", "1").toString());
+        qset->endGroup();
+    }
+    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
+}
+
 ConnectionSettingsDialog::~ConnectionSettingsDialog()
 {
     delete ui;
@@ -37,6 +60,8 @@ ConnectionSettingsDialog::~ConnectionSettingsDialog()
 
 void ConnectionSettingsDialog::Accepted()
 {
+    if (settings != NULL)
+    {
      settings->IP = ui->comboBox_ip->currentText();
      settings->Port = ui->comboBox_port->currentText().toUInt();
      settings->t0 = ui->edit_t0->text().toUInt();
@@ -46,5 +71,22 @@ void ConnectionSettingsDialog::Accepted()
      settings->k = ui->edit_k->text().toUInt();
      settings->w = ui->edit_w->text().toUInt();
      settings->asdu = ui->edit_asdu->text().toUInt();
+    }
+
+    if (qset != NULL)
+    {
+     qset->beginGroup("driver");
+     qset->setValue("ip",   ui->comboBox_ip->currentText());
+     qset->setValue("port", ui->comboBox_port->currentText());
+     qset->setValue("t0",   ui->edit_t0->text());
+     qset->setValue("t1",   ui->edit_t1->text());
+     qset->setValue("t2",   ui->edit_t2->text());
+     qset->setValue("t3",   ui->edit_t3->text());
+     qset->setValue("k",    ui->edit_k->text());
+     qset->setValue("w",    ui->edit_w->text());
+     qset->setValue("asdu", ui->edit_asdu->text());
+
+     qset->endGroup();
+    }
      this->close();
 }

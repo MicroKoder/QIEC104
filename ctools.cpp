@@ -39,6 +39,8 @@ uint IEC104Tools::ParseAPCInum(QByteArray &data){
 /// \param value - значение, возвращаемое значение
 /// \param quality - качество, возвращаемое значение
 ///
+///
+/*
 void ReadSQParams(QByteArray &data,int i, QVariant* value=0, quint16* quality=0)
 {
 
@@ -74,7 +76,7 @@ void ReadSQParams(QByteArray &data,int i, QVariant* value=0, quint16* quality=0)
 
     }; //end switch
 
-}
+}*/
 ///Обработка целого фрейма, должен быть валидный пакет данных
 QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
     QList<CIECSignal> result;//=new QList<CIECSignal>();
@@ -136,7 +138,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 //double-point
                 case 3:
                     {
-                        signal.value = QVariant(data[offset+i]&0x03);
+                        signal.value = QVariant((uchar)data[offset+i]&0x03);
                         signal.quality = uchar(data[offset+i])&0xFC;
                     }
                 break;
@@ -205,7 +207,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 30:
                 {
                     stride = 8;
-                    signal.value = QVariant(bool((data[offset + i*stride]&0x01)>0));
+                    signal.value = QVariant((uchar)(data[offset + i*stride]&0x01));
                     signal.quality = (uchar)(data[offset + i*stride])&0xFE;
                     signal.timestamp = CP56Time(data,offset + i*stride+1);
                 }; break;
@@ -213,10 +215,10 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 31:
                 {
                     stride = 8;
-                    signal.value = QVariant(((uchar)data[offset + i*stride]&0x03)>0);
+                    signal.value = QVariant((uchar)data[offset+i*stride]&0x03);
                     signal.quality = (uchar)(data[offset + i*stride])&0xFC;
                     signal.timestamp = CP56Time(data,offset + i*stride+1);
-                };
+                };break;
 
                 //bitstring
                 case 33:

@@ -29,12 +29,36 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                 break;  //название
             case 2:
             //TODO: подправить для 33 типа мэк
-                if (pSignal.GetType()==30)
+                /*if (pSignal.GetType()==30)
                     result = QVariant(pSignal.value == 1 ? "true" : "false");
                 else
                     result =  pSignal.value;
+        */
+                switch (pSignal.GetType())
+                {
+                case 1 : result = QVariant(pSignal.value == 1 ? "ON" : "OFF");break;
+                case 3 : if (pSignal.value.toUInt() == 0)
+                            result = QVariant("Intransit(0)");
+                         else if (pSignal.value.toUInt() == 1)
+                            result = QVariant("OFF(1)");
+                         else if (pSignal.value.toUInt() == 2)
+                            result = QVariant("ON(2)");
+                         else result = QVariant("Invalid(3)");
+                        break;
 
+                case 30:result = QVariant(pSignal.value == 1 ? "ON" : "OFF");break;
+                case 31 : if (pSignal.value == 0)
+                            result = QVariant("Intransit(0)");
+                         else if (pSignal.value == 1)
+                            result = QVariant("OFF(1)");
+                         else if (pSignal.value == 2)
+                            result = QVariant("ON(2)");
+                         else result = QVariant("Invalid(3)");
+                        break;
+                default:
+                    result = pSignal.value;
 
+                }
                 break;  //значение
             case 3:
                 result =  QVariant(pSignal.GetType());

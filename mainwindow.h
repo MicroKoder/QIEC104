@@ -5,6 +5,7 @@
 #include <csetting.h>
 #include <iec104driver.h>
 #include "tablemodel.h"
+#include <QSettings>
 #include <QLabel>
 namespace Ui {
 class MainWindow;
@@ -16,7 +17,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    CSetting *settings;
+    //CSetting *settings;
+    QSettings *qsettings;
     IEC104Driver *driver;
     TableModel *tabmodel;
 

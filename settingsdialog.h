@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <csetting.h>
 #include <qstring>
+#include <qsettings.h>
 namespace Ui {
 class SettingsDialog;
 }
@@ -15,12 +16,14 @@ class ConnectionSettingsDialog : public QDialog
 public:
     explicit ConnectionSettingsDialog(QWidget *parent = 0);
     ConnectionSettingsDialog(CSetting *settings);
+    ConnectionSettingsDialog(QSettings *settings);
     ~ConnectionSettingsDialog();
 public slots:
     void Accepted();
 private:
     Ui::SettingsDialog *ui;
-    CSetting *settings;
+    CSetting *settings=NULL;
+    QSettings *qset=NULL;
 };
 
 #endif // SETTINGSDIALOG_H

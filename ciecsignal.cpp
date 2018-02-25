@@ -20,7 +20,9 @@ QString CIECSignal::GetValueString()
 
     switch (typeID)
     {
-        case 30: result += (value==1) ? "true" : "false"; break;
+    case 3: result += value.toUInt(); break;
+    case 30: result += (value==1) ? "true" : "false"; break;
+    case 31: result += value.toUInt(); break;
     case 33: result += QString::number( value.toUInt());break;
     case 34: result += QString::number(value.toUInt());break;
     case 35: result += QString::number(value.toInt());break;

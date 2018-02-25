@@ -32,7 +32,8 @@ SOURCES += \
     ctools.cpp \
     tablemodel.cpp \
     cp56time.cpp \
-    ciecsignal.cpp
+    ciecsignal.cpp \
+    importdialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,11 +43,13 @@ HEADERS += \
     ctools.h \
     tablemodel.h \
     cp56time.h \
-    ciecsignal.h
+    ciecsignal.h \
+    importdialog.h
 
 FORMS += \
         mainwindow.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    importdialog.ui
 
 RESOURCES += \
     resources.qrc

@@ -9,10 +9,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    qsettings = new QSettings("Settings.ini",QSettings::IniFormat);
+    //qsettings = new QSettings("ZayruAZ","IEC104 sim");
    //настройка драйвера для работы с МЭК
-    settings = new CSetting();
+   // settings = new CSetting();
     driver = IEC104Driver::GetInstance();
-    driver->SetSettings(settings);
+
+    qsettings->beginGroup("driver");
+    driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
+                                  qsettings->value("asdu").toInt(),
+                                  qsettings->value("port").toInt()
+                                        ));
+    qsettings->endGroup();
+
     connect(driver,SIGNAL(Connected()),this,SLOT(OnConnected()));
     connect(driver,SIGNAL(Disconnected()),this,SLOT(OnDisconnected()));
     connect(driver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
@@ -46,14 +55,21 @@ MainWindow::~MainWindow()
 void MainWindow::OnConnectPressed(void)
 {
     //IEC104Driver::GetInstance()->OpenConnection(settings->IP,settings->Port);
-    ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(settings);
+    ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(qsettings);
     connect(cdialog, SIGNAL(accepted()),this,SLOT(OnConnectAck()));
     cdialog->exec();
 }
 
 void MainWindow::OnConnectAck(void)
 {
-    driver->OpenConnection(settings);
+    qsettings->beginGroup("driver");
+    driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
+                                  qsettings->value("asdu").toInt(),
+                                  qsettings->value("port").toInt()
+                                        ));
+    qsettings->endGroup();
+
+    driver->OpenConnection();
 }
 
 ///кнопка "разорвать соединение"
@@ -67,14 +83,14 @@ void MainWindow::OnDisconnectPressed(void)
 ///вызов окна настроек
 void MainWindow::OnSettingsPressed(void)
 {
-    ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(settings);
+    ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(qsettings);
     cdialog->exec();
 }
 
 ///в случае успешного подключения драйвера
 void MainWindow::OnConnected()
 {
-    connectionStatusLabel->setText("connected: "+settings->IP);
+    connectionStatusLabel->setText("connected: "/*+settings->IP*/);
     ui->actionConnect->setEnabled(false);
     ui->actionDisconnect->setEnabled(true);
 }
@@ -129,5 +145,8 @@ void MainWindow::IECReceived(CIECSignal *tag)
 
 void MainWindow::OnGIPressed()
 {
-    driver->SendFullRequest(settings->asdu,20);
+    //driver->SendFullRequest(settings->asdu,20);
+    qsettings->beginGroup("driver");
+    driver->SendFullRequest(qsettings->value("asdu",QVariant(1)).toInt(),20);
+    qsettings->endGroup();
 }
