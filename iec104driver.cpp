@@ -99,14 +99,18 @@ void IEC104Driver::SendTestCon()
 }
 
 void IEC104Driver::Send_ConfirmPacks(){
-    uint count = (uint)N_R+1;
-    char pack[] ={0x68, 0x04, 0x01, 0x00, char(count<<1),char(count>>7)};
-    //buf = QByteArray(pack,6);
-    //sock->write(buf);
-    sock->write(pack, 6);
-    lastAPCICount = N_R;
-    emit Message(IEC104Tools::BytesToString(pack,6));
-    emit Message("<-- Confirm");
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState)
+    {
+        uint count = (uint)N_R+1;
+        char pack[] ={0x68, 0x04, 0x01, 0x00, char(count<<1),char(count>>7)};
+        //buf = QByteArray(pack,6);
+        //sock->write(buf);
+        sock->write(pack, 6);
+        lastAPCICount = N_R;
+        emit Message(IEC104Tools::BytesToString(pack,6));
+        emit Message("<-- Confirm");
+    }
+
 }
 
 
@@ -165,12 +169,42 @@ IEC104Driver* IEC104Driver::GetInstance()
     return IEC104Driver::instance;
 }
 
-
+///
+/// \brief IEC104Driver::SetSettings
+/// give connection parameters straight
+/// \param settings
+/// can't be NULL
 void IEC104Driver::SetSettings(CSetting *settings)
 {
     if (settings != NULL)
     {
         this->settings = settings;
+    }
+}
+
+///
+/// \brief IEC104Driver::SetSettings
+/// build connection parameters from QSettings object
+/// \param settings
+/// can't be NULL
+void IEC104Driver::SetSettings(QSettings *settings)
+{
+
+    if (settings != NULL)
+    {
+        settings->beginGroup("driver");
+        this->settings = new CSetting(
+            settings->value("IP").toString(),
+            settings->value("asdu").toInt(),
+            settings->value("port").toInt()
+        );
+        this->settings->t0 = settings->value("t0").toInt();
+        this->settings->t1 = settings->value("t1").toInt();
+        this->settings->t2 = settings->value("t2").toInt();
+        this->settings->t3 = settings->value("t3").toInt();
+        this->settings->k = settings->value("k").toInt();
+        this->settings->w = settings->value("w").toInt();
+        settings->endGroup();
     }
 }
 
@@ -180,22 +214,30 @@ CSetting* IEC104Driver::GetSettings()
 }
 
 
-void IEC104Driver::OpenConnection(CSetting *settings)
+void IEC104Driver::OpenConnection(CSetting *_settings)
 {
+    //still open? exit
     if (sock->isOpen())
         return;
 
-    sock->open(QIODevice::ReadWrite);
-    this->settings = settings;
-    sock->connectToHost(settings->IP,settings->Port);
-    testTimer->setInterval(settings->t3*1000);
-    emit Connected();
-    return;
-}
+    //use new settings if got it
+    if (_settings != NULL)
+    {
+        this->settings = _settings;
+    }
 
-void IEC104Driver::OpenConnection()
-{
-    OpenConnection(settings);
+    if (settings != NULL)
+    {
+        sock->open(QIODevice::ReadWrite);
+        //setup connection
+        sock->connectToHost(settings->IP,settings->Port);
+
+        //setup timer
+        testTimer->setInterval(settings->t3*1000);
+
+    }
+
+    return;
 }
 
 void IEC104Driver::CloseConnection()
@@ -207,12 +249,14 @@ void IEC104Driver::OnConnected()
 {
     SendStart();
     testTimer->start();
+    emit Connected();
 }
 
 void IEC104Driver::OnDisconnected()
 {
-    sock->disconnectFromHost();
+    //sock->disconnectFromHost();
     sock->close();
+    testTimer->stop();
     emit Disconnected();
 }
 

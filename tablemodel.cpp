@@ -6,12 +6,12 @@ TableModel::TableModel()
     bAllowAppend = true;
 }
 
-int TableModel::rowCount(const QModelIndex &parent) const{
+int TableModel::rowCount(const QModelIndex &parent=QModelIndex()) const{
     return mData->count();
    // return 5;
 }
 
-int TableModel::columnCount(const QModelIndex &parent) const{
+int TableModel::columnCount(const QModelIndex &parent = QModelIndex()) const{
    return 6;
 }
 
@@ -165,11 +165,51 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &index)
     endInsertRows();
 }
 
-bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
+bool TableModel::removeRow(int row, const QModelIndex &parent)
 {
-    beginRemoveRows(QModelIndex(),row,row+count-1);
+    beginRemoveRows(parent,row,row+1);
+    QList<unsigned int> keys = mData->keys();
+
+
+    mData->remove(keys[row]);
+
+
     endRemoveRows();
     return true;
+}
+
+bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    beginRemoveRows(parent,row,row+count-1);
+    QList<unsigned int> keys = mData->keys();
+
+        for (int i= row; i< row+count;i++)
+        {
+            mData->remove(keys[i]);
+        }
+
+
+    endRemoveRows();
+    return true;
+}
+
+// Compare two variants.
+bool ModelIndexLessThan(const QModelIndex &v1, const QModelIndex &v2)
+{
+    return v1.row() < v2.row();
+}
+
+bool TableModel::removeRows(QItemSelectionModel *pSelection)
+{
+    //get list of selected rows and sort it
+    QModelIndexList selectedRowsList = pSelection->selectedIndexes();
+    qSort(selectedRowsList.begin(),selectedRowsList.end(),ModelIndexLessThan);
+    QVector<QModelIndex> vec = selectedRowsList.toVector();
+
+    int count = vec.count();
+
+    for (int i=count-1; i>=0; i--)
+        this->removeRow(vec[i].row());
 }
 
 bool TableModel::setData(const QModelIndex &index, const QVariant &value, int role)

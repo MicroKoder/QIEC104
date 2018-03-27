@@ -5,7 +5,7 @@
 #include <QAbstractTableModel>
 #include <QVariant>
 #include "ciecsignal.h"
-
+#include <QItemSelectionModel>
 
 class CTableModelItem: public CIECSignal{
 public:
@@ -26,6 +26,9 @@ public:
         this->SetAddress(address);
         this->name = name;
     }*/
+    ///
+    /// \brief name
+    /// наименование
     QString name;
 };
 
@@ -41,7 +44,10 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     bool insertRows(int position, int rows, const QModelIndex &index);
-    bool removeRows(int row, int count, const QModelIndex &parent);
+
+    bool removeRow(int row, const QModelIndex &parent=QModelIndex());
+    bool removeRows(int row, int count, const QModelIndex &parent=QModelIndex());
+    bool removeRows(QItemSelectionModel *pSelection);
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 
     bool isSignalExist(CIECSignal *pSignal);

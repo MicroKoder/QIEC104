@@ -50,6 +50,7 @@ public:
     void SendFullRequest(quint16 ASDU, quint8 requestDescription); //general interrogation [100]
     static IEC104Driver* GetInstance();
     void SetSettings(CSetting* settings);
+    void SetSettings(QSettings* settings);
     CSetting* GetSettings();
     void CloseConnection();
 signals:
@@ -68,8 +69,7 @@ private slots:
     void displayError(QAbstractSocket::SocketError);
     void OnTestTimer();
 public slots:
-    void OpenConnection(CSetting *settings);
-    void OpenConnection();
+    void OpenConnection(CSetting *_settings=NULL);
     void Interrogation();
     void ClockSynch();
 

@@ -10,6 +10,7 @@ CIECSignal::CIECSignal(uint16_t addr, uchar type)
 {
     SetAddress(addr);
     SetType(type);
+    this->quality = 0;
 }
 
 QString CIECSignal::GetValueString()

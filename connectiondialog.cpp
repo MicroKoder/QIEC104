@@ -1,4 +1,4 @@
-#include "settingsdialog.h"
+#include "connectiondialog.h"
 #include "ui_settingsdialog.h"
 
 ConnectionSettingsDialog::ConnectionSettingsDialog(QWidget *parent) :

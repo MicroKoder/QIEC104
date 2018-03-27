@@ -43,21 +43,21 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="selector_txt">
       <property name="text">
        <string>Из текстового файла</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_2">
+     <widget class="QRadioButton" name="selector_csv">
       <property name="text">
        <string>CSV-файл</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QRadioButton" name="radioButton_3">
+     <widget class="QRadioButton" name="selector_xls">
       <property name="text">
        <string>Excel</string>
       </property>

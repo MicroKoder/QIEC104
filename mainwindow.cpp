@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-#include <settingsdialog.h>
+
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,23 +14,25 @@ MainWindow::MainWindow(QWidget *parent) :
     //qsettings = new QSettings("ZayruAZ","IEC104 sim");
    //настройка драйвера для работы с МЭК
    // settings = new CSetting();
-    driver = IEC104Driver::GetInstance();
+    pDriver = IEC104Driver::GetInstance();
 
-    qsettings->beginGroup("driver");
-    driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
-                                  qsettings->value("asdu").toInt(),
-                                  qsettings->value("port").toInt()
-                                        ));
-    qsettings->endGroup();
 
-    connect(driver,SIGNAL(Connected()),this,SLOT(OnConnected()));
-    connect(driver,SIGNAL(Disconnected()),this,SLOT(OnDisconnected()));
-    connect(driver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
-    connect(driver, SIGNAL(IECSignalReceived(CIECSignal*)),this,SLOT(IECReceived(CIECSignal*)));
+    //driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
+   //                               qsettings->value("asdu").toInt(),
+   //                               qsettings->value("port").toInt()
+   //                                     ));
+   // qsettings->endGroup();
+    pDriver->SetSettings(qsettings);
+
+    connect(pDriver,SIGNAL(Connected()),this,SLOT(OnConnected()));
+    connect(pDriver,SIGNAL(Disconnected()),this,SLOT(OnDisconnected()));
+    connect(pDriver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
+    connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal*)),this,SLOT(IECReceived(CIECSignal*)));
+
 
     //создаем статус сообщение
-    connectionStatusLabel= new QLabel();
-    statusBar()->addWidget(connectionStatusLabel);
+    pConnectionStatusLabel= new QLabel();
+    statusBar()->addWidget(pConnectionStatusLabel);
 
     //настройка таблицы сигналов контроля
     tabmodel = new TableModel();
@@ -55,28 +58,37 @@ MainWindow::~MainWindow()
 void MainWindow::OnConnectPressed(void)
 {
     //IEC104Driver::GetInstance()->OpenConnection(settings->IP,settings->Port);
-    ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(qsettings);
-    connect(cdialog, SIGNAL(accepted()),this,SLOT(OnConnectAck()));
-    cdialog->exec();
+    pConnectionDialog = new ConnectionSettingsDialog(qsettings);
+  //  connect(pConnectionDialog, SIGNAL(accepted()),this,SLOT(OnConnectAck()));
+    connect(pConnectionDialog, SIGNAL(finished(int)),this, SLOT(OnConnectionDialogFinished(int)));
+    pConnectionDialog->exec();
 }
-
+//
 void MainWindow::OnConnectAck(void)
 {
-    qsettings->beginGroup("driver");
+   /* qsettings->beginGroup("driver");
     driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
                                   qsettings->value("asdu").toInt(),
                                   qsettings->value("port").toInt()
                                         ));
     qsettings->endGroup();
-
-    driver->OpenConnection();
+*/
+    pDriver->SetSettings(qsettings);
+    pDriver->OpenConnection();
+}
+void MainWindow::OnConnectionDialogFinished(int result)
+{
+    qDebug() << result;
+    pDriver->SetSettings(qsettings);
+    pDriver->OpenConnection();
+    delete pConnectionDialog;
 }
 
 ///кнопка "разорвать соединение"
 void MainWindow::OnDisconnectPressed(void)
 {
     //IEC104Driver::GetInstance()->CloseConnection();
-    driver->CloseConnection();
+    pDriver->CloseConnection();
 
 }
 
@@ -90,7 +102,7 @@ void MainWindow::OnSettingsPressed(void)
 ///в случае успешного подключения драйвера
 void MainWindow::OnConnected()
 {
-    connectionStatusLabel->setText("connected: "/*+settings->IP*/);
+    pConnectionStatusLabel->setText("connected: "/*+settings->IP*/);
     ui->actionConnect->setEnabled(false);
     ui->actionDisconnect->setEnabled(true);
 }
@@ -98,7 +110,7 @@ void MainWindow::OnConnected()
 ///при разрыве соединения драйвера
 void MainWindow::OnDisconnected()
 {
-    connectionStatusLabel->setText("disconnected");
+    pConnectionStatusLabel->setText("disconnected");
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
 
@@ -111,20 +123,52 @@ void MainWindow::LogReceived(QString text)
     ui->log->append(text);
 }
 
+void MainWindow::AddMSignal(CIECSignal *tag)
+{
+    tabmodel->appendSignal(tag);
+    ui->MTable->setModel(0);
+    ui->MTable->setModel(tabmodel);
+    tabmodel->redraw();
+    ui->MTable->resizeRowsToContents();
+}
+
 ///очистка окна логов
 void MainWindow::OnClearLogPressed()
 {
     ui->log->clear();
 }
 
-void MainWindow::MToolAdd()
+//accept adding new signal from AddSignalDialog
+void MainWindow::MToolAdd_Accept()
 {
 
+    if ((pAddSignalDialog->tag != NULL)&&(!tabmodel->isSignalExist(pAddSignalDialog->tag)))
+    {
+        AddMSignal(pAddSignalDialog->tag);
+    }
+    delete pAddSignalDialog;
+    qDebug()<< "accept";
 }
 
-void MainWindow::MToolRemove()
+void MainWindow::MToolAdd_Pressed()
 {
+    pAddSignalDialog = new addSignalDialog();
+    connect(pAddSignalDialog,SIGNAL(accepted()),this,SLOT(MToolAdd_Accept()));
+    pAddSignalDialog->exec();
+}
 
+
+void MainWindow::MToolRemove_Pressed()
+{
+    ui->log->append("remove pressed");
+    QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
+
+    tabmodel->removeRows(pSelection);
+
+    ui->MTable->setModel(0);
+    ui->MTable->setModel(tabmodel);
+    tabmodel->redraw();
+    ui->MTable->resizeRowsToContents();
 }
 
 ///от драйвера получен декодированный тег
@@ -135,9 +179,8 @@ void MainWindow::IECReceived(CIECSignal *tag)
 
     else
     {
-        tabmodel->appendSignal(tag);
-       ui->MTable->setModel(0);
-       ui->MTable->setModel(tabmodel);
+        //add new row, reload table
+        AddMSignal(tag);
     }
     tabmodel->redraw();
     ui->MTable->resizeRowsToContents();
@@ -147,6 +190,6 @@ void MainWindow::OnGIPressed()
 {
     //driver->SendFullRequest(settings->asdu,20);
     qsettings->beginGroup("driver");
-    driver->SendFullRequest(qsettings->value("asdu",QVariant(1)).toInt(),20);
+    pDriver->SendFullRequest(qsettings->value("asdu",QVariant(1)).toInt(),20);
     qsettings->endGroup();
 }

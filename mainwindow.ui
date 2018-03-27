@@ -369,6 +369,9 @@
    <property name="text">
     <string>IC</string>
    </property>
+   <property name="toolTip">
+    <string>Общий опрос</string>
+   </property>
   </action>
   <action name="actionTS">
    <property name="text">
@@ -485,6 +488,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>MTool_remove</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>MToolRemove_Pressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>344</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>970</x>
+     <y>195</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MTool_add</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>MToolAdd_Pressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>29</x>
+     <y>342</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>486</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnConnectPressed()</slot>
@@ -492,5 +527,7 @@
   <slot>OnSettingsPressed()</slot>
   <slot>OnClearLogPressed()</slot>
   <slot>OnGIPressed()</slot>
+  <slot>MToolRemove_Pressed()</slot>
+  <slot>MToolAdd_Pressed()</slot>
  </slots>
 </ui>

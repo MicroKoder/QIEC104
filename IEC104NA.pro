@@ -28,28 +28,31 @@ SOURCES += \
         mainwindow.cpp \
     iec104driver.cpp \
     csetting.cpp \
-    settingsdialog.cpp \
     ctools.cpp \
     tablemodel.cpp \
     cp56time.cpp \
     ciecsignal.cpp \
-    importdialog.cpp
+    importdialog.cpp \
+    addsignaldialog.cpp \
+    connectiondialog.cpp
 
 HEADERS += \
         mainwindow.h \
     iec104driver.h \
     csetting.h \
-    settingsdialog.h \
     ctools.h \
     tablemodel.h \
     cp56time.h \
     ciecsignal.h \
-    importdialog.h
+    importdialog.h \
+    addsignaldialog.h \
+    connectiondialog.h
 
 FORMS += \
         mainwindow.ui \
     settingsdialog.ui \
-    importdialog.ui
+    importdialog.ui \
+    addsignaldialog.ui
 
 RESOURCES += \
     resources.qrc

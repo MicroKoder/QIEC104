@@ -16,7 +16,7 @@ CSetting::CSetting()
     asdu = 1;
 }
 
-CSetting::CSetting(QString _ip, quint8 _asdu=1, quint16 _port=2404)
+CSetting::CSetting(QString _ip, quint8 _asdu, quint16 _port)
 {
     IP = _ip;
     Port = _port;

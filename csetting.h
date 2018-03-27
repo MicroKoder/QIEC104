@@ -2,22 +2,45 @@
 #define CSETTING_H
 #include <QString>
 ///
-/// \brief Class for IEC104 driver settings
+/// \brief class for connection settins used by iec104driver.h
 ///
 class CSetting
 {
 public:
     QString IP;
+
+    ///
+    /// \brief Port
+    /// default is 2404
     quint16 Port;
+
+    ///
+    /// \brief t0
+    /// time in seconds
     quint16 t0;
+    ///
+    /// \brief t1
+    /// time in seconds
     quint16 t1;
+    ///
+    /// \brief t2
+    ///time in seconds
     quint16 t2;
+    ///
+    /// \brief t3
+    /// time in seconds
     quint16 t3;
+    ///
+    /// \brief k
+    /// count
     quint16 k;
+    ///
+    /// \brief w
+    /// count
     quint16 w;
     quint8 asdu;
     CSetting();
-    CSetting(QString _ip, quint8 _asdu, quint16 _port);
+    CSetting(QString _ip, quint8 _asdu=1, quint16 _port=2404);
 };
 
 #endif // CSETTING_H
