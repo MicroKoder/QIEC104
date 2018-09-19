@@ -16,6 +16,7 @@ public:
     explicit addSignalDialog(QWidget *parent = 0);
     ~addSignalDialog();
     CIECSignal *tag=NULL;
+    QString description;
 private:
     Ui::addSignalDialog *ui;
 public slots:

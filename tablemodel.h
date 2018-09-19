@@ -30,8 +30,12 @@ public:
     /// \brief name
     /// наименование
     QString name;
+
+    ///флаг обозначающий что с момента подключения или добавления в список сигнал еще ни разу не обновлялся
+    bool bNeverUpdated = true;
 };
 
+//таблица измерений (сигналы в направлении контроля)
 class TableModel : public QAbstractTableModel
 {
 public:
@@ -52,7 +56,8 @@ public:
 
     bool isSignalExist(CIECSignal *pSignal);
     void updateSignal(CIECSignal *pSignal);
-    void appendSignal(CIECSignal *pSignal);
+    void appendSignal(CIECSignal*);
+    void appendSignal(CIECSignal*, QString);
 
     void redraw();
 

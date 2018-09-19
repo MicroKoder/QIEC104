@@ -149,6 +149,13 @@
           </property>
          </widget>
         </item>
+        <item row="8" column="1">
+         <widget class="QCheckBox" name="AutoCreate_checkBox">
+          <property name="text">
+           <string>Автоматически добавлять тэги</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>

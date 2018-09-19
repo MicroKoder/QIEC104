@@ -158,7 +158,7 @@
      <string>Файл</string>
     </property>
     <addaction name="action"/>
-    <addaction name="action_2"/>
+    <addaction name="action_LoadBase"/>
    </widget>
    <widget class="QMenu" name="menu_about">
     <property name="title">
@@ -350,7 +350,7 @@
     <string>Сохранить базу</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="action_LoadBase">
    <property name="text">
     <string>Загрузить базу</string>
    </property>

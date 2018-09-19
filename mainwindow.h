@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <addsignaldialog.h>
 #include <connectiondialog.h>
+#include "importdialog.h"
 namespace Ui {
 class MainWindow;
 }
@@ -26,7 +27,7 @@ public:
 
     ~MainWindow();
 
-    void AddMSignal(CIECSignal* tag);
+    void AddMSignal(CIECSignal* tag, QString description=QString());
 private:
     Ui::MainWindow *ui;
      QLabel *pConnectionStatusLabel;
@@ -50,6 +51,7 @@ public slots:
     void MToolRemove_Pressed();
     void IECReceived(CIECSignal* tag);
 
+    void OnLoadBaseTriggered(bool); //меню - импорт базы
     void OnGIPressed(void); //general interrogation
 };
 

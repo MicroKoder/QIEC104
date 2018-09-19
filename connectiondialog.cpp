@@ -24,6 +24,8 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
     ui->edit_w->setText(QString::number(settings->w));
     ui->edit_asdu->setText(QString::number(settings->asdu));
 
+    ui->AutoCreate_checkBox->setChecked(settings->autoCreateTags);
+
    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
  //connect(ui->buttonBox,SIGNAL(rejected()), this, SLOT(reject());
 
@@ -48,6 +50,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset=NULL):
         ui->edit_k->setText(qset->value("k", "12").toString());
         ui->edit_w->setText(qset->value("w", "8").toString());
         ui->edit_asdu->setText(qset->value("asdu", "1").toString());
+        ui->AutoCreate_checkBox->setChecked(qset->value("autoCreate","false").toBool());
         qset->endGroup();
     }
     connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
@@ -71,6 +74,7 @@ void ConnectionSettingsDialog::Accepted()
      settings->k = ui->edit_k->text().toUInt();
      settings->w = ui->edit_w->text().toUInt();
      settings->asdu = ui->edit_asdu->text().toUInt();
+     settings->autoCreateTags = ui->AutoCreate_checkBox->isChecked();
     }
 
     if (qset != NULL)
@@ -85,7 +89,7 @@ void ConnectionSettingsDialog::Accepted()
      qset->setValue("k",    ui->edit_k->text());
      qset->setValue("w",    ui->edit_w->text());
      qset->setValue("asdu", ui->edit_asdu->text());
-
+     qset->setValue("autoCreate", ui->AutoCreate_checkBox->isChecked());
      qset->endGroup();
     }
      this->close();

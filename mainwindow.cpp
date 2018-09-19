@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pDriver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
     connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal*)),this,SLOT(IECReceived(CIECSignal*)));
 
-
+    connect(ui->action_LoadBase, SIGNAL(triggered(bool)),this, SLOT(OnLoadBaseTriggered(bool)));
     //создаем статус сообщение
     pConnectionStatusLabel= new QLabel();
     statusBar()->addWidget(pConnectionStatusLabel);
@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     tabmodel->setHeaderData(5,Qt::Horizontal,QVariant("Время"));
 
     emit tabmodel->headerDataChanged(Qt::Horizontal,0,5);
-
+    connect(tabmodel,SIGNAL(rowsInserted(QModelIndex,int,int)),ui->MTable,SLOT(rowsInserted(QModelIndex,int,int)));
+    connect(tabmodel,SIGNAL(rowsRemoved(QModelIndex,int,int)),ui->MTable, SLOT(rowsAboutToBeRemoved(QModelIndex,int,int)));
 }
 
 MainWindow::~MainWindow()
@@ -123,14 +124,6 @@ void MainWindow::LogReceived(QString text)
     ui->log->append(text);
 }
 
-void MainWindow::AddMSignal(CIECSignal *tag)
-{
-    tabmodel->appendSignal(tag);
-    ui->MTable->setModel(0);
-    ui->MTable->setModel(tabmodel);
-    tabmodel->redraw();
-    ui->MTable->resizeRowsToContents();
-}
 
 ///очистка окна логов
 void MainWindow::OnClearLogPressed()
@@ -138,13 +131,23 @@ void MainWindow::OnClearLogPressed()
     ui->log->clear();
 }
 
-//accept adding new signal from AddSignalDialog
+///добавление в список сигналов через форму add
 void MainWindow::MToolAdd_Accept()
 {
 
     if ((pAddSignalDialog->tag != NULL)&&(!tabmodel->isSignalExist(pAddSignalDialog->tag)))
     {
-        AddMSignal(pAddSignalDialog->tag);
+       // AddMSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
+
+
+        tabmodel->appendSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
+
+      //  ui->MTable->setModel(0);
+       // ui->MTable->setModel(tabmodel);
+      //  tabmodel->redraw();
+      //  ui->MTable->resizeRowsToContents();
+
+
     }
     delete pAddSignalDialog;
     qDebug()<< "accept";
@@ -165,12 +168,28 @@ void MainWindow::MToolRemove_Pressed()
 
     tabmodel->removeRows(pSelection);
 
+  //  ui->MTable->setModel(0);
+   // ui->MTable->setModel(tabmodel);
+  //  tabmodel->redraw();
+  //  ui->MTable->resizeRowsToContents();
+}
+
+///добавление нового сигнала в список
+/*void MainWindow::AddMSignal(CIECSignal *tag)
+{
+    if (description=="")
+    {
+        tabmodel->appendSignal(tag);
+    }
+    else
+    {
+        tabmodel->appendSignal(tag, description);
+    }
     ui->MTable->setModel(0);
     ui->MTable->setModel(tabmodel);
     tabmodel->redraw();
     ui->MTable->resizeRowsToContents();
-}
-
+}*/
 ///от драйвера получен декодированный тег
 void MainWindow::IECReceived(CIECSignal *tag)
 {
@@ -180,10 +199,23 @@ void MainWindow::IECReceived(CIECSignal *tag)
     else
     {
         //add new row, reload table
-        AddMSignal(tag);
+        //AddMSignal(tag);
+
+        //принят сигнал которого нет в списке, добавляем список и перерисовка
+        //if (this->)
+        bool autoCreate;
+        qsettings->beginGroup("driver");
+            autoCreate = qsettings->value("autoCreate",QVariant(false)).toBool();
+        qsettings->endGroup();
+        if (autoCreate)
+            tabmodel->appendSignal(tag);
+    //    ui->MTable->setModel(0);
+    //    ui->MTable->setModel(tabmodel);
+   //     tabmodel->redraw();
+   //     ui->MTable->resizeRowsToContents();
     }
-    tabmodel->redraw();
-    ui->MTable->resizeRowsToContents();
+  //  tabmodel->redraw();
+  //  ui->MTable->resizeRowsToContents();
 }
 
 void MainWindow::OnGIPressed()
@@ -192,4 +224,11 @@ void MainWindow::OnGIPressed()
     qsettings->beginGroup("driver");
     pDriver->SendFullRequest(qsettings->value("asdu",QVariant(1)).toInt(),20);
     qsettings->endGroup();
+}
+
+void MainWindow::OnLoadBaseTriggered(bool val)
+{
+   ImportDialog *id = new ImportDialog();
+   id->SetModel(this->tabmodel);
+   id->exec();
 }

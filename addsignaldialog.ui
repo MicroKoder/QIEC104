@@ -23,7 +23,7 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="edit_IOA"/>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QDialogButtonBox" name="buttonBox">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -33,7 +33,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QComboBox" name="comboBox">
         <item>
          <property name="text">
@@ -149,10 +149,20 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_type">
         <property name="text">
          <string>Тип</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_descr"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_desc">
+        <property name="text">
+         <string>Описание</string>
         </property>
        </widget>
       </item>

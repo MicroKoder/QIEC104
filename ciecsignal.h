@@ -16,7 +16,7 @@ class CIECSignal
 public:
     CIECSignal();
     CIECSignal(uint16_t addr, uchar type);
-
+ //   CIECSignal(uint16_t addr, uchar type, QString description);
     ///
     /// \brief GetKey
     /// returns unique key that depend of type and IOA
@@ -74,6 +74,8 @@ public:
     ///IEC104 quality
     uchar quality;
 
+    ///description
+  //  QString descr;
     ///7-byte time
     CP56Time timestamp;
 

@@ -66,6 +66,8 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
             case 4:
                 {
                 QString quality_str;
+                if (!pSignal.bNeverUpdated)
+                {
                     if (pSignal.quality&1)
                         quality_str+="OV ";
 
@@ -83,6 +85,11 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 
                     if (pSignal.quality&128)
                         quality_str+="IV ";
+                }
+                else
+                {
+                    result = "NULL";
+                }
 
                     result = QVariant(quality_str);
                 }
@@ -100,6 +107,8 @@ bool TableModel::isSignalExist(CIECSignal *pSignal)
 {
     return mData->keys().contains(pSignal->GetKey());
 }
+
+///обновить существующий сигнал
 void TableModel::updateSignal(CIECSignal *pSignal)
 {
     if (isSignalExist(pSignal))
@@ -107,9 +116,11 @@ void TableModel::updateSignal(CIECSignal *pSignal)
         (*mData)[pSignal->GetKey()].quality = pSignal->quality;
         (*mData)[pSignal->GetKey()].value = pSignal->value;
         (*mData)[pSignal->GetKey()].timestamp = pSignal->timestamp;
+        (*mData)[pSignal->GetKey()].bNeverUpdated = false;
     }
 }
 
+///принят сигнал которого еще небыло в таблице
 void TableModel::appendSignal(CIECSignal *pSignal)
 {
     if (!isSignalExist(pSignal))
@@ -118,6 +129,24 @@ void TableModel::appendSignal(CIECSignal *pSignal)
         (*mData)[pSignal->GetKey()].quality = pSignal->quality;
         (*mData)[pSignal->GetKey()].value = pSignal->value;
         (*mData)[pSignal->GetKey()].timestamp = pSignal->timestamp;
+        (*mData)[pSignal->GetKey()].bNeverUpdated = false;
+        insertRow(0);
+    }
+
+}
+
+///добавить в базу данных сигнал который еще не принимался
+void TableModel::appendSignal(CIECSignal *pSignal, QString description)
+{
+    if (!isSignalExist(pSignal))
+    {
+        mData->insert(pSignal->GetKey(), CTableModelItem(pSignal, description));
+        (*mData)[pSignal->GetKey()].quality = pSignal->quality;
+        (*mData)[pSignal->GetKey()].value = pSignal->value;
+        (*mData)[pSignal->GetKey()].timestamp = pSignal->timestamp;
+        (*mData)[pSignal->GetKey()].bNeverUpdated = true;
+
+        insertRow(0);
     }
 }
 
@@ -162,7 +191,9 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &index)
     beginInsertRows(QModelIndex(),position, position + rows - 1);
         CIECSignal* temp = new CIECSignal(1,1);
         mData->insert(temp->GetKey(),CTableModelItem(temp,""));
+
     endInsertRows();
+//    this->redraw();
 }
 
 bool TableModel::removeRow(int row, const QModelIndex &parent)

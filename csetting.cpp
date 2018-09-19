@@ -14,9 +14,10 @@ CSetting::CSetting()
     w = 8;
 
     asdu = 1;
+    autoCreateTags = false;
 }
 
-CSetting::CSetting(QString _ip, quint8 _asdu, quint16 _port)
+CSetting::CSetting(QString _ip, quint8 _asdu, quint16 _port, bool autoCreate)
 {
     IP = _ip;
     Port = _port;
@@ -29,4 +30,6 @@ CSetting::CSetting(QString _ip, quint8 _asdu, quint16 _port)
 
     k = 12;
     w = 8;
+
+    autoCreateTags = autoCreate;
 }

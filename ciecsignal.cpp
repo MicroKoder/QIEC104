@@ -11,7 +11,15 @@ CIECSignal::CIECSignal(uint16_t addr, uchar type)
     SetAddress(addr);
     SetType(type);
     this->quality = 0;
+    //this->descr = "";
 }
+
+/*CIECSignal::CIECSignal(uint16_t addr, uchar type, QString description)
+{
+    SetAddress(addr);
+    SetType(type);
+    this->descr = description;
+}*/
 
 QString CIECSignal::GetValueString()
 {
@@ -24,6 +32,7 @@ QString CIECSignal::GetValueString()
     case 3: result += value.toUInt(); break;
     case 30: result += (value==1) ? "true" : "false"; break;
     case 31: result += value.toUInt(); break;
+    case 32: result += QString::number(value.toUInt());break;
     case 33: result += QString::number( value.toUInt());break;
     case 34: result += QString::number(value.toUInt());break;
     case 35: result += QString::number(value.toInt());break;
