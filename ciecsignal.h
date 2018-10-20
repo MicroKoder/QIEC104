@@ -15,7 +15,7 @@ class CIECSignal
     uchar typeID;
 public:
     CIECSignal();
-    CIECSignal(uint16_t addr, uchar type);
+    CIECSignal(uint16_t addr, uchar type, QString descr=QString());
  //   CIECSignal(uint16_t addr, uchar type, QString description);
     ///
     /// \brief GetKey
@@ -74,8 +74,8 @@ public:
     ///IEC104 quality
     uchar quality;
 
-    ///description
-  //  QString descr;
+    ///описание сигнала
+    QString description = QString("empty");
     ///7-byte time
     CP56Time timestamp;
 
@@ -85,6 +85,10 @@ public:
     /// \return value as string
     ///
     QString GetValueString();
+
+    ///флаг означает что с момента подключения или добавления в список сигнал еще ни разу не обновлялся
+    bool bNeverUpdated = true;
+
 };
 
 bool IsStartDTCon(QByteArray &data);

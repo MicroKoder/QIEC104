@@ -48,8 +48,8 @@ void addSignalDialog::accept()
     {
         IOA = ui->edit_IOA->text().toInt();
         this->tag = new CIECSignal(IOA,type);
+        this->tag->description = ui->lineEdit_descr->text();
 
-        description = ui->lineEdit_descr->text();
 
          qDebug() << "selected type "<< type << "; IOA= " << IOA;
          this->accepted();

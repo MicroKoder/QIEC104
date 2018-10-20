@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+//#define FILL_TEST_TABLE
+
 #include <QMainWindow>
 //#include <csetting.h>
 #include <iec104driver.h>
@@ -37,7 +39,7 @@ private:
 public slots:
     void OnConnectPressed(void);
     void OnConnectAck(void);//
-    void OnConnectionDialogFinished(int);
+    void OnConnectionDialogFinished();
 
     void OnDisconnectPressed(void);
     void OnSettingsPressed(void);

@@ -117,6 +117,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
             signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
             signal.SetAddress(addr);
             signal.timestamp = CP56Time();
+            signal.bNeverUpdated =false;
             addr++;
 
             signal.SetType(typeID);
@@ -128,8 +129,9 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 //single-point
                 case 1:
                     {
-                        signal.value = QVariant(data[offset+i]&0x01);
-                        signal.quality = uchar(data[offset+i])&0xFE;
+                        stride = 1;
+                        signal.value = QVariant(data[offset+i*stride]&0x01);
+                        signal.quality = uchar(data[offset+i*stride])&0xFE;
                     }
                 break;
                 //тип 2 не определен для SQ=1
@@ -138,13 +140,17 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 //double-point
                 case 3:
                     {
-                        signal.value = QVariant((uchar)data[offset+i]&0x03);
-                        signal.quality = uchar(data[offset+i])&0xFC;
+                        stride = 1;
+                        signal.value = QVariant((uchar)data[offset+i*stride]&0x03);
+                        signal.quality = uchar(data[offset+i*stride])&0xFC;
                     }
                 break;
                 //положение отпаек M_ST_NA
                 case 5:
                     {
+                        stride = 2;
+                        signal.value = QVariant((uchar)data[offset+i*stride]);
+                        signal.quality = uchar(data[offset+i*stride+1]);
 
                     }
                 break;
@@ -220,6 +226,14 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.timestamp = CP56Time(data,offset + i*stride+1);
                 };break;
 
+            case 32:
+            {
+                stride = 9; //байт значения, байт качества, 7 байт метки времени
+                signal.value = QVariant((uchar)data[offset+i*stride]);
+                signal.quality = (uchar)(data[offset + i*stride+1]);
+                signal.timestamp = CP56Time(data,offset + i*stride+2);
+            }; break;
+
                 //bitstring
                 case 33:
                 {
@@ -287,6 +301,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
             CIECSignal signal;
             uint addr;
             signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
+            signal.bNeverUpdated = false;
             switch (typeID)
             {
                 case 1:
@@ -301,7 +316,16 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     {
                         stride = 1;
                     }break;
-                case 5: break;
+                case 5:
+                    {
+                        stride = 5;
+                        addr = data[offset + i*stride] | (data[offset + i*stride +1]<<8) | (data[offset+ i*stride +2]<<16);
+                        signal.SetAddress(addr);
+                        signal.value = QVariant(char(data[offset + i*stride + 3]));
+                        signal.quality = data[offset + i*stride + 4];
+
+                    }
+                break;
                 //32-bit string (dword)
                 case 7: break;
                 //uint
@@ -352,7 +376,14 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         signal.timestamp = CP56Time(data,offset + i*stride+4);
                     }break;
                 case 31:break;
-                case 32:break;
+                case 32:
+                   {
+                        stride = 9; //байт значения, байт качества, 7 байт метки времени
+                        signal.value = QVariant((uchar)data[offset+i*stride]);
+                        signal.quality = (uchar)(data[offset + i*stride+1]);
+                        signal.timestamp = CP56Time(data,offset + i*stride+2);
+                    }; break;
+                break;
                 case 33:break;
                 case 34:break;
                 case 35:break;

@@ -14,7 +14,7 @@ ImportDialog::ImportDialog() :
 
     connect(ui->pbOpenDialog, SIGNAL(pressed()),this,SLOT(On_OpenDialogPressed()));
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(On_OkPressed()));
-   MeasuresTable = NULL;
+    MeasuresTable = NULL;
 }
 void ImportDialog::SetModel(TableModel* table)
 {
@@ -36,7 +36,7 @@ void ImportDialog::On_OkPressed()
          ImportItem item;
          foreach(item, *importedItems)
              if (item.kod<45) //измерения
-                MeasuresTable->appendSignal(new CIECSignal(item.ioa,item.kod),item.descr);
+                MeasuresTable->updateSignal(new CIECSignal(item.ioa,item.kod, item.descr));
             //else //добавить код для таблицы команд
      }
    // MeasuresTable->redraw();

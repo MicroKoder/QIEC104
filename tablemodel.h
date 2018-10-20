@@ -6,13 +6,22 @@
 #include <QVariant>
 #include "ciecsignal.h"
 #include <QItemSelectionModel>
+#include <QStringListModel.h>
 
-class CTableModelItem: public CIECSignal{
+///
+/// \brief Отображаемый элемент таблицы сигналов
+///
+class CTableModelItem{
 public:
     CTableModelItem(){
-
+        pSignal = NULL;
     }
-    CTableModelItem(CIECSignal *signal, QString name = QString()){
+    CTableModelItem(CIECSignal *signal){
+
+        pSignal = signal;
+
+
+/*
         this->SetAddress(signal->GetAddress());
 
         this->quality = signal->quality;
@@ -20,27 +29,24 @@ public:
         this->timestamp = signal->timestamp;
         this->SetType(signal->GetType());
 
-        this->name = name;
+        this->name = name;*/
     }
     /*CTableModelItem(int address, QString name= QString()){
         this->SetAddress(address);
         this->name = name;
     }*/
-    ///
-    /// \brief name
-    /// наименование
-    QString name;
 
-    ///флаг обозначающий что с момента подключения или добавления в список сигнал еще ни разу не обновлялся
-    bool bNeverUpdated = true;
+    CIECSignal *pSignal;
+
 };
 
 //таблица измерений (сигналы в направлении контроля)
 class TableModel : public QAbstractTableModel
 {
+    CIECSignal *itemToAdd=nullptr;
 public:
-    QMap<uint, CTableModelItem> *mData;
-
+    //QMap<uint, CTableModelItem> *mData;
+    QList<CTableModelItem> *mData;
     TableModel();
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
@@ -52,17 +58,19 @@ public:
     bool removeRow(int row, const QModelIndex &parent=QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent=QModelIndex());
     bool removeRows(QItemSelectionModel *pSelection);
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
 
-    bool isSignalExist(CIECSignal *pSignal);
-    void updateSignal(CIECSignal *pSignal);
-    void appendSignal(CIECSignal*);
-    void appendSignal(CIECSignal*, QString);
+    bool isSignalExist(CIECSignal*);
+    void updateSignal(CIECSignal*, bool autoCreate = true);
+    //void appendSignal(CIECSignal*);
+    //void appendSignal(CIECSignal*, QString);
 
     void redraw();
 
     bool bAllowAppend;      //разрешение на автоматическое добавление тэга в таблицу
 
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value,
+                    int role = Qt::EditRole);
 };
 
 #endif // TABLEMODEL_H

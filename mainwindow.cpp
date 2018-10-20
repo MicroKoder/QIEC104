@@ -48,6 +48,13 @@ MainWindow::MainWindow(QWidget *parent) :
     emit tabmodel->headerDataChanged(Qt::Horizontal,0,5);
     connect(tabmodel,SIGNAL(rowsInserted(QModelIndex,int,int)),ui->MTable,SLOT(rowsInserted(QModelIndex,int,int)));
     connect(tabmodel,SIGNAL(rowsRemoved(QModelIndex,int,int)),ui->MTable, SLOT(rowsAboutToBeRemoved(QModelIndex,int,int)));
+
+    ui->MTable->verticalHeader()->setDefaultSectionSize(20);
+
+#ifdef FILL_TEST_TABLE
+    for (int i=1; i<10; i++)
+        tabmodel->updateSignal(new CIECSignal(i,30,"test"));
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -61,7 +68,8 @@ void MainWindow::OnConnectPressed(void)
     //IEC104Driver::GetInstance()->OpenConnection(settings->IP,settings->Port);
     pConnectionDialog = new ConnectionSettingsDialog(qsettings);
   //  connect(pConnectionDialog, SIGNAL(accepted()),this,SLOT(OnConnectAck()));
-    connect(pConnectionDialog, SIGNAL(finished(int)),this, SLOT(OnConnectionDialogFinished(int)));
+    //connect(pConnectionDialog, SIGNAL(finished(int)),this, SLOT(OnConnectionDialogFinished(int)));
+    connect(pConnectionDialog, SIGNAL(accepted()), this, SLOT(OnConnectionDialogFinished()));
     pConnectionDialog->exec();
 }
 //
@@ -77,9 +85,12 @@ void MainWindow::OnConnectAck(void)
     pDriver->SetSettings(qsettings);
     pDriver->OpenConnection();
 }
-void MainWindow::OnConnectionDialogFinished(int result)
+
+///
+/// \brief Окно "соединение" закрыто с результатом "ок" - устанавливаем соединение
+///
+void MainWindow::OnConnectionDialogFinished(/*int result*/)
 {
-    qDebug() << result;
     pDriver->SetSettings(qsettings);
     pDriver->OpenConnection();
     delete pConnectionDialog;
@@ -135,12 +146,12 @@ void MainWindow::OnClearLogPressed()
 void MainWindow::MToolAdd_Accept()
 {
 
-    if ((pAddSignalDialog->tag != NULL)&&(!tabmodel->isSignalExist(pAddSignalDialog->tag)))
+    if (pAddSignalDialog->tag != NULL)
     {
        // AddMSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
 
 
-        tabmodel->appendSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
+        tabmodel->updateSignal(pAddSignalDialog->tag,true);
 
       //  ui->MTable->setModel(0);
        // ui->MTable->setModel(tabmodel);
@@ -175,47 +186,20 @@ void MainWindow::MToolRemove_Pressed()
 }
 
 ///добавление нового сигнала в список
-/*void MainWindow::AddMSignal(CIECSignal *tag)
-{
-    if (description=="")
-    {
-        tabmodel->appendSignal(tag);
-    }
-    else
-    {
-        tabmodel->appendSignal(tag, description);
-    }
-    ui->MTable->setModel(0);
-    ui->MTable->setModel(tabmodel);
-    tabmodel->redraw();
-    ui->MTable->resizeRowsToContents();
-}*/
+
 ///от драйвера получен декодированный тег
 void MainWindow::IECReceived(CIECSignal *tag)
 {
-    if (tabmodel->isSignalExist(tag))
-        tabmodel->updateSignal(tag);
 
-    else
-    {
-        //add new row, reload table
-        //AddMSignal(tag);
 
-        //принят сигнал которого нет в списке, добавляем список и перерисовка
-        //if (this->)
+
         bool autoCreate;
         qsettings->beginGroup("driver");
             autoCreate = qsettings->value("autoCreate",QVariant(false)).toBool();
         qsettings->endGroup();
-        if (autoCreate)
-            tabmodel->appendSignal(tag);
-    //    ui->MTable->setModel(0);
-    //    ui->MTable->setModel(tabmodel);
-   //     tabmodel->redraw();
-   //     ui->MTable->resizeRowsToContents();
-    }
-  //  tabmodel->redraw();
-  //  ui->MTable->resizeRowsToContents();
+
+         tabmodel->updateSignal(tag, autoCreate);
+
 }
 
 void MainWindow::OnGIPressed()
@@ -228,7 +212,12 @@ void MainWindow::OnGIPressed()
 
 void MainWindow::OnLoadBaseTriggered(bool val)
 {
-   ImportDialog *id = new ImportDialog();
-   id->SetModel(this->tabmodel);
-   id->exec();
+    Q_UNUSED(val);
+  //  QMessageBox::warning(this,"load base","load base");
+  // if (val)
+  // {
+       ImportDialog *id = new ImportDialog();
+       id->SetModel(this->tabmodel);
+       id->exec();
+  // }
 }

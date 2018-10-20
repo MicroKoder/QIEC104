@@ -32,7 +32,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
 
 }
 
-ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset=NULL):
+ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset):
     QDialog(0),
     ui(new Ui::SettingsDialog)
 {

@@ -3,14 +3,15 @@
 #include <Qdebug>
 CIECSignal::CIECSignal()
 {
-
+    description = "";
 }
 
-CIECSignal::CIECSignal(uint16_t addr, uchar type)
+CIECSignal::CIECSignal(uint16_t addr, uchar type, QString descr)
 {
     SetAddress(addr);
     SetType(type);
     this->quality = 0;
+    this->description = descr;
     //this->descr = "";
 }
 

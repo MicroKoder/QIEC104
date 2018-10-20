@@ -230,6 +230,7 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
     {
         sock->open(QIODevice::ReadWrite);
         //setup connection
+        qDebug()<< settings->IP;
         sock->connectToHost(settings->IP,settings->Port);
 
         //setup timer
@@ -282,7 +283,7 @@ void IEC104Driver::OnSockReadyRead()
 
 
     //----------------------------------- processing format U packages ---------------
-    if (buf.count()==6 && (buf[2]&0x3 == 0x3)){
+    if (buf.count()==6 && ((buf[2]&0x3) == 0x3)){
         if (isTestAct(buf))
         {
             emit Message("--> TestAct");
