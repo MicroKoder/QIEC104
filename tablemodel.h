@@ -11,15 +11,14 @@
 ///
 /// \brief Отображаемый элемент таблицы сигналов
 ///
-class CTableModelItem{
+/*class CTableModelItem{
 public:
     CTableModelItem(){
-        pSignal = NULL;
     }
     CTableModelItem(CIECSignal *signal){
 
-        pSignal = signal;
-
+        pSignal = *signal;
+*/
 
 /*
         this->SetAddress(signal->GetAddress());
@@ -30,23 +29,23 @@ public:
         this->SetType(signal->GetType());
 
         this->name = name;*/
-    }
+ //   }
     /*CTableModelItem(int address, QString name= QString()){
         this->SetAddress(address);
         this->name = name;
     }*/
 
-    CIECSignal *pSignal;
+  /*  CIECSignal pSignal;
 
 };
-
+*/
 //таблица измерений (сигналы в направлении контроля)
 class TableModel : public QAbstractTableModel
 {
-    CIECSignal *itemToAdd=nullptr;
+    CIECSignal itemToAdd;
 public:
     //QMap<uint, CTableModelItem> *mData;
-    QList<CTableModelItem> *mData;
+    QList<CIECSignal> mData;
     TableModel();
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
@@ -59,8 +58,8 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent=QModelIndex());
     bool removeRows(QItemSelectionModel *pSelection);
 
-    bool isSignalExist(CIECSignal*);
-    void updateSignal(CIECSignal*, bool autoCreate = true);
+    //bool isSignalExist(CIECSignal*);
+    void updateSignal(CIECSignal, bool autoCreate = true);
     //void appendSignal(CIECSignal*);
     //void appendSignal(CIECSignal*, QString);
 

@@ -51,7 +51,7 @@ public slots:
     void MToolAdd_Pressed();
     void MToolAdd_Accept();
     void MToolRemove_Pressed();
-    void IECReceived(CIECSignal* tag);
+    void IECReceived(CIECSignal tag);
 
     void OnLoadBaseTriggered(bool); //меню - импорт базы
     void OnGIPressed(void); //general interrogation

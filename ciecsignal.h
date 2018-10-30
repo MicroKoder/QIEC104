@@ -15,7 +15,7 @@ class CIECSignal
     uchar typeID;
 public:
     CIECSignal();
-    CIECSignal(uint16_t addr, uchar type, QString descr=QString());
+    CIECSignal(uint16_t addr, uchar type, QString descr=QString("new tag"));
  //   CIECSignal(uint16_t addr, uchar type, QString description);
     ///
     /// \brief GetKey

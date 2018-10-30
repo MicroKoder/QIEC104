@@ -15,7 +15,7 @@ class addSignalDialog : public QDialog
 public:
     explicit addSignalDialog(QWidget *parent = 0);
     ~addSignalDialog();
-    CIECSignal *tag=NULL;
+    CIECSignal tag;
     QString description;
 private:
     Ui::addSignalDialog *ui;

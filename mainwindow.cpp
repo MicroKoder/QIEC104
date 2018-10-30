@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pDriver,SIGNAL(Connected()),this,SLOT(OnConnected()));
     connect(pDriver,SIGNAL(Disconnected()),this,SLOT(OnDisconnected()));
     connect(pDriver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
-    connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal*)),this,SLOT(IECReceived(CIECSignal*)));
+    connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal)),this,SLOT(IECReceived(CIECSignal)));
 
     connect(ui->action_LoadBase, SIGNAL(triggered(bool)),this, SLOT(OnLoadBaseTriggered(bool)));
     //создаем статус сообщение
@@ -146,8 +146,8 @@ void MainWindow::OnClearLogPressed()
 void MainWindow::MToolAdd_Accept()
 {
 
-    if (pAddSignalDialog->tag != NULL)
-    {
+    //if (pAddSignalDialog->tag != NULL)
+    //{
        // AddMSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
 
 
@@ -159,7 +159,7 @@ void MainWindow::MToolAdd_Accept()
       //  ui->MTable->resizeRowsToContents();
 
 
-    }
+    //}
     delete pAddSignalDialog;
     qDebug()<< "accept";
 }
@@ -188,7 +188,7 @@ void MainWindow::MToolRemove_Pressed()
 ///добавление нового сигнала в список
 
 ///от драйвера получен декодированный тег
-void MainWindow::IECReceived(CIECSignal *tag)
+void MainWindow::IECReceived(CIECSignal tag)
 {
 
 

@@ -36,7 +36,7 @@ void ImportDialog::On_OkPressed()
          ImportItem item;
          foreach(item, *importedItems)
              if (item.kod<45) //измерения
-                MeasuresTable->updateSignal(new CIECSignal(item.ioa,item.kod, item.descr));
+                MeasuresTable->updateSignal(CIECSignal(item.ioa,item.kod, item.descr));
             //else //добавить код для таблицы команд
      }
    // MeasuresTable->redraw();

@@ -3,13 +3,12 @@
 TableModel::TableModel()
 {
     //mData = new QMap<uint, CTableModelItem>();
-    mData = new QList<CTableModelItem>();
     bAllowAppend = true;
 }
 
 int TableModel::rowCount(const QModelIndex &parent=QModelIndex()) const{
     Q_UNUSED(parent);
-        return mData->count();
+        return mData.count();
 
 }
 
@@ -19,19 +18,22 @@ int TableModel::columnCount(const QModelIndex &parent = QModelIndex()) const{
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const{
-    if ((role == Qt::DisplayRole)&&(mData->count()>index.row())){
+    int row = index.row();
+    if ((role == Qt::DisplayRole)&&(mData.count()>row)&& row>=0){
+
     //    QString data = "row: "+QString::number(index.row())+" col: "+QString::number(index.column());
-        CTableModelItem pSignalModel = mData->at(index.row());
+        CIECSignal item = mData[row];
         QVariant result = QVariant("");
 
-        if (pSignalModel.pSignal==NULL) return result;
+      //  if (pSignalModel->pSignal==NULL) return result;
 
         switch (index.column()){
             case 0:
-                result =  QVariant(pSignalModel.pSignal->GetAddress());
+                result =  QVariant(item.GetAddress());
                 break;  //адрес
             case 1:
-                    result =  QVariant(pSignalModel.pSignal->description);
+
+                    result =  QVariant(item.description);
                 break;  //название
             case 2:
             //TODO: подправить для 33 типа мэк
@@ -40,59 +42,60 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                 else
                     result =  pSignal.value;
         */
-                switch (pSignalModel.pSignal->GetType())
+                switch (item.GetType())
                 {
-                case 1 : result = QVariant(pSignalModel.pSignal->value == 1 ? "ON" : "OFF");break;
-                case 3 : if (pSignalModel.pSignal->value.toUInt() == 0)
+                case 1 : result = QVariant(item.value == 1 ? "ON" : "OFF");break;
+                case 3 : if (item.value.toUInt() == 0)
                             result = QVariant("Intransit(0)");
-                         else if (pSignalModel.pSignal->value.toUInt() == 1)
+                         else if (item.value.toUInt() == 1)
                             result = QVariant("OFF(1)");
-                         else if (pSignalModel.pSignal->value.toUInt() == 2)
+                         else if (item.value.toUInt() == 2)
                             result = QVariant("ON(2)");
                          else result = QVariant("Invalid(3)");
                         break;
 
-                case 30:result = QVariant(pSignalModel.pSignal->value == 1 ? "ON" : "OFF");break;
-                case 31 : if (pSignalModel.pSignal->value == 0)
+                case 30:result = QVariant(item.value == 1 ? "ON" : "OFF");break;
+                case 31 : if (item.value == 0)
                             result = QVariant("Intransit(0)");
-                         else if (pSignalModel.pSignal->value == 1)
+                         else if (item.value == 1)
                             result = QVariant("OFF(1)");
-                         else if (pSignalModel.pSignal->value == 2)
+                         else if (item.value == 2)
                             result = QVariant("ON(2)");
                          else result = QVariant("Invalid(3)");
                         break;
                 default:
-                    result = pSignalModel.pSignal->value;
+                    result = item.value;
 
                 }
                 break;  //значение
             case 3:
-                result =  QVariant(pSignalModel.pSignal->GetType());
+                result =  QVariant(item.GetType());
                 break;  //тип
             case 4:
                 {
                 QString quality_str;
-                if (!pSignalModel.pSignal->bNeverUpdated)
+                uchar qualityByte = item.quality;
+                if (!item.bNeverUpdated)
                 {
-                    if (pSignalModel.pSignal->quality&1)
+                    if (qualityByte&1)
                         quality_str+="OV ";
 
-                    if (pSignalModel.pSignal->quality&8)
+                    if (qualityByte&8)
                         quality_str+="EI ";
 
-                    if (pSignalModel.pSignal->quality&16)
+                    if (qualityByte&16)
                         quality_str+="BL ";
 
-                    if (pSignalModel.pSignal->quality&32)
+                    if (qualityByte&32)
                         quality_str+="SB ";
 
-                    if (pSignalModel.pSignal->quality&64)
+                    if (qualityByte&64)
                         quality_str+="NT ";
 
-                    if (pSignalModel.pSignal->quality&128)
+                    if (qualityByte&128)
                         quality_str+="IV ";
 
-                    if (pSignalModel.pSignal->quality==0)
+                    if (qualityByte==0)
                         quality_str = "GOOD";
                 }
                 else
@@ -104,7 +107,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                 }
                 break;  //качество
             case 5:
-                result = QVariant(pSignalModel.pSignal->timestamp.GetTimeString());
+                result = QVariant(item.timestamp.GetTimeString());
                 break;  //метка времени
         };
         return result;
@@ -113,19 +116,25 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 }
 
 ///обновить существующий сигнал
-void TableModel::updateSignal(CIECSignal *pSignal, bool autoCreate)
+void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate)
 {
-    CTableModelItem item;
-    if (mData->count()>0)
-        for(int i=0; i<mData->count(); i++)
+    CIECSignal* item;
+    if (mData.count()>0)
+        for(int i=0; i<mData.count(); i++)
         {
-            item =   mData->at(i);
-            if (item.pSignal->GetKey() == pSignal->GetKey())
+            item =   &mData[i];
+            if (item->GetKey() == pSignal.GetKey())
             {
-                delete (*mData)[i].pSignal;
-                (*mData)[i].pSignal = pSignal;
+                item->value = pSignal.value;
+                item->quality = pSignal.quality;
+                item->timestamp = pSignal.timestamp;
+                item->bNeverUpdated = false;
+
                 //delete (*mData)[i].pSignal->bNeverUpdated = false;
-                emit dataChanged(QModelIndex(),QModelIndex(),{Qt::EditRole});
+               // emit dataChanged(index(i,0),index(i,6),{Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole});
+                setData(index(i,2), QVariant(pSignal.value));
+                setData(index(i,4), QVariant(pSignal.quality));
+                setData(index(i,5), QVariant(pSignal.timestamp.GetTimeString()));
                 return;
             }
         }
@@ -134,7 +143,7 @@ void TableModel::updateSignal(CIECSignal *pSignal, bool autoCreate)
         return;
     //если дошли до этой части кода значит сигнала небыло в таблице, добавляем
     //-добавление в пустой список
-    if (mData->count()==0)
+    if (mData.count()==0)
     {
         itemToAdd = pSignal;
         insertRows(0,1,QModelIndex());
@@ -146,16 +155,16 @@ void TableModel::updateSignal(CIECSignal *pSignal, bool autoCreate)
     do
     {
 
-        item =   mData->at(row);
+        item =   &mData[row];
 
-        if (pSignal->GetKey()< item.pSignal->GetKey())
+        if (pSignal.GetKey()< item->GetKey())
         {
 
             break;
         }
         ++row;
 
-    }while (row<mData->count());
+    }while (row<mData.count());
 
     itemToAdd = pSignal;
     insertRows(row,1,QModelIndex());
@@ -163,7 +172,7 @@ void TableModel::updateSignal(CIECSignal *pSignal, bool autoCreate)
 
 
 void TableModel::redraw(){
-    emit dataChanged(this->index(0,0),this->index(mData->count()-1,4));
+    emit dataChanged(this->index(0,0),this->index(mData.count()-1,4));
 }
 
 QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -204,15 +213,15 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &index)
   beginInsertRows(QModelIndex(),position, position + rows - 1);
   for (int row = 0; row<rows; ++row)
   {
-      if (itemToAdd != nullptr)
-      {
-        CTableModelItem item = CTableModelItem(itemToAdd);
-        mData->insert(position,item);
-      }
+      //if (itemToAdd != nullptr)
+      //{
+       // CIECSignal item = new CTableModelItem(itemToAdd);
+        mData.insert(position,itemToAdd);
+      //}
   }
 
   endInsertRows();
-    itemToAdd =nullptr;
+   // itemToAdd =nullptr;
     return true;
 }
 
@@ -221,7 +230,7 @@ bool TableModel::removeRow(int row, const QModelIndex &parent)
     beginRemoveRows(parent,row,row);
 
 
-    mData->removeAt(row);
+    mData.removeAt(row);
 
 
     endRemoveRows();
@@ -235,7 +244,7 @@ bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
 
         for (int i= row; i< row+count;i++)
         {
-            mData->removeAt(i);
+            mData.removeAt(i);
         }
 
 
@@ -283,25 +292,27 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
         /*CTableModelItem pSignalModel = mData->values().at(index.row());
         pSignalModel.pSignal->description = value.toString();
 */
-        CTableModelItem p;
-        if (mData->count()>index.row())
-            p = (*mData)[index.row()];
+        CIECSignal *p;
+        if (mData.count()>index.row())
+            p = &mData[index.row()];
 
         switch (index.column())
         {
             case 0:
-                    p.pSignal->SetAddress(value.toInt());
-            break;
+                    p->SetAddress(value.toInt());
+                    break;
+
             case 1:
-                    p.pSignal->description = value.toString();
-            break;
+                    p->description = value.toString();
+                    break;
+
             case 3:
-                    p.pSignal->SetType(value.toInt());
-            break;
-            break;
+                    p->SetType(value.toInt());
+                    break;
+
+
 
         }
-        (*mData)[index.row()] = p;
         emit(dataChanged(index, index));
 
         return true;

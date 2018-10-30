@@ -61,7 +61,7 @@ signals:
     void Message(QString);
 
     /// декодированный сигнал
-    void IECSignalReceived(CIECSignal*);
+    void IECSignalReceived(CIECSignal);
 private slots:
     void OnConnected();
     void OnDisconnected();

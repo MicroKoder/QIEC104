@@ -3,7 +3,7 @@
 #include <Qdebug>
 CIECSignal::CIECSignal()
 {
-    description = "";
+    description = "new tag";
 }
 
 CIECSignal::CIECSignal(uint16_t addr, uchar type, QString descr)

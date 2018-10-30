@@ -281,6 +281,9 @@ void IEC104Driver::OnSockReadyRead()
 
     emit Message(QTime::currentTime().toString()+" -->" + IEC104Tools::BytesToString(&buf));
 
+    // reset timer when any package received
+    testTimer->stop();
+    testTimer->start();
 
     //----------------------------------- processing format U packages ---------------
     if (buf.count()==6 && ((buf[2]&0x3) == 0x3)){
@@ -318,7 +321,7 @@ void IEC104Driver::OnSockReadyRead()
                if (signal.ASDU == settings->asdu)
                {
                 emit Message(signal.GetValueString());
-                emit IECSignalReceived(&signal);
+                emit IECSignalReceived(signal);
                }
            }
            delete s; //
