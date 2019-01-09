@@ -38,11 +38,11 @@ public:
     /// \brief w
     /// count
     quint16 w;
-    quint8 asdu;
+    quint16 asdu;
 
     bool autoCreateTags;
     CSetting();
-    CSetting(QString _ip, quint8 _asdu=1, quint16 _port=2404, bool autoCreate=false);
+    CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false);
 };
 
 #endif // CSETTING_H
