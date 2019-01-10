@@ -69,11 +69,15 @@ MainWindow::~MainWindow()
 ///кнопка "соединение"
 void MainWindow::OnConnectPressed(void)
 {
-    if (pConnectionDialog==0)
+    if (pConnectionDialog!=0)
     {
+        delete pConnectionDialog;
+        pConnectionDialog = 0;
+    }
+
         pConnectionDialog = new ConnectionSettingsDialog(qsettings);
         connect(pConnectionDialog, SIGNAL(SettingsAccepted()), this, SLOT(OnConnectionDialogFinished()));
-    }
+
     pConnectionDialog->exec();
 }
 //

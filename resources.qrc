@@ -6,5 +6,7 @@
         <file alias="icon_settings">icons/settings.png</file>
         <file alias="icon_timer">icons/timer.png</file>
         <file alias="icon_erase">icons/Erase.png</file>
+        <file>icons/minus.png</file>
+        <file>icons/plus.png</file>
     </qresource>
 </RCC>
