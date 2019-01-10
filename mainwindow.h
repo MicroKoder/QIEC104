@@ -34,7 +34,7 @@ private:
     Ui::MainWindow *ui;
      QLabel *pConnectionStatusLabel;
      addSignalDialog *pAddSignalDialog;
-     ConnectionSettingsDialog *pConnectionDialog;
+     ConnectionSettingsDialog *pConnectionDialog=0;
 
 public slots:
     void OnConnectPressed(void);

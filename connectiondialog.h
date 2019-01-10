@@ -18,8 +18,11 @@ public:
     ConnectionSettingsDialog(CSetting *settings);
     ConnectionSettingsDialog(QSettings *settings);
     ~ConnectionSettingsDialog();
+signals:
+   void SettingsAccepted();
+
 public slots:
-    void Accepted();
+    void AcceptSettings();
 private:
     Ui::SettingsDialog *ui;
     CSetting *settings=NULL;

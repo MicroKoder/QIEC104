@@ -1,6 +1,6 @@
 #include "connectiondialog.h"
 #include "ui_settingsdialog.h"
-
+#include <QDebug>
 ConnectionSettingsDialog::ConnectionSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
@@ -53,7 +53,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset):
         ui->AutoCreate_checkBox->setChecked(qset->value("autoCreate","false").toBool());
         qset->endGroup();
     }
-    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
+    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(AcceptSettings()));
 }
 
 ConnectionSettingsDialog::~ConnectionSettingsDialog()
@@ -61,7 +61,7 @@ ConnectionSettingsDialog::~ConnectionSettingsDialog()
     delete ui;
 }
 
-void ConnectionSettingsDialog::Accepted()
+void ConnectionSettingsDialog::AcceptSettings()
 {
     if (settings != NULL)
     {
@@ -92,5 +92,7 @@ void ConnectionSettingsDialog::Accepted()
      qset->setValue("autoCreate", ui->AutoCreate_checkBox->isChecked());
      qset->endGroup();
     }
+    qDebug() << "Connection Settings accepted";
+    emit SettingsAccepted();
      this->close();
 }

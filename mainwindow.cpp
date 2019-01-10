@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-
+#include <QShortcut>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -55,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i=1; i<10; i++)
         tabmodel->updateSignal(new CIECSignal(i,30,"test"));
 #endif
+
+    QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->MTable);
+    connect(shortcut, SIGNAL(activated()), ui->MTool_remove, SLOT(click()));
+
 }
 
 MainWindow::~MainWindow()
@@ -65,11 +69,11 @@ MainWindow::~MainWindow()
 ///кнопка "соединение"
 void MainWindow::OnConnectPressed(void)
 {
-    //IEC104Driver::GetInstance()->OpenConnection(settings->IP,settings->Port);
-    pConnectionDialog = new ConnectionSettingsDialog(qsettings);
-  //  connect(pConnectionDialog, SIGNAL(accepted()),this,SLOT(OnConnectAck()));
-    //connect(pConnectionDialog, SIGNAL(finished(int)),this, SLOT(OnConnectionDialogFinished(int)));
-    connect(pConnectionDialog, SIGNAL(accepted()), this, SLOT(OnConnectionDialogFinished()));
+    if (pConnectionDialog==0)
+    {
+        pConnectionDialog = new ConnectionSettingsDialog(qsettings);
+        connect(pConnectionDialog, SIGNAL(SettingsAccepted()), this, SLOT(OnConnectionDialogFinished()));
+    }
     pConnectionDialog->exec();
 }
 //
@@ -91,9 +95,10 @@ void MainWindow::OnConnectAck(void)
 ///
 void MainWindow::OnConnectionDialogFinished(/*int result*/)
 {
+    qDebug() << "OnConnectionDialogFinished";
     pDriver->SetSettings(qsettings);
     pDriver->OpenConnection();
-    delete pConnectionDialog;
+   //delete pConnectionDialog;
 }
 
 ///кнопка "разорвать соединение"
@@ -216,7 +221,7 @@ void MainWindow::OnLoadBaseTriggered(bool val)
   //  QMessageBox::warning(this,"load base","load base");
   // if (val)
   // {
-       ImportDialog *id = new ImportDialog();
+       ImportDialog *id = new ImportDialog(qsettings);
        id->SetModel(this->tabmodel);
        id->exec();
   // }

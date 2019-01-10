@@ -59,7 +59,7 @@ public:
     bool removeRows(QItemSelectionModel *pSelection);
 
     //bool isSignalExist(CIECSignal*);
-    void updateSignal(CIECSignal, bool autoCreate = true);
+    void updateSignal(CIECSignal, bool autoCreate = true,bool isImported=false);
     //void appendSignal(CIECSignal*);
     //void appendSignal(CIECSignal*, QString);
 

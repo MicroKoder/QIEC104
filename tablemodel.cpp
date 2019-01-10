@@ -116,7 +116,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 }
 
 ///обновить существующий сигнал
-void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate)
+void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate, bool isImported)
 {
     CIECSignal* item;
     if (mData.count()>0)
@@ -125,10 +125,18 @@ void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate)
             item =   &mData[i];
             if (item->GetKey() == pSignal.GetKey())
             {
-                item->value = pSignal.value;
-                item->quality = pSignal.quality;
-                item->timestamp = pSignal.timestamp;
-                item->bNeverUpdated = false;
+                if (isImported)
+                {
+                    item->description = pSignal.description;
+                }else
+                {
+                    item->value = pSignal.value;
+                    item->quality = pSignal.quality;
+                    item->timestamp = pSignal.timestamp;
+
+                    item->bNeverUpdated = false;
+                }
+
 
                 //delete (*mData)[i].pSignal->bNeverUpdated = false;
                // emit dataChanged(index(i,0),index(i,6),{Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole});

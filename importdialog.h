@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "tablemodel.h"
 
+#include <QSettings>
 
 ///
 /// \brief Элемент прочитанный из базы данных
@@ -49,15 +50,17 @@ class ImportDialog : public QDialog
 
 public:
     explicit ImportDialog();
+    ImportDialog(QSettings *settings);
 
     /// прицепить таблицу с сигналами
     void SetModel(TableModel*);
     ~ImportDialog();
 
 private:
+    QSettings *sett;
     Ui::ImportDialog *ui;
     TableModel *MeasuresTable;//указатель на таблицу с сигналами
-    QList<ImportItem> *importedItems; // список импортированных данных
+    QList<ImportItem> *importedItems=0; // список импортированных данных
 public slots:
     void On_OpenDialogPressed();
     void On_OkPressed();

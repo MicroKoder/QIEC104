@@ -11,11 +11,31 @@ ImportDialog::ImportDialog() :
     ui(new Ui::ImportDialog)
 {
     ui->setupUi(this);
+}
+
+ImportDialog::ImportDialog(QSettings *settings=0):
+QDialog(0),
+ui(new Ui::ImportDialog)
+{
+    ui->setupUi(this);
 
     connect(ui->pbOpenDialog, SIGNAL(pressed()),this,SLOT(On_OpenDialogPressed()));
     connect(ui->buttonBox,SIGNAL(accepted()),this,SLOT(On_OkPressed()));
     MeasuresTable = NULL;
+
+    sett = settings;
+    if (sett != 0)
+    {
+    sett->beginGroup("import");
+    ui->codSpinBox->setValue(sett->value("ColCode",5).toInt());
+    ui->descrSpinBox->setValue(sett->value("ColDescr",1).toInt());
+    ui->ioaSpinBox->setValue(sett->value("ColIOA",7).toInt());
+    ui->skipSpinBox->setValue(sett->value("SkipRows",7).toInt());
+    sett->endGroup();
+    }
 }
+
+
 void ImportDialog::SetModel(TableModel* table)
 {
      this->MeasuresTable = dynamic_cast<TableModel*>(table);
@@ -30,18 +50,29 @@ ImportDialog::~ImportDialog()
 ///
 void ImportDialog::On_OkPressed()
 {
-    if (MeasuresTable != NULL && importedItems->count()>0)
+    if (MeasuresTable != NULL &&importedItems!=0&& importedItems->count()>0)
      {
         qDebug() << "adding to table...";
          ImportItem item;
          foreach(item, *importedItems)
              if (item.kod<45) //измерения
-                MeasuresTable->updateSignal(CIECSignal(item.ioa,item.kod, item.descr));
+                MeasuresTable->updateSignal(CIECSignal(item.ioa,item.kod, item.descr),true,true);
             //else //добавить код для таблицы команд
+         qDebug() << "import complete";
+         delete importedItems;
      }
    // MeasuresTable->redraw();
-    qDebug() << "import complete";
-    delete importedItems;
+
+
+    if (sett != 0)
+    {
+        sett->beginGroup("import");
+        sett->setValue("ColCode",  QVariant(ui->codSpinBox->value()));
+        sett->setValue("ColDescr", QVariant(ui->descrSpinBox->value()));
+        sett->setValue("ColIOA",   QVariant(ui->ioaSpinBox->value()));
+        sett->setValue("SkipRows", QVariant(ui->skipSpinBox->value()));
+        sett->endGroup();
+    }
 }
 void ImportDialog::On_OpenDialogPressed()
 {
@@ -140,6 +171,11 @@ void ImportDialog::On_OpenDialogPressed()
             }
         }//while
         qDebug() << "rows parsed " << parsedRows;
+
+        workbook->dynamicCall("Close()");
+        excel->dynamicCall("Quit()");
+
+
         QMessageBox msg;
         msg.setText("Прочитано сигналов: " + QString::number(parsedRows));
         msg.show();

@@ -8,6 +8,15 @@ IEC104Tools::IEC104Tools()
 
 QByteArray IEC104Tools::lostBytes=QByteArray();
 
+quint32 GetIOA(char LB, char MB, char HB)
+{
+    quint32 lb = (unsigned char)(LB);
+    quint32 mb = (unsigned char)(MB);
+    quint32 hb = (unsigned char)(HB);
+
+    return lb+ (mb<<8) + (hb<<16);
+}
+
 QString IEC104Tools::BytesToString(QByteArray *bytes)
 {
     QString str="[";
@@ -53,7 +62,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
 
 
     QVariant value;
-    uint32_t addr;
+    quint32 addr;
     int offset=0;
     int stride=0;
     //------------------------------------------------------- SQ = 1  ----------------------------
@@ -70,7 +79,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
         for (int i=0; i<count; i++)
         {            
             CIECSignal signal;
-            signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
+            signal.ASDU = ( (uchar)data[11]<<8) + (uchar)data[10];
             signal.SetAddress(addr);
             signal.timestamp = CP56Time();
             signal.bNeverUpdated =false;
@@ -88,6 +97,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         stride = 1;
                         signal.value = QVariant(data[offset+i*stride]&0x01);
                         signal.quality = uchar(data[offset+i*stride])&0xFE;
+
+                        result.append(signal);
                     }
                 break;
                 //тип 2 не определен для SQ=1
@@ -99,6 +110,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         stride = 1;
                         signal.value = QVariant((uchar)data[offset+i*stride]&0x03);
                         signal.quality = uchar(data[offset+i*stride])&0xFC;
+
+                        result.append(signal);
                     }
                 break;
                 //положение отпаек M_ST_NA
@@ -108,6 +121,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         signal.value = QVariant((uchar)data[offset+i*stride]);
                         signal.quality = uchar(data[offset+i*stride+1]);
 
+                        result.append(signal);
                     }
                 break;
                 // 32-bit string (dword)
@@ -120,6 +134,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                             ((uchar)data[offset+i*stride+3]<<24);
                     signal.value = QVariant(val_u32);
                     signal.quality = (uchar)data[offset+i*stride+4];
+
+                    result.append(signal);
                 }
                 break;
                 //uint
@@ -129,6 +145,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         uint uiValue = (uchar)data[offset+i*stride] + (((uchar)data[offset+i*stride+1])<<8);
                         signal.value = QVariant(uiValue);
                         signal.quality = (uchar)data[offset +i*stride + 2];
+
+                        result.append(signal);
                     }
                 break;
                 //int
@@ -140,6 +158,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         int (*iValue) = reinterpret_cast<int*>(bytes);
                         signal.value = QVariant(*iValue);
                         signal.quality = (uchar)data[offset +i*stride + 2];
+
+                        result.append(signal);
                     }
                 break;
                 case 13:
@@ -156,6 +176,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
 
                         signal.quality = (uchar)data[offset +i*stride + 4];
 
+                        result.append(signal);
                     }
                 break;
                 //integral sum
@@ -172,6 +193,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.value = QVariant((uchar)(data[offset + i*stride]&0x01));
                     signal.quality = (uchar)(data[offset + i*stride])&0xFE;
                     signal.timestamp = CP56Time(data,offset + i*stride+1);
+
+                    result.append(signal);
                 }; break;
                 //M_DP_TB_1 double point
                 case 31:
@@ -180,6 +203,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.value = QVariant((uchar)data[offset+i*stride]&0x03);
                     signal.quality = (uchar)(data[offset + i*stride])&0xFC;
                     signal.timestamp = CP56Time(data,offset + i*stride+1);
+
+                    result.append(signal);
                 };break;
 
             case 32:
@@ -188,6 +213,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 signal.value = QVariant((uchar)data[offset+i*stride]);
                 signal.quality = (uchar)(data[offset + i*stride+1]);
                 signal.timestamp = CP56Time(data,offset + i*stride+2);
+
+                result.append(signal);
             }; break;
 
                 //bitstring
@@ -204,6 +231,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.value = QVariant(*uivalue);
                     signal.quality = (uchar)data[offset+i*stride+4];
                     signal.timestamp = CP56Time(data,offset + i*stride+5);
+
+                    result.append(signal);
                 }; break;
                 //uint
                 case 34:
@@ -213,6 +242,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.value = QVariant(uiValue);
                     signal.quality = (uchar)data[offset +i*stride + 2];
                     signal.timestamp = CP56Time(data,offset + i*stride+3);
+
+                    result.append(signal);
                 }; break;
                 //int
                 case 35:
@@ -224,6 +255,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                     signal.value = QVariant(*iValue);
                     signal.quality = (uchar)data[offset +i*stride + 2];
                     signal.timestamp = CP56Time(data,offset + i*stride+3);
+
+                    result.append(signal);
                 }; break;
                 case 36:
                 {
@@ -239,23 +272,26 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
 
                     signal.quality = (uchar)data[offset +i*stride + 4];
                     signal.timestamp = CP56Time(data,offset + i*stride+5);
+
+                    result.append(signal);
                 }; break;
             }
 
             //signal.value = value;
             //signal.quality = quality;
 
-            result.append(signal);
+
         }//end for
 
     }else
         //------------------------- SQ=0  -----------------------------
     {
+        uint val_u32;   //буфер для вычисления значения
         offset = 12;
         for (int i=0; i<count; i++)
         {
             CIECSignal signal;
-            uint addr;
+            quint32 addr;
             signal.ASDU = ((uchar)data[11]<<8) + (uchar)data[10];
             signal.bNeverUpdated = false;
             signal.SetType(typeID);
@@ -264,10 +300,13 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 1:
                     {
                         stride = 4;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
                         signal.value = QVariant(bool((data[offset + i*stride + 3]&0x01)>0));
                         signal.quality = data[offset + i*stride +3]&0xFE;
+
+                        result.append(signal);
                     }break;
                 case 3:
                     {
@@ -276,11 +315,13 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 5:
                     {
                         stride = 5;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
                         signal.SetAddress(addr);
                         signal.value = QVariant(char(data[offset + i*stride + 3]));
                         signal.quality = data[offset + i*stride + 4];
 
+                        result.append(signal);
                     }
                 break;
                 //32-bit string (dword)
@@ -291,10 +332,13 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         stride = 6;
              //           (*p_addr) = data[offset + i*stride] + (data[offset + i*stride +1]<<8) + (data[offset+ i*stride +2]<<16);
              //           addr = reinterpret_cast<quint32*>(p_addr);
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
                         signal.value = QVariant(uint(data[offset + i*stride + 3] + (data[offset + i*stride + 4]<<8)));
                         signal.quality = data[offset + i*stride +5];
+
+                        result.append(signal);
                     }break;
                 //int
                 case 11:
@@ -302,10 +346,13 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         stride = 6;
            //            (*p_addr) = data[offset + i*stride] + (data[offset + i*stride +1]<<8) + (data[offset+ i*stride +2]<<16);
            //             addr = reinterpret_cast<quint32*>(p_addr);
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
                         signal.value = QVariant(int(data[offset + i*stride + 3] + (data[offset + i*stride + 4]<<8)));
                         signal.quality = data[offset + i*stride +5];
+
+                        result.append(signal);
                     }break;
                 //float
                 case 13:
@@ -313,10 +360,21 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         stride = 8;
                //         (*p_addr) = data[offset + i*stride] + (data[offset + i*stride +1]<<8) + (data[offset+ i*stride +2]<<16);
                //         addr = reinterpret_cast<quint32*>(p_addr);
-                        addr = (data[offset+ i*stride +2]<<16) + ((data[offset + i*stride +1])<<8) + data[offset + i*stride];
+
+                        //addr = (data[offset+ i*stride +2]<<16) + ((data[offset + i*stride +1])<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
-                        signal.value = QVariant(int(data[offset + i*stride + 3] + (data[offset + i*stride + 4]<<8)+ (data[offset + i*stride + 5]<<16)+ (data[offset + i*stride + 6]<<24)));
+
+                        val_u32 = (uchar)data[offset+i*stride] +
+                                ((uchar)data[offset+i*stride+1]<<8) +
+                                ((uchar)data[offset+i*stride+2]<<16) +
+                                ((uchar)data[offset+i*stride+3]<<24);
+                        signal.value = QVariant(val_u32);
+
+                        //signal.value = QVariant(int(data[offset + i*stride + 3] + (data[offset + i*stride + 4]<<8)+ (data[offset + i*stride + 5]<<16)+ (data[offset + i*stride + 6]<<24)));
                         signal.quality = data[offset + i*stride + 7];
+
+                        result.append(signal);
                     }break;
                 case 15: break;
                 case 20: break;
@@ -324,56 +382,80 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 30:
                     {
                         stride = 11;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
-               //         (*p_addr) = data[offset + i*stride] + (data[offset + i*stride +1]<<8) + (data[offset+ i*stride +2]<<16);
-               //         addr = reinterpret_cast<quint32*>(p_addr);
+                        addr = GetIOA(data[offset + i*stride],data[offset + i*stride +1],data[offset + i*stride +2]);
+                       // addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
                         signal.SetAddress(addr);
                         signal.value = QVariant(bool((data[offset + i*stride + 3]&0x01)>0));
                         signal.quality = data[offset + i*stride +3]&0xFE;
                         signal.timestamp = CP56Time(data,offset + i*stride+4);
+
+                        result.append(signal);
                     }break;
                 case 31:break;
                 case 32:
                    {
-                        stride = 9; //байт значения, байт качества, 7 байт метки времени
-                        signal.value = QVariant((uchar)data[offset+i*stride]);
-                        signal.quality = (uchar)(data[offset + i*stride+1]);
-                        signal.timestamp = CP56Time(data,offset + i*stride+2);
+                        stride = 12; //3 байта - IOA, 1 байт значения, байт качества, 7 байт метки времени
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+
+                        signal.value = QVariant((uchar)data[offset+i*stride+3]);
+                        signal.quality = (uchar)(data[offset + i*stride+4]);
+                        signal.timestamp = CP56Time(data,offset + i*stride+5);
+
+                        result.append(signal);
                     }; break;
                 case 33:
                     {
                         stride = 15;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
-                        signal.value = QVariant((data[offset+ i*stride +6]<<24) + (data[offset+ i*stride +5]<<16) + (data[offset + i*stride +4]<<8) + data[offset + i*stride+3]);
+
+                        val_u32 = (uchar)data[offset+i*stride+3] +
+                                ((uchar)data[offset+i*stride+4]<<8) +
+                                ((uchar)data[offset+i*stride+5]<<16) +
+                                ((uchar)data[offset+i*stride+6]<<24);
+                        signal.value = QVariant(val_u32);
+
+                        //signal.value = QVariant((data[offset+ i*stride +6]<<24) + (data[offset+ i*stride +5]<<16) + (data[offset + i*stride +4]<<8) + data[offset + i*stride+3]);
                         signal.quality = (uchar)(data[offset + i*stride+7]);
                         signal.timestamp = CP56Time(data,offset + i*stride+8);
+
+                        result.append(signal);
                     };
                 break;
                 case 34:
                     {
                         stride = 13;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                         addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
                         signal.value = QVariant( (data[offset + i*stride +4]<<8) + data[offset + i*stride+3]);
                         signal.quality = (uchar)(data[offset + i*stride+5]);
                         signal.timestamp = CP56Time(data,offset + i*stride+6);
+
+                        result.append(signal);
                     };
                 break;
                 case 35:
                     {
                         stride = 13;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                         addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
                         signal.value = QVariant( (data[offset + i*stride +4]<<8) + data[offset + i*stride+3]);
                         signal.quality = (uchar)(data[offset + i*stride+5]);
                         signal.timestamp = CP56Time(data,offset + i*stride+6);
+
+                        result.append(signal);
                     };
                 break;
                 case 36:
                     {
                         stride = 15;
-                        addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                        //addr = (data[offset+ i*stride +2]<<16) + (data[offset + i*stride +1]<<8) + data[offset + i*stride];
+                         addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
                         signal.SetAddress(addr);
 
                         uint *bytes = new uint();
@@ -387,6 +469,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                         signal.value = QVariant(*fValue);
                         signal.quality = (uchar)(data[offset + i*stride+7]);
                         signal.timestamp = CP56Time(data,offset + i*stride+8);
+
+                        result.append(signal);
                     };
                 break;
                 case 37:break;
@@ -394,7 +478,8 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
                 case 39:break;
                 case 40:break;
             }
-             result.append(signal);
+
+
         }//end for
         /*
         //c метками в формате cp56
@@ -447,3 +532,5 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *APCInum){
   qDebug() <<"APCI: "<< (*APCInum);
     return result;
 }
+
+

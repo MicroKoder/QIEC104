@@ -75,7 +75,7 @@ public:
     uchar quality;
 
     ///описание сигнала
-    QString description = QString("empty");
+    QString description = QString("");
     ///7-byte time
     CP56Time timestamp;
 
