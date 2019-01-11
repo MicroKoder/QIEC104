@@ -8,5 +8,6 @@
         <file alias="icon_erase">icons/Erase.png</file>
         <file>icons/minus.png</file>
         <file>icons/plus.png</file>
+        <file>icons/interrogation.png</file>
     </qresource>
 </RCC>

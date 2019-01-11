@@ -23,17 +23,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     //CSetting *settings;
-    QSettings *qsettings;
-    IEC104Driver *pDriver;
-    TableModel *tabmodel;
+    QSettings *qsettings=0;
+    IEC104Driver *pDriver=0;
+    TableModel *tabmodel=0;
 
     ~MainWindow();
 
     void AddMSignal(CIECSignal* tag, QString description=QString());
 private:
     Ui::MainWindow *ui;
-     QLabel *pConnectionStatusLabel;
-     addSignalDialog *pAddSignalDialog;
+     QLabel *pConnectionStatusLabel=0;
+     addSignalDialog *pAddSignalDialog=0;
      ConnectionSettingsDialog *pConnectionDialog=0;
 
 public slots:
@@ -55,6 +55,7 @@ public slots:
 
     void OnLoadBaseTriggered(bool); //меню - импорт базы
     void OnGIPressed(void); //general interrogation
+    void OnCMDPressed(void); //открыть диалог с командами
 };
 
 #endif // MAINWINDOW_H

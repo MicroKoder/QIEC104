@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QDebug>
+#include "cmddialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal)),this,SLOT(IECReceived(CIECSignal)));
 
     connect(ui->action_LoadBase, SIGNAL(triggered(bool)),this, SLOT(OnLoadBaseTriggered(bool)));
+    connect(ui->actionCMD,SIGNAL(triggered(bool)),this,SLOT(OnCMDPressed()));
     //создаем статус сообщение
     pConnectionStatusLabel= new QLabel();
     statusBar()->addWidget(pConnectionStatusLabel);
@@ -213,10 +215,8 @@ void MainWindow::IECReceived(CIECSignal tag)
 
 void MainWindow::OnGIPressed()
 {
-    //driver->SendFullRequest(settings->asdu,20);
-    qsettings->beginGroup("driver");
-    pDriver->SendFullRequest(qsettings->value("asdu",QVariant(1)).toInt(),20);
-    qsettings->endGroup();
+    if (pDriver!=0)
+    pDriver->SendFullRequest(20);
 }
 
 void MainWindow::OnLoadBaseTriggered(bool val)
@@ -229,4 +229,10 @@ void MainWindow::OnLoadBaseTriggered(bool val)
        id->SetModel(this->tabmodel);
        id->exec();
   // }
+}
+
+void MainWindow::OnCMDPressed()
+{
+CmdDialog *pDialog = new CmdDialog(pDriver, qsettings,this);
+pDialog->exec();
 }

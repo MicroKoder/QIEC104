@@ -33,11 +33,13 @@ IEC104Driver::IEC104Driver():
 /// \param ASDU
 /// \param requestDescription - описатель запроса (20 - общий, 21 - группа 1 и т.д.)
 ///
-void IEC104Driver::SendFullRequest(quint16 ASDU, quint8 requestDescription)
+void IEC104Driver::SendFullRequest(quint8 requestDescription)
 {
+    quint16 ASDU = settings->asdu;
+
     char temp[] = {0x68, 0xE,
-                   0x00, 0x00,
-                   char(N_T), char(N_T>>8),
+                   char(N_T<<1), char(N_T>>7),
+                   char(N_R<<1), char(N_R>>7),
                    0x64, 0x01,
                    0x06,0x00,    //причина передачи - активация
                    char(ASDU&0xFF), char((ASDU>>8)&0xFF),
@@ -48,7 +50,7 @@ void IEC104Driver::SendFullRequest(quint16 ASDU, quint8 requestDescription)
    QByteArray buf = QByteArray(temp, 16);
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,16);
-        emit Message("<-- General interrogation");
+        emit Message("<-- Команда опроса");
         N_T ++;
     }
 
@@ -174,13 +176,13 @@ IEC104Driver* IEC104Driver::GetInstance()
 /// give connection parameters straight
 /// \param settings
 /// can't be NULL
-void IEC104Driver::SetSettings(CSetting *settings)
+/*void IEC104Driver::SetSettings(CSetting *settings)
 {
     if (settings != NULL)
     {
         this->settings = settings;
     }
-}
+}*/
 
 ///
 /// \brief IEC104Driver::SetSettings
@@ -244,6 +246,46 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
 void IEC104Driver::CloseConnection()
 {
     sock->disconnectFromHost();
+}
+
+///
+/// \brief IEC104Driver::SendCommand
+/// \param type
+/// \param ioa
+/// запись однопозиционной команды
+void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
+{
+    qDebug() << "sending command "<< type << " " << ioa ;
+    quint16 ASDU = settings->asdu;
+    char requestDescription = 0;
+    char temp[] = {0x68, 0xE,
+                   char(N_T<<1), char(N_T>>7),
+                   char(N_R<<1), char(N_R>>7),
+                   45, 0x01,
+                   0x06,0x00,    //причина передачи - активация
+                   char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                   char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
+                   char(1)
+                  };
+
+   QByteArray buf = QByteArray(temp, 16);
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,16);
+        emit Message("<-- Однопозиционная команда");
+        N_T ++;
+    }
+
+}
+
+///
+/// \brief IEC104Driver::SetPoint
+/// \param type
+/// \param ioa
+/// \param value
+///Запись уставки
+void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
+{
+
 }
 //==================================================== PRIVATE SLOTS =======================================================================
 void IEC104Driver::OnConnected()

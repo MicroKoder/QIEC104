@@ -47,12 +47,15 @@ private:
     bool isTestCon(QByteArray data);
 
 public:
-    void SendFullRequest(quint16 ASDU, quint8 requestDescription); //general interrogation [100]
+    void SendFullRequest(quint8 requestDescription); //general interrogation [100]
     static IEC104Driver* GetInstance();
-    void SetSettings(CSetting* settings);
+    //void SetSettings(CSetting* settings);
     void SetSettings(QSettings* settings);
     CSetting* GetSettings();
     void CloseConnection();
+
+    void SendCommand(quint16 type, quint32 ioa, quint8 value); //отправка команды или уставки регулирования
+    void SetPoint(quint16 type, quint32 ioa, QVariant value);
 signals:
     void Connected();
     void Disconnected();

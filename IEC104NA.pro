@@ -34,7 +34,8 @@ SOURCES += \
     ciecsignal.cpp \
     importdialog.cpp \
     addsignaldialog.cpp \
-    connectiondialog.cpp
+    connectiondialog.cpp \
+    cmddialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,13 +47,15 @@ HEADERS += \
     ciecsignal.h \
     importdialog.h \
     addsignaldialog.h \
-    connectiondialog.h
+    connectiondialog.h \
+    cmddialog.h
 
 FORMS += \
         mainwindow.ui \
     settingsdialog.ui \
     importdialog.ui \
-    addsignaldialog.ui
+    addsignaldialog.ui \
+    cmddialog.ui
 
 RESOURCES += \
     resources.qrc
