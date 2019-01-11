@@ -255,7 +255,7 @@ void IEC104Driver::CloseConnection()
 /// запись однопозиционной команды
 void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
 {
-    qDebug() << "sending command "<< type << " " << ioa ;
+    qDebug() << "sending command "<< type << " " << ioa << " "<< value ;
     quint16 ASDU = settings->asdu;
     char requestDescription = 0;
     char temp[] = {0x68, 0xE,
@@ -265,7 +265,7 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
                    0x06,0x00,    //причина передачи - активация
                    char(ASDU&0xFF), char((ASDU>>8)&0xFF),
                    char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
-                   char(1)
+                   char(value)
                   };
 
    QByteArray buf = QByteArray(temp, 16);
@@ -285,6 +285,98 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
 ///Запись уставки
 void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
 {
+    quint16 ASDU = settings->asdu;
+    char requestDescription = 0;
+
+    if (type == 48 || type == 61)
+    {
+        quint16 uvalue = value.toUInt();
+        char temp[] = {0x68, 0xE,
+                       char(N_T<<1), char(N_T>>7),
+                       char(N_R<<1), char(N_R>>7),
+                       type, 0x01,
+                       0x06,0x00,    //причина передачи - активация
+                       char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                       char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
+                       char(uvalue&0xff),char((uvalue>>8)&0xff),0x00
+                      };
+
+        QByteArray buf = QByteArray(temp, sizeof(temp));
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,buf.count());
+            emit Message("<-- Команда уставки, нормализованное значение");
+            N_T ++;
+        }
+        return;
+    }//48,61
+    if (type == 49 || type == 62)
+    {
+        int ivalue = value.toUInt();
+        char temp[] = {0x68, 0xE,
+                       char(N_T<<1), char(N_T>>7),
+                       char(N_R<<1), char(N_R>>7),
+                       type, 0x01,
+                       0x06,0x00,    //причина передачи - активация
+                       char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                       char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
+                       char(ivalue&0xff),char((ivalue>>8)&0xff),0x00
+                      };
+
+        QByteArray buf = QByteArray(temp, sizeof(temp));
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,buf.count());
+            emit Message("<-- Команда уставки, масштабированное значение");
+            N_T ++;
+        }
+        return;
+    }//49,62
+    if (type == 50 || type == 63)
+    {
+        float fvalue = value.toFloat();
+        QByteArray bytes(reinterpret_cast<const char*>(&fvalue), sizeof(fvalue));
+        char temp[] = {0x68, 0xE,
+                       char(N_T<<1), char(N_T>>7),
+                       char(N_R<<1), char(N_R>>7),
+                       type, 0x01,
+                       0x06,0x00,    //причина передачи - активация
+                       char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                       char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
+                       bytes[0],bytes[1],bytes[2],bytes[3],0x00
+                      };
+
+
+        QByteArray buf = QByteArray(temp, 20);
+
+        qDebug() << temp;
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,20);
+            emit Message("<-- Команда уставки с плавающей точкой");
+            N_T ++;
+        }
+        return;
+    }//50,63
+    if (type == 51 || type == 64)
+    {
+        uint dvalue = value.toUInt();
+        char temp[] = {0x68, 0xE,
+                       char(N_T<<1), char(N_T>>7),
+                       char(N_R<<1), char(N_R>>7),
+                       type, 0x01,
+                       0x06,0x00,    //причина передачи - активация
+                       char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                       char(ioa&0xFF),char((ioa)>>8)&0xff,char((ioa)>>16)&0xff,
+                       char(dvalue&0xff),char((dvalue>>8)&0xff),char((dvalue>>16)&0xff),char((dvalue>>24)&0xff),0x00
+                      };
+
+        QByteArray buf = QByteArray(temp, sizeof(temp));
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,buf.count());
+            emit Message("<-- Команда уставки, строка 32 бит");
+            N_T ++;
+        }
+        return;
+    }//48,61
+
 
 }
 //==================================================== PRIVATE SLOTS =======================================================================

@@ -19,10 +19,11 @@ private:
     Ui::CmdDialog *ui;
     QSettings *pSett=0;
     IEC104Driver *pDriver=0;
-
+    void ShowWarning();
 public slots:
     void reject();
     void OnActivateCommand();
+    void OnTypeChanged(int);
 };
 
 #endif // CMDDIALOG_H
