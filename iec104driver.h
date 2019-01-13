@@ -13,7 +13,13 @@ namespace IEC104
     class IEC104Driver;
 }
 
-///Класс - синглтон
+///
+/// \brief The IEC104Driver class
+/// This singleton class takes over iec104 protocol interaction.
+///  Use slot "OpenConnection" to start. Driver automatically maintain connection by sending test packages.
+///  When the signal received the IECSignalReceived signal will be activated.
+///  For sending commands use methods SendCommand or SetPoint.
+///
 class IEC104Driver:public QObject
 {
     Q_OBJECT
@@ -22,9 +28,19 @@ private:
     QTcpSocket *sock;
     uint count;
     uint lastAPCICount;
-    quint16 N_R;    //счетчик вх. пакетов
-    quint16 N_T;    //счетчик исх. пактов
-    //QByteArray buf;
+    ///
+    /// \brief N_R
+    /// count of recieved packeges from server
+    quint16 N_R;
+
+    ///
+    /// \brief N_T
+    ///count of thansfered packages to server
+    quint16 N_T;
+
+    ///
+    /// \brief settings
+    ///connection settings
     CSetting* settings;
 
     IEC104Driver();
@@ -54,7 +70,13 @@ public:
     CSetting* GetSettings();
     void CloseConnection();
 
-    void SendCommand(quint16 type, quint32 ioa, quint8 value); //отправка команды или уставки регулирования
+    ///
+    /// \brief SendCommand
+    /// \param type
+    /// \param ioa
+    /// \param value
+    ///
+    void SendCommand(quint16 type, quint32 ioa, quint8 value);
     void SetPoint(quint16 type, quint32 ioa, QVariant value);
 signals:
     void Connected();

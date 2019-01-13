@@ -4,6 +4,10 @@
 #include <qstring.h>
 #include "ciecsignal.h"
 #include "cp56time.h"
+
+///
+/// \brief The IEC104Tools class
+/// static functions used by iec104 driver for decoding packages
 class IEC104Tools
 {
     static QByteArray lostBytes;
