@@ -463,7 +463,7 @@ void IEC104Driver::OnSockReadyRead()
     }
 
     //send confirmation
-   if ((N_R - lastAPCICount)>=settings->w){
+   if ((N_R - lastAPCICount)>=(settings->w-2)){
        Send_ConfirmPacks();
     }
 }
