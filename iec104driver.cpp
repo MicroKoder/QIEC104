@@ -238,6 +238,9 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
         //setup timer
         testTimer->setInterval(settings->t3*1000);
 
+        N_R = 0;
+        N_T = 0;
+
     }
 
     return;
@@ -251,8 +254,9 @@ void IEC104Driver::CloseConnection()
 ///
 /// \brief IEC104Driver::SendCommand
 /// \param type
+/// 45,46,47,58,59, 60
 /// \param ioa
-/// запись однопозиционной команды
+/// запись однопозиционной или двухпозиционной команды
 void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
 {
     qDebug() << "sending command "<< type << " " << ioa << " "<< value ;
@@ -261,7 +265,7 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
     char temp[] = {0x68, 0xE,
                    char(N_T<<1), char(N_T>>7),
                    char(N_R<<1), char(N_R>>7),
-                   45, 0x01,
+                   char(type), 0x01,
                    0x06,0x00,    //причина передачи - активация
                    char(ASDU&0xFF), char((ASDU>>8)&0xFF),
                    char(ioa&0xFF),char(((ioa)>>8)&0xff),char(((ioa)>>16)&0xff),
@@ -449,7 +453,7 @@ void IEC104Driver::OnSockReadyRead()
     //N_R = IEC104Tools::ParseAPCInum(buf);
     if ((buf.length()>6) && ((buf[2]&0x1) == 0))
     {
-       QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R,&N_T);
+       QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R);
        if (s!=NULL)
        {
            bool isSequence = (buf[7]&0x80)>0;

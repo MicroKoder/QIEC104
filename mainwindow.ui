@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>IEC104 Эмулятор</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normalon>:/new/prefix1/icons/Q104.png</normalon>
+   </iconset>
+  </property>
   <property name="iconSize">
    <size>
     <width>32</width>
@@ -147,7 +152,6 @@
      <string>Сервис</string>
     </property>
     <addaction name="action_settings"/>
-    <addaction name="action_params"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -335,7 +339,7 @@
   </action>
   <action name="action_settings">
    <property name="text">
-    <string>Настройки подключения</string>
+    <string>Настройки</string>
    </property>
   </action>
   <action name="action_params">
@@ -356,6 +360,11 @@
    </property>
   </action>
   <action name="actionTS">
+   <property name="icon">
+    <iconset>
+     <normalon>:/new/prefix1/icon_timer</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>TS</string>
    </property>
@@ -369,6 +378,11 @@
    </property>
   </action>
   <action name="actionCMD">
+   <property name="icon">
+    <iconset>
+     <normalon>:/new/prefix1/icons/cmd.png</normalon>
+    </iconset>
+   </property>
    <property name="text">
     <string>CMD</string>
    </property>

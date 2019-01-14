@@ -44,8 +44,8 @@ char CP56Time::GetYear(){
 
 QString CP56Time::GetTimeString()
 {
-    return QString::number(GetDay()) + "/"+
-            QString::number(GetMonth()) + "/" +
+    return QString::number(GetDay()) + "-"+
+            QString::number(GetMonth()) + "-" +
             QString::number(GetYear()) + " " +
             QString::number(GetHour())+":"+
             QString::number(GetMinute())+":"+

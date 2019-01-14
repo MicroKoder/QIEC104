@@ -43,7 +43,7 @@ QString IEC104Tools::BytesToString(char *bytes, quint16 len)
 
 
 ///Обработка целого фрейма, должен быть валидный пакет данных
-QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count,quint16 *T_Count){
+QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
     QList<CIECSignal> result;//=new QList<CIECSignal>();
 
     if (R_Count !=0)
@@ -51,10 +51,10 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count,qui
         (*R_Count) = (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7));
     }
 
-    if (T_Count !=0)
-    {
-        (*T_Count) = ((unsigned char)data[4]>>1) + ((unsigned char)data[5]<<7);
-    }
+//    if (T_Count !=0)
+//    {
+//        (*T_Count) = ((unsigned char)data[4]>>1) + ((unsigned char)data[5]<<7);
+//    }
 
     uchar typeID = uchar(data[6]);
 
@@ -494,7 +494,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count,qui
 }
 
 ///Обработка пакета байт
-QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count, quint16 *T_Count){
+QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count){
 
     QList<CIECSignal>* result = new QList<CIECSignal>();
 
@@ -514,7 +514,7 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count, qu
         return result;
     }else
     {
-        QList<CIECSignal> temp = ParseFrame(data,R_Count,T_Count);
+        QList<CIECSignal> temp = ParseFrame(data,R_Count);
         if (!temp.isEmpty())
         {
             result->append(temp);
@@ -528,7 +528,7 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count, qu
         for (int i=(uchar)data[1]+2; i<data.length(); i++)
             d.append(data[i]);
 
-        QList<CIECSignal>* temp = ParseData(d,R_Count, T_Count);
+        QList<CIECSignal>* temp = ParseData(d,R_Count);
       //    QList<CIECSignal>* temp = ParseData(data[],APCInum);
 
         if (temp != NULL)

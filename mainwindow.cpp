@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QDebug>
-#include "cmddialog.h"
+
 #include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -294,6 +294,10 @@ void MainWindow::OnLoadBaseTriggered(bool val)
 
 void MainWindow::OnCMDPressed()
 {
-CmdDialog *pDialog = new CmdDialog(pDriver, qsettings,this);
-pDialog->exec();
+    if (pDialog!=0)
+        delete pDialog;
+
+    pDialog = new CmdDialog(pDriver, qsettings,this);
+pDialog->show();
+//pDialog->exec();
 }

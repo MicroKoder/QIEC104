@@ -2,6 +2,8 @@
 #include "ui_cmddialog.h"
 #include <QDebug>
 #include <QMessageBox>
+
+
 CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CmdDialog)
@@ -33,7 +35,37 @@ void CmdDialog::OnTypeChanged(int index)
     Q_UNUSED(index);
     switch(ui->comboBox_type->currentIndex())
     {
-        case 0: ui->groupBox_setcommand->show(); ui->groupBox_setpoint->hide(); break;
+    case 0:
+            ui->groupBox_setcommand->show();
+            ui->groupBox_setpoint->hide();
+            ui->comboBox_cmdValue->clear();
+
+            ui->comboBox_cmdValue->addItem("0:Выкл");
+            ui->comboBox_cmdValue->addItem("1:Вкл");
+        break;
+    case 1:
+        ui->groupBox_setcommand->show();
+        ui->groupBox_setpoint->hide();
+        ui->comboBox_cmdValue->clear();
+
+        ui->comboBox_cmdValue->addItem("0:Не разрешено");
+        ui->comboBox_cmdValue->addItem("1:Выкл");
+        ui->comboBox_cmdValue->addItem("2:Вкл");
+        ui->comboBox_cmdValue->addItem("3:Не разрешено");
+
+        break;
+    case 2:
+        ui->groupBox_setcommand->show();
+        ui->groupBox_setpoint->hide();
+        ui->comboBox_cmdValue->clear();
+
+        ui->comboBox_cmdValue->addItem("0:Не разрешено");
+        ui->comboBox_cmdValue->addItem("1:Шаг вниз");
+        ui->comboBox_cmdValue->addItem("2:Шаг вверх");
+        ui->comboBox_cmdValue->addItem("3:Не разрешено");
+
+        break;
+
     default:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
@@ -60,7 +92,7 @@ void CmdDialog::reject()
 void CmdDialog::OnActivateCommand()
 {
     bool ok=0;
-    quint8 SCO;
+    quint8 CO; //Command Object
     quint16 uvalue;
     int ivalue;
     float fValue;
@@ -75,10 +107,21 @@ void CmdDialog::OnActivateCommand()
         switch(ui->comboBox_type->currentIndex())
         {
            case 0:
-            SCO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
 
-            pDriver->SendCommand(45 + correctType,ui->spinBox_ioa->value(),SCO);
+            pDriver->SendCommand(45 + correctType ,ui->spinBox_ioa->value(),CO);
             break;
+           case 1:
+            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+
+            pDriver->SendCommand(46 + correctType ,ui->spinBox_ioa->value(),CO);
+            break;
+
+          case 2:
+            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+
+           pDriver->SendCommand(47 + correctType ,ui->spinBox_ioa->value(),CO);
+         break;
            case 3:
             uvalue = ui->lineEdit_value->text().toUInt(&ok);
             if (ok)

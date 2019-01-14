@@ -9,5 +9,7 @@
         <file>icons/minus.png</file>
         <file>icons/plus.png</file>
         <file>icons/interrogation.png</file>
+        <file>icons/Q104.png</file>
+        <file>icons/cmd.png</file>
     </qresource>
 </RCC>

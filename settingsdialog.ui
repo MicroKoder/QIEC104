@@ -31,6 +31,11 @@
   <property name="windowTitle">
    <string>Настройки соединения</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normalon>:/new/prefix1/icon_settings</normalon>
+   </iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox">

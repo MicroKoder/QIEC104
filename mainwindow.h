@@ -12,6 +12,7 @@
 #include <addsignaldialog.h>
 #include <connectiondialog.h>
 #include "importdialog.h"
+#include "cmddialog.h"
 namespace Ui {
 class MainWindow;
 }
@@ -35,6 +36,7 @@ private:
      QLabel *pConnectionStatusLabel=0;
      addSignalDialog *pAddSignalDialog=0;
      ConnectionSettingsDialog *pConnectionDialog=0;
+     CmdDialog *pDialog=0;
 
 public slots:
     void OnConnectPressed(void);
