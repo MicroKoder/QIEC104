@@ -26,6 +26,9 @@ public:
     {
         return key;
     }
+
+    void SetKey(uint key);
+
     ///
     /// \brief SetAddress
     /// set IOA address to signal

@@ -133,7 +133,8 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="action"/>
+    <addaction name="action_SaveBase"/>
+    <addaction name="action_LoadFile"/>
     <addaction name="action_LoadBase"/>
    </widget>
    <widget class="QMenu" name="menu_about">
@@ -322,14 +323,14 @@
     <string>Настройки</string>
    </property>
   </action>
-  <action name="action">
+  <action name="action_SaveBase">
    <property name="text">
-    <string>Сохранить базу</string>
+    <string>Сохранить файл</string>
    </property>
   </action>
-  <action name="action_LoadBase">
+  <action name="action_LoadFile">
    <property name="text">
-    <string>Загрузить базу</string>
+    <string>Загрузить файл</string>
    </property>
   </action>
   <action name="action_settings">
@@ -373,6 +374,11 @@
    </property>
    <property name="toolTip">
     <string>команды</string>
+   </property>
+  </action>
+  <action name="action_LoadBase">
+   <property name="text">
+    <string>Импортировать базу</string>
    </property>
   </action>
  </widget>

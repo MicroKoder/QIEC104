@@ -100,7 +100,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                 }
                 else
                 {
-                      quality_str+="NULL";
+                      quality_str+="";
                 }
 
                     result = QVariant(quality_str);

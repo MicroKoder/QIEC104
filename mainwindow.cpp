@@ -4,7 +4,7 @@
 #include <QShortcut>
 #include <QDebug>
 #include "cmddialog.h"
-
+#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -31,6 +31,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal)),this,SLOT(IECReceived(CIECSignal)));
 
     connect(ui->action_LoadBase, SIGNAL(triggered(bool)),this, SLOT(OnLoadBaseTriggered(bool)));
+    connect(ui->action_SaveBase, SIGNAL(triggered(bool)),this,SLOT(OnSaveBaseTriggered(bool)));
+    connect(ui->action_LoadFile, SIGNAL(triggered(bool)),this,SLOT(OnLoadFileTriggered(bool)));
+
+
     connect(ui->actionCMD,SIGNAL(triggered(bool)),this,SLOT(OnCMDPressed()));
     //создаем статус сообщение
     pConnectionStatusLabel= new QLabel();
@@ -217,6 +221,63 @@ void MainWindow::OnGIPressed()
 {
     if (pDriver!=0)
     pDriver->SendFullRequest(20);
+}
+void MainWindow::OnSaveBaseTriggered(bool)
+{
+    qDebug() << "save base";
+    QFileDialog *fileDialog = new QFileDialog();
+
+    QString filename = fileDialog->getSaveFileName(this,"Сохранение",QString(),QString("*.dat")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
+    qDebug() << filename;
+    if (filename.length()>0)
+    {
+        QFile *file = new QFile(filename);
+        file->open(QIODevice::ReadWrite);
+        QTextStream stream(file);
+        foreach(CIECSignal signal, tabmodel->mData)
+        {
+            stream << signal.GetKey() << '\\' << signal.description << '\n';
+
+        }
+        file->close();
+        delete file;
+
+    }
+    delete fileDialog;
+}
+
+void MainWindow::OnLoadFileTriggered(bool)
+{
+  QFileDialog *fileDialog = new QFileDialog();
+
+
+  QString filename = fileDialog->getOpenFileName(this,"Открытие",QString(),QString("*.dat"));
+  QString key;
+  QString descr;
+  if (filename.length()>0)
+  {
+      QFile *file= new QFile(filename);
+      file->open(QIODevice::ReadOnly);
+      QTextStream in(file);
+      while(!in.atEnd())
+      {
+        QString line = in.readLine();
+        qDebug() << line;
+        QStringList words= line.split('\\');
+        key = words[0];
+
+        CIECSignal sig;
+        sig.SetKey( key.toUInt());
+        sig.description = words[1];
+        tabmodel->updateSignal(sig,true,true);
+      }
+
+      file->close();
+      delete file;
+
+  }
+
+  delete fileDialog;
 }
 
 void MainWindow::OnLoadBaseTriggered(bool val)

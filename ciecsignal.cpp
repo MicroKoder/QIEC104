@@ -22,6 +22,12 @@ CIECSignal::CIECSignal(uint16_t addr, uchar type, QString descr)
     this->descr = description;
 }*/
 
+void CIECSignal::SetKey(uint key)
+{
+    this->key = key;
+    address = key & 0x00FFFFFFu;
+    typeID = (key &0xFF000000u)>>24;
+}
 QString CIECSignal::GetValueString()
 {
     QString result;
