@@ -14,9 +14,9 @@ class IEC104Tools
     //декодирование одного сигнала из пакета данных
     static CIECSignal ParseSignal(QByteArray &data, uchar typeID, int n);
     //декодирование фрейма APCI
-    static QList<CIECSignal> ParseFrame(QByteArray &data, quint16 *APCInum);
+    static QList<CIECSignal> ParseFrame(QByteArray &data, quint16 *APCInum,quint16 *T_Count);
     /// выделение счетчика пакетов
-    static uint ParseAPCInum(QByteArray &data);
+   // static uint ParseAPCInum(QByteArray &data);
 public:
     IEC104Tools();
 
@@ -27,7 +27,7 @@ public:
     ///парсинг пакета данных
     /// data может быть целым фреймом APCI, началом фрейма APCI, либо целым фреймом APCI с началом следующего фрейма
     /// гарантируется что любая последовательность байт будет обработана
-    static QList<CIECSignal>* ParseData(QByteArray &data, quint16 *APCInum);
+    static QList<CIECSignal>* ParseData(QByteArray &data, quint16 *APCInum,quint16 *T_Count);
 };
 
 #endif // CTOOLS_H

@@ -18,7 +18,7 @@ addSignalDialog::~addSignalDialog()
 
 void addSignalDialog::accept()
 {
-    int type;
+    int type=0;
     switch (ui->comboBox->currentIndex())
     {
         case 0: type = 1; break;

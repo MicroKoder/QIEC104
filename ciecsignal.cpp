@@ -28,6 +28,21 @@ void CIECSignal::SetKey(uint key)
     address = key & 0x00FFFFFFu;
     typeID = (key &0xFF000000u)>>24;
 }
+
+void CIECSignal::SetAddress(quint32 ioa)
+{
+    address = ioa;
+    key &= 0xFF000000;
+    key |= ioa;
+}
+
+void CIECSignal::SetType(uchar type)
+{
+    typeID = type;
+    key &=0x00FFFFu;
+    key |= type<<24;
+}
+
 QString CIECSignal::GetValueString()
 {
     QString result;

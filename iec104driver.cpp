@@ -449,7 +449,7 @@ void IEC104Driver::OnSockReadyRead()
     //N_R = IEC104Tools::ParseAPCInum(buf);
     if ((buf.length()>6) && ((buf[2]&0x1) == 0))
     {
-       QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R);
+       QList<CIECSignal>* s = IEC104Tools::ParseData(buf,&N_R,&N_T);
        if (s!=NULL)
        {
            bool isSequence = (buf[7]&0x80)>0;

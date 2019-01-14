@@ -30,6 +30,7 @@ CmdDialog::~CmdDialog()
 
 void CmdDialog::OnTypeChanged(int index)
 {
+    Q_UNUSED(index);
     switch(ui->comboBox_type->currentIndex())
     {
         case 0: ui->groupBox_setcommand->show(); ui->groupBox_setpoint->hide(); break;

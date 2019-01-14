@@ -55,7 +55,8 @@ FORMS += \
     settingsdialog.ui \
     importdialog.ui \
     addsignaldialog.ui \
-    cmddialog.ui
+    cmddialog.ui \
+    aboutdialog.ui
 
 RESOURCES += \
     resources.qrc

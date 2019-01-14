@@ -7,12 +7,12 @@
 class CIECSignal
 {
     ///unique key for signal depends of IOA and type
-    uint key;
+    uint key=0;
 
     ///IOA
-    quint32 address;
+    quint32 address=0;
     ///IEC104 type
-    uchar typeID;
+    uchar typeID=0;
 public:
     CIECSignal();
     CIECSignal(uint16_t addr, uchar type, QString descr=QString("new tag"));
@@ -34,24 +34,14 @@ public:
     /// set IOA address to signal
     /// \param ioa
     ///
-    void SetAddress(quint32 ioa)
-    {
-        address = ioa;
-        key &= 0xFF000000;
-        key |= ioa;
-    }
+    void SetAddress(quint32 ioa);
 
     ///
     /// \brief SetType
     /// set IEC-104 type to signal
     /// \param type
     ///
-    void SetType(uchar type)
-    {
-        typeID = type;
-        key &=0x00FFFF;
-        key |= type<<24;
-    }
+    void SetType(uchar type);
     ///
     /// \brief GetAddress
     /// return IOA address

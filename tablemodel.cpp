@@ -276,7 +276,8 @@ bool TableModel::removeRows(QItemSelectionModel *pSelection)
     foreach (QModelIndex index, selectedRowsList)
         rowList.append(index.row());
 
-    qSort(rowList);
+    //qSort(rowList);
+    std::sort(rowList.begin(),rowList.end());
 
     for (int i=rowList.count()-1; i>=0; i--)
         removeRow(rowList[i]);

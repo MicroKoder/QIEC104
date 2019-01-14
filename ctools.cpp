@@ -37,18 +37,23 @@ QString IEC104Tools::BytesToString(char *bytes, quint16 len)
     return BytesToString(&b);
 }
 
-uint IEC104Tools::ParseAPCInum(QByteArray &data){
-   return (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7));
-}
+//uint IEC104Tools::ParseAPCInum(QByteArray &data){
+//   return (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7));
+//}
 
 
 ///Обработка целого фрейма, должен быть валидный пакет данных
-QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
+QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count,quint16 *T_Count){
     QList<CIECSignal> result;//=new QList<CIECSignal>();
 
-    if (APCInum !=0)
+    if (R_Count !=0)
     {
-        (*APCInum) = IEC104Tools::ParseAPCInum(data);
+        (*R_Count) = (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7));
+    }
+
+    if (T_Count !=0)
+    {
+        (*T_Count) = ((unsigned char)data[4]>>1) + ((unsigned char)data[5]<<7);
     }
 
     uchar typeID = uchar(data[6]);
@@ -489,7 +494,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *APCInum=0){
 }
 
 ///Обработка пакета байт
-QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *APCInum){
+QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count, quint16 *T_Count){
 
     QList<CIECSignal>* result = new QList<CIECSignal>();
 
@@ -509,7 +514,7 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *APCInum){
         return result;
     }else
     {
-        QList<CIECSignal> temp = ParseFrame(data,APCInum);
+        QList<CIECSignal> temp = ParseFrame(data,R_Count,T_Count);
         if (!temp.isEmpty())
         {
             result->append(temp);
@@ -523,13 +528,13 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *APCInum){
         for (int i=(uchar)data[1]+2; i<data.length(); i++)
             d.append(data[i]);
 
-        QList<CIECSignal>* temp = ParseData(d,APCInum);
+        QList<CIECSignal>* temp = ParseData(d,R_Count, T_Count);
       //    QList<CIECSignal>* temp = ParseData(data[],APCInum);
 
         if (temp != NULL)
             result->append(*temp);
     }
-  qDebug() <<"APCI: "<< (*APCInum);
+  qDebug() <<"APCI: "<< (*R_Count);
     return result;
 }
 
