@@ -273,6 +273,7 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
         sock->write(buf,16);
         emit Message("<-- Однопозиционная команда");
         N_T ++;
+        emit Message(IEC104Tools::BytesToString(&buf));
     }
 
 }
@@ -306,6 +307,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, нормализованное значение");
             N_T ++;
+            emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
     }//48,61
@@ -327,6 +329,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, масштабированное значение");
             N_T ++;
+            emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
     }//49,62
@@ -334,7 +337,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
     {
         float fvalue = value.toFloat();
         QByteArray bytes(reinterpret_cast<const char*>(&fvalue), sizeof(fvalue));
-        char temp[] = {0x68, 0xE,
+        char temp[] = {0x68, 0x12,
                        char(N_T<<1), char(N_T>>7),
                        char(N_R<<1), char(N_R>>7),
                        char(type), 0x01,
@@ -352,13 +355,14 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
             sock->write(buf,20);
             emit Message("<-- Команда уставки с плавающей точкой");
             N_T ++;
+            emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
     }//50,63
     if (type == 51 || type == 64)
     {
         uint dvalue = value.toUInt();
-        char temp[] = {0x68, 0xE,
+        char temp[] = {0x68, 0x12,
                        char(N_T<<1), char(N_T>>7),
                        char(N_R<<1), char(N_R>>7),
                        char(type), 0x01,
@@ -373,6 +377,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, строка 32 бит");
             N_T ++;
+            emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
     }//48,61
