@@ -146,6 +146,7 @@
     <property name="title">
      <string>О программе</string>
     </property>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -393,6 +394,11 @@
   <action name="action_LoadBase">
    <property name="text">
     <string>Импортировать базу</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>О программе</string>
    </property>
   </action>
  </widget>

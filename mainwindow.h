@@ -13,6 +13,8 @@
 #include <connectiondialog.h>
 #include "importdialog.h"
 #include "cmddialog.h"
+#include "aboutdialog.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -58,6 +60,8 @@ public slots:
     void OnLoadBaseTriggered(bool); //меню - импорт базы
     void OnLoadFileTriggered(bool); ///загрузить базу из файла
     void OnSaveBaseTriggered(bool); //сохранить базу в файл
+    void OnAboutTriggered(bool);
+
     void OnGIPressed(void); //general interrogation
     void OnCMDPressed(void); //открыть диалог с командами
 };

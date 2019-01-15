@@ -35,7 +35,8 @@ SOURCES += \
     importdialog.cpp \
     addsignaldialog.cpp \
     connectiondialog.cpp \
-    cmddialog.cpp
+    cmddialog.cpp \
+    aboutdialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +49,8 @@ HEADERS += \
     importdialog.h \
     addsignaldialog.h \
     connectiondialog.h \
-    cmddialog.h
+    cmddialog.h \
+    aboutdialog.h
 
 FORMS += \
         mainwindow.ui \

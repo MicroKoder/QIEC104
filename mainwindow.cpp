@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_SaveBase, SIGNAL(triggered(bool)),this,SLOT(OnSaveBaseTriggered(bool)));
     connect(ui->action_LoadFile, SIGNAL(triggered(bool)),this,SLOT(OnLoadFileTriggered(bool)));
 
+    connect(ui->actionAbout, SIGNAL(triggered(bool)),this,SLOT(OnAboutTriggered(bool)));
+
 
     connect(ui->actionCMD,SIGNAL(triggered(bool)),this,SLOT(OnCMDPressed()));
     //создаем статус сообщение
@@ -300,4 +302,11 @@ void MainWindow::OnCMDPressed()
     pDialog = new CmdDialog(pDriver, qsettings,this);
 pDialog->show();
 //pDialog->exec();
+}
+
+void MainWindow::OnAboutTriggered(bool)
+{
+    aboutDialog *dialog = new aboutDialog();
+    dialog->show();
+    //delete dialog;
 }
