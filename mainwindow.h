@@ -15,6 +15,7 @@
 #include "cmddialog.h"
 #include "aboutdialog.h"
 #include <QFileDialog>
+#include "proxymodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +43,7 @@ private:
      CmdDialog *pDialog=0;
      QFile *logFile=0;
      QTextStream *logStream=0;
+     ProxyModel *proxyModel=0;
 
 
 public slots:

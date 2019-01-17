@@ -36,7 +36,8 @@ SOURCES += \
     addsignaldialog.cpp \
     connectiondialog.cpp \
     cmddialog.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    proxymodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -50,7 +51,8 @@ HEADERS += \
     addsignaldialog.h \
     connectiondialog.h \
     cmddialog.h \
-    aboutdialog.h
+    aboutdialog.h \
+    proxymodel.h
 
 FORMS += \
         mainwindow.ui \

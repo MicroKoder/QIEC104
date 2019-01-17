@@ -44,8 +44,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //настройка таблицы сигналов контроля
     tabmodel = new TableModel();
-    ui->MTable->setModel(tabmodel);
 
+    proxyModel = new ProxyModel(this);
+    proxyModel->setSourceModel(tabmodel);
+
+    ui->MTable->setModel(proxyModel);
+   // ui->MTable->setModel(tabmodel);
+
+    connect(ui->lineEdit_nameFilter,SIGNAL(textChanged(QString)),proxyModel,SLOT(setFilter(QString)));
     tabmodel->setHeaderData(0,Qt::Horizontal,QVariant("IOA"));
     tabmodel->setHeaderData(1,Qt::Horizontal,QVariant("Название"));
     tabmodel->setHeaderData(2,Qt::Horizontal,QVariant("Значение"));
