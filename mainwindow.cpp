@@ -3,8 +3,8 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QDebug>
+#include <QDateTime>
 
-#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -66,6 +66,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->MTable);
     connect(shortcut, SIGNAL(activated()), ui->MTool_remove, SLOT(click()));
+
+
+    QString logFileName(QDateTime::currentDateTime().toString() + ".txt");
+    logFileName= logFileName.replace(':','_');
+
+    logFile = new QFile(logFileName);
+
+    qDebug() << "New log: " << logFileName;
+    logFile->open(QIODevice::ReadWrite | QIODevice::Text);
+
+
 
 }
 
@@ -149,7 +160,10 @@ void MainWindow::OnDisconnected()
 ///получено текстовое сообщение от драйвера
 void MainWindow::LogReceived(QString text)
 {
+     QTextStream logStream(logFile);
+    logStream << text << '\n';
     ui->log->append(text);
+   //qDebug() << text;
 }
 
 

@@ -14,6 +14,7 @@
 #include "importdialog.h"
 #include "cmddialog.h"
 #include "aboutdialog.h"
+#include <QFileDialog>
 
 namespace Ui {
 class MainWindow;
@@ -39,6 +40,9 @@ private:
      addSignalDialog *pAddSignalDialog=0;
      ConnectionSettingsDialog *pConnectionDialog=0;
      CmdDialog *pDialog=0;
+     QFile *logFile=0;
+     QTextStream *logStream=0;
+
 
 public slots:
     void OnConnectPressed(void);

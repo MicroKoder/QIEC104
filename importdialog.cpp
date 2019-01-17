@@ -143,6 +143,7 @@ void ImportDialog::On_OpenDialogPressed()
                             descr = QString (cell->property("Value").toString());
                             break;
                }
+                delete cell;
 
             }//col
             row++;
