@@ -28,6 +28,8 @@ public:
     /// data может быть целым фреймом APCI, началом фрейма APCI, либо целым фреймом APCI с началом следующего фрейма
     /// гарантируется что любая последовательность байт будет обработана
     static QList<CIECSignal>* ParseData(QByteArray &data, quint16 *APCInum);
+
+    static QString GetQualityString(uchar quality);
 };
 
 #endif // CTOOLS_H

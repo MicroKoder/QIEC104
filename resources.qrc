@@ -11,5 +11,6 @@
         <file>icons/interrogation.png</file>
         <file>icons/Q104.png</file>
         <file>icons/cmd.png</file>
+        <file>icons/watch.png</file>
     </qresource>
 </RCC>

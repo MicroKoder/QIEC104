@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Команды и уставки</string>
   </property>
   <property name="modal">
    <bool>false</bool>

@@ -16,6 +16,7 @@
 #include "aboutdialog.h"
 #include <QFileDialog>
 #include "proxymodel.h"
+#include "watchdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -44,7 +45,7 @@ private:
      QFile *logFile=0;
      QTextStream *logStream=0;
      ProxyModel *proxyModel=0;
-
+     WatchDialog *watch=0;
 
 public slots:
     void OnConnectPressed(void);
@@ -67,9 +68,11 @@ public slots:
     void OnLoadFileTriggered(bool); ///загрузить базу из файла
     void OnSaveBaseTriggered(bool); //сохранить базу в файл
     void OnAboutTriggered(bool);
-
+    void OnShowWatchTriggered(bool);
     void OnGIPressed(void); //general interrogation
     void OnCMDPressed(void); //открыть диалог с командами
+    void OnContextMenuRequested(QPoint);
+    void OnAddWatch(bool);
 };
 
 #endif // MAINWINDOW_H

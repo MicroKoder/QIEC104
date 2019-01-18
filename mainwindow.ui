@@ -204,6 +204,7 @@
    <addaction name="Interrogation"/>
    <addaction name="actionTS"/>
    <addaction name="actionCMD"/>
+   <addaction name="actionWatch"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -405,6 +406,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>О программе</string>
+   </property>
+  </action>
+  <action name="actionWatch">
+   <property name="icon">
+    <iconset>
+     <normalon>:/new/prefix1/icons/watch.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Таблица просмотра</string>
    </property>
   </action>
  </widget>

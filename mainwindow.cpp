@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_LoadBase, SIGNAL(triggered(bool)),this, SLOT(OnLoadBaseTriggered(bool)));
     connect(ui->action_SaveBase, SIGNAL(triggered(bool)),this,SLOT(OnSaveBaseTriggered(bool)));
     connect(ui->action_LoadFile, SIGNAL(triggered(bool)),this,SLOT(OnLoadFileTriggered(bool)));
-
+    connect(ui->actionWatch,SIGNAL(triggered(bool)),this,SLOT(OnShowWatchTriggered(bool)));
     connect(ui->actionAbout, SIGNAL(triggered(bool)),this,SLOT(OnAboutTriggered(bool)));
 
 
@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->MTable->verticalHeader()->setDefaultSectionSize(20);
 
+    connect(ui->MTable, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(OnContextMenuRequested(QPoint)));
+
 #ifdef FILL_TEST_TABLE
     for (int i=1; i<10; i++)
         tabmodel->updateSignal(new CIECSignal(i,30,"test"));
@@ -82,10 +84,32 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "New log: " << logFileName;
     logFile->open(QIODevice::ReadWrite | QIODevice::Text);
 
-
-
+     watch = new WatchDialog(pDriver,this);
 }
+void MainWindow::OnContextMenuRequested(QPoint pos)
+{
+    qDebug() << "context menu requsted";
+    QMenu *contextMenu= new QMenu(this);
+    QAction *addWatch=new QAction("Добавить в просмотр",this);
+    connect(addWatch,SIGNAL(triggered(bool)), this, SLOT(OnAddWatch(bool)));
+    contextMenu->addAction(addWatch);
+    contextMenu->popup(mapToParent(pos)+QPoint(10,120));
+    //contextMenu->show()
+}
+void MainWindow::OnAddWatch(bool)
+{
+    if (watch==0)
+        return; //no watch window, exiting
 
+  //  qDebug() << "Add to watch";
+     QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
+     QModelIndexList indexes= pSelection->selectedIndexes();
+     foreach(QModelIndex index, indexes)
+     {
+         CIECSignal s =tabmodel->mData.at(index.row());
+         watch->AddWatch(s);
+     }
+}
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -329,4 +353,11 @@ void MainWindow::OnAboutTriggered(bool)
     aboutDialog *dialog = new aboutDialog();
     dialog->show();
     //delete dialog;
+}
+
+void MainWindow::OnShowWatchTriggered(bool)
+{
+
+
+    watch->show();
 }

@@ -8,6 +8,31 @@ IEC104Tools::IEC104Tools()
 
 QByteArray IEC104Tools::lostBytes=QByteArray();
 
+QString IEC104Tools::GetQualityString(uchar quality)
+{
+    QString quality_str;
+    if (quality&1)
+        quality_str+="OV ";
+
+    if (quality&8)
+        quality_str+="EI ";
+
+    if (quality&16)
+        quality_str+="BL ";
+
+    if (quality&32)
+        quality_str+="SB ";
+
+    if (quality&64)
+        quality_str+="NT ";
+
+    if (quality&128)
+        quality_str+="IV ";
+
+    if (quality==0)
+        quality_str = "GOOD";
+    return quality_str;
+}
 quint32 GetIOA(char LB, char MB, char HB)
 {
     quint32 lb = (unsigned char)(LB);
