@@ -57,7 +57,8 @@ void ImportDialog::On_OkPressed()
          foreach(item, *importedItems)
              if (item.kod<45) //измерения
                 MeasuresTable->updateSignal(CIECSignal(item.ioa,item.kod, item.descr),true,true);
-            //else //добавить код для таблицы команд
+            else
+                 emit AddCommand(CIECSignal(item.ioa,item.kod,item.descr));
          qDebug() << "import complete";
          delete importedItems;
      }

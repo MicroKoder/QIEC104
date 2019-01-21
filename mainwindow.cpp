@@ -85,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
     logFile->open(QIODevice::ReadWrite | QIODevice::Text);
 
      watch = new WatchDialog(pDriver,this);
+
+     commandList = new QList<CIECSignal>();
+
 }
 void MainWindow::OnContextMenuRequested(QPoint pos)
 {
@@ -98,7 +101,7 @@ void MainWindow::OnContextMenuRequested(QPoint pos)
 }
 void MainWindow::OnAddWatch(bool)
 {
-    if (watch==0)
+    if (!watch)
         return; //no watch window, exiting
 
   //  qDebug() << "Add to watch";
@@ -106,7 +109,7 @@ void MainWindow::OnAddWatch(bool)
      QModelIndexList indexes= pSelection->selectedIndexes();
      foreach(QModelIndex index, indexes)
      {
-         CIECSignal s =tabmodel->mData.at(index.row());
+         CIECSignal s =tabmodel->mData[index.row()];
          watch->AddWatch(s);
      }
 }
@@ -118,7 +121,7 @@ MainWindow::~MainWindow()
 ///кнопка "соединение"
 void MainWindow::OnConnectPressed(void)
 {
-    if (pConnectionDialog!=0)
+    if (pConnectionDialog)
     {
         delete pConnectionDialog;
         pConnectionDialog = 0;
@@ -148,25 +151,21 @@ void MainWindow::OnConnectAck(void)
 ///
 void MainWindow::OnConnectionDialogFinished(/*int result*/)
 {
-    qDebug() << "OnConnectionDialogFinished";
     pDriver->SetSettings(qsettings);
     pDriver->OpenConnection();
-   //delete pConnectionDialog;
 }
 
 ///кнопка "разорвать соединение"
 void MainWindow::OnDisconnectPressed(void)
 {
-    //IEC104Driver::GetInstance()->CloseConnection();
     pDriver->CloseConnection();
-
 }
 
 ///вызов окна настроек
 void MainWindow::OnSettingsPressed(void)
 {
     ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(qsettings);
-    cdialog->exec();
+    cdialog->show();
 }
 
 ///в случае успешного подключения драйвера
@@ -207,22 +206,10 @@ void MainWindow::OnClearLogPressed()
 void MainWindow::MToolAdd_Accept()
 {
 
-    //if (pAddSignalDialog->tag != NULL)
-    //{
-       // AddMSignal(pAddSignalDialog->tag,pAddSignalDialog->description);
-
 
         tabmodel->updateSignal(pAddSignalDialog->tag,true);
 
-      //  ui->MTable->setModel(0);
-       // ui->MTable->setModel(tabmodel);
-      //  tabmodel->redraw();
-      //  ui->MTable->resizeRowsToContents();
-
-
-    //}
     delete pAddSignalDialog;
-    qDebug()<< "accept";
 }
 
 void MainWindow::MToolAdd_Pressed()
@@ -265,22 +252,27 @@ void MainWindow::IECReceived(CIECSignal tag)
 
 void MainWindow::OnGIPressed()
 {
-    if (pDriver!=0)
+    if (pDriver)
     pDriver->SendFullRequest(20);
 }
 void MainWindow::OnSaveBaseTriggered(bool)
 {
-    qDebug() << "save base";
     QFileDialog *fileDialog = new QFileDialog();
 
     QString filename = fileDialog->getSaveFileName(this,"Сохранение",QString(),QString("*.dat")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
-    qDebug() << filename;
+
     if (filename.length()>0)
     {
         QFile *file = new QFile(filename);
         file->open(QIODevice::ReadWrite);
         QTextStream stream(file);
         foreach(CIECSignal signal, tabmodel->mData)
+        {
+            stream << signal.GetKey() << '\\' << signal.description << '\n';
+
+        }
+
+        foreach(CIECSignal signal, (*commandList))
         {
             stream << signal.GetKey() << '\\' << signal.description << '\n';
 
@@ -305,6 +297,8 @@ void MainWindow::OnLoadFileTriggered(bool)
       QFile *file= new QFile(filename);
       file->open(QIODevice::ReadOnly);
       QTextStream in(file);
+
+      commandList = new QList<CIECSignal>();
       while(!in.atEnd())
       {
         QString line = in.readLine();
@@ -315,7 +309,11 @@ void MainWindow::OnLoadFileTriggered(bool)
         CIECSignal sig;
         sig.SetKey( key.toUInt());
         sig.description = words[1];
-        tabmodel->updateSignal(sig,true,true);
+
+        if (sig.GetType()>=45)
+            this->commandList->append(sig);
+        else
+            tabmodel->updateSignal(sig,true,true);
       }
 
       file->close();
@@ -334,18 +332,18 @@ void MainWindow::OnLoadBaseTriggered(bool val)
   // {
        ImportDialog *id = new ImportDialog(qsettings);
        id->SetModel(this->tabmodel);
+       connect(id, SIGNAL(AddCommand(CIECSignal)),this,SLOT(AddCommand(CIECSignal)));
        id->exec();
   // }
 }
 
 void MainWindow::OnCMDPressed()
 {
-    if (pDialog!=0)
+    if (pDialog)
         delete pDialog;
 
-    pDialog = new CmdDialog(pDriver, qsettings,this);
-pDialog->show();
-//pDialog->exec();
+    pDialog = new CmdDialog(pDriver, qsettings, commandList,this);
+    pDialog->show();
 }
 
 void MainWindow::OnAboutTriggered(bool)
@@ -357,7 +355,10 @@ void MainWindow::OnAboutTriggered(bool)
 
 void MainWindow::OnShowWatchTriggered(bool)
 {
-
-
     watch->show();
+}
+
+void MainWindow::AddCommand(CIECSignal item)
+{
+    commandList->append(item);
 }

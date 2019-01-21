@@ -61,6 +61,8 @@ private:
     Ui::ImportDialog *ui;
     TableModel *MeasuresTable;//указатель на таблицу с сигналами
     QList<ImportItem> *importedItems=0; // список импортированных данных
+signals:
+    void AddCommand(CIECSignal);
 public slots:
     void On_OpenDialogPressed();
     void On_OkPressed();

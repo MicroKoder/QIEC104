@@ -12,18 +12,24 @@ class CmdDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CmdDialog( IEC104Driver *pDriver,QSettings *pSettings, QWidget *parent = 0);
+    explicit CmdDialog( IEC104Driver *pDriver,QSettings *pSettings, QList<CIECSignal> *cmdList, QWidget *parent = 0);
     ~CmdDialog();
 
 private:
     Ui::CmdDialog *ui;
-    QSettings *pSett=0;
-    IEC104Driver *pDriver=0;
+    QSettings *pSett=nullptr;
+    IEC104Driver *pDriver=nullptr;
+    QList<CIECSignal> *pCmdList=nullptr;
     void ShowWarning();
+    QList<CIECSignal> filteredList;
+
+    void FilterCommands(int type);
 public slots:
     void reject();
     void OnActivateCommand();
     void OnTypeChanged(int);
+    void OnCommandSelected(int);
+
 };
 
 #endif // CMDDIALOG_H

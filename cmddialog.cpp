@@ -4,7 +4,7 @@
 #include <QMessageBox>
 
 
-CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QWidget *parent) :
+CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QList<CIECSignal> *cmdList, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CmdDialog)
 {
@@ -22,7 +22,15 @@ CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QWidget *parent
     }
     connect(ui->pushButton,SIGNAL(pressed()),this,SLOT(OnActivateCommand()));
     connect(ui->comboBox_type, SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged(int)));
+    connect(ui->comboBox_selectCMD, SIGNAL(currentIndexChanged(int)),this, SLOT(OnCommandSelected(int)));
+
+        pCmdList = cmdList;
+
+
     OnTypeChanged(ui->comboBox_type->currentIndex());
+    OnCommandSelected(ui->comboBox_selectCMD->currentIndex());
+
+
 }
 
 CmdDialog::~CmdDialog()
@@ -42,6 +50,8 @@ void CmdDialog::OnTypeChanged(int index)
 
             ui->comboBox_cmdValue->addItem("0:Выкл");
             ui->comboBox_cmdValue->addItem("1:Вкл");
+
+            FilterCommands(45);
         break;
     case 1:
         ui->groupBox_setcommand->show();
@@ -52,6 +62,8 @@ void CmdDialog::OnTypeChanged(int index)
         ui->comboBox_cmdValue->addItem("1:Выкл");
         ui->comboBox_cmdValue->addItem("2:Вкл");
         ui->comboBox_cmdValue->addItem("3:Не разрешено");
+
+        FilterCommands(46);
 
         break;
     case 2:
@@ -64,12 +76,53 @@ void CmdDialog::OnTypeChanged(int index)
         ui->comboBox_cmdValue->addItem("2:Шаг вверх");
         ui->comboBox_cmdValue->addItem("3:Не разрешено");
 
-        break;
+        FilterCommands(47);
 
-    default:
+        break;
+    case 3:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
+        FilterCommands(48);
+        break;
+    case 4:
+        ui->groupBox_setcommand->hide();
+        ui->groupBox_setpoint->show();
+        FilterCommands(49);
+        break;
+    case 5:
+        ui->groupBox_setcommand->hide();
+        ui->groupBox_setpoint->show();
+        FilterCommands(50);
+        break;
+    case 6:
+        ui->groupBox_setcommand->hide();
+        ui->groupBox_setpoint->show();
+        FilterCommands(51);
+        break;
     }
+
+}
+void CmdDialog::FilterCommands(int type)
+{
+    filteredList.clear();
+    ui->comboBox_selectCMD->clear();
+    if (pCmdList)
+        foreach(CIECSignal item, (*pCmdList))
+        {
+            if (item.GetType()==type)
+            {
+            filteredList.append(item);
+            ui->comboBox_selectCMD->addItem(item.description);
+            }
+        }
+
+}
+void CmdDialog::OnCommandSelected(int index)
+{
+    if (filteredList.count()==0) return;
+
+    ui->spinBox_ioa->setValue((int)filteredList[index].GetAddress());
+
 }
 
 void CmdDialog::reject()

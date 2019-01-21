@@ -24,8 +24,8 @@ class IEC104Driver:public QObject
 {
     Q_OBJECT
 private:
-    QTimer *testTimer;  //таймер отправки тестового пакета
-    QTcpSocket *sock;
+    QTimer *testTimer=nullptr;  //таймер отправки тестового пакета
+    QTcpSocket *sock=nullptr;
     uint count;
     uint lastAPCICount;
     ///
@@ -41,7 +41,7 @@ private:
     ///
     /// \brief settings
     ///connection settings
-    CSetting* settings;
+    CSetting* settings=nullptr;
 
     IEC104Driver();
     IEC104Driver(IEC104Driver *other);

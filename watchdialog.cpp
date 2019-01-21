@@ -32,16 +32,12 @@ void WatchDialog::ContextMenuRequested(QPoint pos)
 }
 void WatchDialog::OnRowRemove()
 {
-    QList<int> rows;
-    foreach(QTableWidgetItem *item, ui->tableWidget->selectedItems())
-    {
-        rows.append(item->row());
-       // watchItems.removeOne(item.row());
+    auto selection = ui->tableWidget->selectedItems();
+    std::sort(selection.begin(),selection.end(),
+              [] (const QTableWidgetItem *it1,const QTableWidgetItem *it2) -> bool { return it1->row()<it2->row();} );
 
-    }
-    std::sort(rows.begin(),rows.end());
-    for(int i=rows.count()-1; i>=0;i--)
-        watchItems.removeAt(rows[i]);
+    for (auto it=selection.end()-1; it>=selection.begin();it--)
+        watchItems.removeAt((*it)->row());
 
     RefreshTable();
 }

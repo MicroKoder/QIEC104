@@ -36,6 +36,10 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                     result =  QVariant(item.description);
                 break;  //название
             case 2:
+                result =  QVariant(item.GetType());
+                break;  //тип
+
+            case 3:
             //TODO: подправить для 33 типа мэк
                 /*if (pSignal.GetType()==30)
                     result = QVariant(pSignal.value == 1 ? "true" : "false");
@@ -68,9 +72,6 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 
                 }
                 break;  //значение
-            case 3:
-                result =  QVariant(item.GetType());
-                break;  //тип
             case 4:
                 {
                 QString quality_str;
@@ -197,10 +198,10 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
                 return tr("Описание");
 
             case 2:
-                return tr("Значение");
+                return tr("Тип");
 
             case 3:
-                return tr("Тип");
+                return tr("Значение");
 
             case 4:
                 return tr("Качество");
@@ -315,7 +316,7 @@ bool TableModel::setData(const QModelIndex &index, const QVariant &value, int ro
                     p->description = value.toString();
                     break;
 
-            case 3:
+            case 2:
                     p->SetType(value.toInt());
                     break;
 

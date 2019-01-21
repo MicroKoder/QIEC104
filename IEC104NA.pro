@@ -38,7 +38,8 @@ SOURCES += \
     cmddialog.cpp \
     aboutdialog.cpp \
     proxymodel.cpp \
-    watchdialog.cpp
+    watchdialog.cpp \
+    editcmddialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -54,7 +55,8 @@ HEADERS += \
     cmddialog.h \
     aboutdialog.h \
     proxymodel.h \
-    watchdialog.h
+    watchdialog.h \
+    editcmddialog.h
 
 FORMS += \
         mainwindow.ui \
@@ -63,7 +65,8 @@ FORMS += \
     addsignaldialog.ui \
     cmddialog.ui \
     aboutdialog.ui \
-    watchdialog.ui
+    watchdialog.ui \
+    editcmddialog.ui
 
 RESOURCES += \
     resources.qrc

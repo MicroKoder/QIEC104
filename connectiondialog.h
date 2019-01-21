@@ -25,8 +25,8 @@ public slots:
     void AcceptSettings();
 private:
     Ui::SettingsDialog *ui;
-    CSetting *settings=NULL;
-    QSettings *qset=NULL;
+    CSetting *settings=nullptr;
+    QSettings *qset=nullptr;
 };
 
 #endif // SETTINGSDIALOG_H

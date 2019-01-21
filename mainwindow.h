@@ -29,23 +29,24 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     //CSetting *settings;
-    QSettings *qsettings=0;
-    IEC104Driver *pDriver=0;
-    TableModel *tabmodel=0;
+    QSettings *qsettings=nullptr;
+    IEC104Driver *pDriver=nullptr;
+    TableModel *tabmodel=nullptr;
 
     ~MainWindow();
 
     void AddMSignal(CIECSignal* tag, QString description=QString());
 private:
     Ui::MainWindow *ui;
-     QLabel *pConnectionStatusLabel=0;
-     addSignalDialog *pAddSignalDialog=0;
-     ConnectionSettingsDialog *pConnectionDialog=0;
-     CmdDialog *pDialog=0;
-     QFile *logFile=0;
-     QTextStream *logStream=0;
-     ProxyModel *proxyModel=0;
-     WatchDialog *watch=0;
+     QLabel *pConnectionStatusLabel=nullptr;
+     addSignalDialog *pAddSignalDialog=nullptr;
+     ConnectionSettingsDialog *pConnectionDialog=nullptr;
+     CmdDialog *pDialog=nullptr;
+     QFile *logFile=nullptr;
+     QTextStream *logStream=nullptr;
+     ProxyModel *proxyModel=nullptr;
+     WatchDialog *watch=nullptr;
+    QList<CIECSignal> *commandList=nullptr;
 
 public slots:
     void OnConnectPressed(void);
@@ -73,6 +74,7 @@ public slots:
     void OnCMDPressed(void); //открыть диалог с командами
     void OnContextMenuRequested(QPoint);
     void OnAddWatch(bool);
+    void AddCommand(CIECSignal);
 };
 
 #endif // MAINWINDOW_H
