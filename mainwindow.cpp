@@ -86,7 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
      watch = new WatchDialog(pDriver,this);
 
-     commandList = new QList<CIECSignal>();
+     //commandList = new QList<CIECSignal>();
+    cmdTableModel = new TableModel();
+    cmdTableModel->isShortTable = true;
 
 }
 void MainWindow::OnContextMenuRequested(QPoint pos)
@@ -272,7 +274,7 @@ void MainWindow::OnSaveBaseTriggered(bool)
 
         }
 
-        foreach(CIECSignal signal, (*commandList))
+        foreach(CIECSignal signal, cmdTableModel->mData)
         {
             stream << signal.GetKey() << '\\' << signal.description << '\n';
 
@@ -298,7 +300,7 @@ void MainWindow::OnLoadFileTriggered(bool)
       file->open(QIODevice::ReadOnly);
       QTextStream in(file);
 
-      commandList = new QList<CIECSignal>();
+      //commandList = new QList<CIECSignal>();
       while(!in.atEnd())
       {
         QString line = in.readLine();
@@ -311,7 +313,7 @@ void MainWindow::OnLoadFileTriggered(bool)
         sig.description = words[1];
 
         if (sig.GetType()>=45)
-            this->commandList->append(sig);
+            cmdTableModel->updateSignal(sig,true,true);
         else
             tabmodel->updateSignal(sig,true,true);
       }
@@ -342,7 +344,7 @@ void MainWindow::OnCMDPressed()
     if (pDialog)
         delete pDialog;
 
-    pDialog = new CmdDialog(pDriver, qsettings, commandList,this);
+    pDialog = new CmdDialog(pDriver, qsettings, cmdTableModel,this);
     pDialog->show();
 }
 
@@ -360,5 +362,6 @@ void MainWindow::OnShowWatchTriggered(bool)
 
 void MainWindow::AddCommand(CIECSignal item)
 {
-    commandList->append(item);
+   // commandList->append(item);
+    cmdTableModel->mData.append(item);
 }

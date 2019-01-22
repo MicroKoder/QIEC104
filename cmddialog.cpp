@@ -2,9 +2,9 @@
 #include "ui_cmddialog.h"
 #include <QDebug>
 #include <QMessageBox>
+#include "editcmddialog.h"
 
-
-CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QList<CIECSignal> *cmdList, QWidget *parent) :
+CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings,TableModel *cmdTable, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CmdDialog)
 {
@@ -24,18 +24,24 @@ CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings, QList<CIECSigna
     connect(ui->comboBox_type, SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged(int)));
     connect(ui->comboBox_selectCMD, SIGNAL(currentIndexChanged(int)),this, SLOT(OnCommandSelected(int)));
 
-        pCmdList = cmdList;
-
+    this->cmdTable = cmdTable;
 
     OnTypeChanged(ui->comboBox_type->currentIndex());
     OnCommandSelected(ui->comboBox_selectCMD->currentIndex());
 
+    connect(ui->pushButton_listCMD,SIGNAL(pressed()),this,SLOT(OnEditCommandList()));
 
 }
 
 CmdDialog::~CmdDialog()
 {
     delete ui;
+}
+
+void CmdDialog::OnEditCommandList()
+{
+    EditCMDdialog dialog(cmdTable,this);
+    dialog.exec();
 }
 
 void CmdDialog::OnTypeChanged(int index)
@@ -106,13 +112,13 @@ void CmdDialog::FilterCommands(int type)
 {
     filteredList.clear();
     ui->comboBox_selectCMD->clear();
-    if (pCmdList)
-        foreach(CIECSignal item, (*pCmdList))
+    if (cmdTable)
+        foreach(CIECSignal item, cmdTable->mData)
         {
             if (item.GetType()==type)
             {
             filteredList.append(item);
-            ui->comboBox_selectCMD->addItem(item.description);
+            ui->comboBox_selectCMD->addItem(QString::number(item.GetAddress())+"  " +item.description);
             }
         }
 

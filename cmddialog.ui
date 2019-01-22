@@ -130,8 +130,6 @@
      <zorder>comboBox_type</zorder>
      <zorder>comboBox_selectCMD</zorder>
      <zorder>pushButton_listCMD</zorder>
-     <zorder>comboBox_selectCMD</zorder>
-     <zorder>pushButton_listCMD</zorder>
      <zorder>label</zorder>
      <zorder>spinBox_ioa</zorder>
      <zorder>checkBox_timestamp</zorder>
@@ -185,10 +183,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>label_2</zorder>
-     <zorder>lineEdit_value</zorder>
-     <zorder>label_2</zorder>
-     <zorder>lineEdit_value</zorder>
     </widget>
    </item>
    <item>
@@ -213,6 +207,9 @@
            <width>150</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="currentIndex">
+          <number>1</number>
          </property>
          <item>
           <property name="text">

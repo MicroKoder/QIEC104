@@ -70,6 +70,8 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value,
                     int role = Qt::EditRole);
+
+    bool isShortTable=false;    //true если надо отображать только первые три столбика
 };
 
 #endif // TABLEMODEL_H

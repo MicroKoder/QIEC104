@@ -14,6 +14,9 @@ int TableModel::rowCount(const QModelIndex &parent=QModelIndex()) const{
 
 int TableModel::columnCount(const QModelIndex &parent = QModelIndex()) const{
    Q_UNUSED(parent);
+    if (isShortTable)
+        return 3;
+
     return 6;
 }
 
@@ -141,7 +144,7 @@ void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate, bool isImport
 
                 //delete (*mData)[i].pSignal->bNeverUpdated = false;
                // emit dataChanged(index(i,0),index(i,6),{Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole});
-                setData(index(i,2), QVariant(pSignal.value));
+                setData(index(i,3), QVariant(pSignal.value));
                 setData(index(i,4), QVariant(pSignal.quality));
                 setData(index(i,5), QVariant(pSignal.timestamp.GetTimeString()));
                 return;

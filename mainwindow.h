@@ -32,7 +32,7 @@ public:
     QSettings *qsettings=nullptr;
     IEC104Driver *pDriver=nullptr;
     TableModel *tabmodel=nullptr;
-
+    TableModel *cmdTableModel=nullptr;
     ~MainWindow();
 
     void AddMSignal(CIECSignal* tag, QString description=QString());
@@ -46,7 +46,7 @@ private:
      QTextStream *logStream=nullptr;
      ProxyModel *proxyModel=nullptr;
      WatchDialog *watch=nullptr;
-    QList<CIECSignal> *commandList=nullptr;
+  //  QList<CIECSignal> *commandList=nullptr;
 
 public slots:
     void OnConnectPressed(void);
