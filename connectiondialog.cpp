@@ -51,6 +51,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset):
         ui->edit_w->setText(qset->value("w", "8").toString());
         ui->edit_asdu->setText(qset->value("asdu", "1").toString());
         ui->AutoCreate_checkBox->setChecked(qset->value("autoCreate","false").toBool());
+        ui->checkBox_newLog->setChecked(qset->value("log","false").toBool());
         qset->endGroup();
     }
     connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(AcceptSettings()));
@@ -90,6 +91,7 @@ void ConnectionSettingsDialog::AcceptSettings()
      qset->setValue("w",    ui->edit_w->text());
      qset->setValue("asdu", ui->edit_asdu->text());
      qset->setValue("autoCreate", ui->AutoCreate_checkBox->isChecked());
+     qset->setValue("log",  ui->checkBox_newLog->isChecked());
      qset->endGroup();
     }
     qDebug() << "Connection Settings accepted";

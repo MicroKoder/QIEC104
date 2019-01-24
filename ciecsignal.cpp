@@ -1,6 +1,6 @@
 #include "ciecsignal.h"
 #include "ctools.h"
-#include <Qdebug>
+#include <QDebug>
 CIECSignal::CIECSignal()
 {
     description = "new tag";

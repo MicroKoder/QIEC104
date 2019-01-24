@@ -1,6 +1,6 @@
 #include "addsignaldialog.h"
 #include "ui_addsignaldialog.h"
-#include <Qdebug>
+#include <QDebug>
 #include <QIntValidator>
 
 addSignalDialog::addSignalDialog(QWidget *parent) :

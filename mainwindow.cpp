@@ -12,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     qsettings = new QSettings("Settings.ini",QSettings::IniFormat);
-    //qsettings = new QSettings("ZayruAZ","IEC104 sim");
    //настройка драйвера для работы с МЭК
    // settings = new CSetting();
     pDriver = IEC104Driver::GetInstance();
@@ -76,13 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(shortcut, SIGNAL(activated()), ui->MTool_remove, SLOT(click()));
 
 
-    QString logFileName(QDateTime::currentDateTime().toString() + ".txt");
-    logFileName= logFileName.replace(':','_');
-
-    logFile = new QFile(logFileName);
-
-    qDebug() << "New log: " << logFileName;
-    logFile->open(QIODevice::ReadWrite | QIODevice::Text);
 
      watch = new WatchDialog(pDriver,this);
 
@@ -145,7 +137,7 @@ void MainWindow::OnConnectAck(void)
     qsettings->endGroup();
 */
     pDriver->SetSettings(qsettings);
-    pDriver->OpenConnection();
+
 }
 
 ///
@@ -155,12 +147,30 @@ void MainWindow::OnConnectionDialogFinished(/*int result*/)
 {
     pDriver->SetSettings(qsettings);
     pDriver->OpenConnection();
+
+    qsettings->beginGroup("driver");
+    bool createLog = qsettings->value("log","false").toBool();
+    qsettings->endGroup();
+
+     if (createLog)
+     {
+         QString logFileName(QDateTime::currentDateTime().toString() + ".txt");
+         logFileName= logFileName.replace(':','_');
+
+         logFile = new QFile(logFileName);
+
+         qDebug() << "New log: " << logFileName;
+         logFile->open(QIODevice::ReadWrite | QIODevice::Text);
+     }
 }
 
 ///кнопка "разорвать соединение"
 void MainWindow::OnDisconnectPressed(void)
 {
     pDriver->CloseConnection();
+
+    if (logFile)
+        logFile->close();
 }
 
 ///вызов окна настроек
@@ -191,8 +201,11 @@ void MainWindow::OnDisconnected()
 ///получено текстовое сообщение от драйвера
 void MainWindow::LogReceived(QString text)
 {
-     QTextStream logStream(logFile);
-    logStream << text << '\n';
+    if (logFile)
+    {
+      QTextStream logStream(logFile);
+      logStream << text << '\n';
+    }
     ui->log->append(text);
    //qDebug() << text;
 }
@@ -266,7 +279,7 @@ void MainWindow::OnSaveBaseTriggered(bool)
     if (filename.length()>0)
     {
         QFile *file = new QFile(filename);
-        file->open(QIODevice::ReadWrite);
+        file->open(QIODevice::WriteOnly);
         QTextStream stream(file);
         foreach(CIECSignal signal, tabmodel->mData)
         {

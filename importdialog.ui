@@ -23,16 +23,6 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QRadioButton" name="selector_txt">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Из текстового файла</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QRadioButton" name="selector_csv">
           <property name="enabled">
            <bool>false</bool>

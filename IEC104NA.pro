@@ -3,11 +3,13 @@
 # Project created by QtCreator 2017-09-25T06:11:36
 #
 #-------------------------------------------------
-
+#define LINUXBUILD
 QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += network
-QT += axcontainer
+
+win32:QT += axcontainer
+
 TARGET = IEC104NA
 TEMPLATE = app
 

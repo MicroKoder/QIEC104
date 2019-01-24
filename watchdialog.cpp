@@ -1,7 +1,6 @@
 #include "watchdialog.h"
 #include "ui_watchdialog.h"
 #include "QDebug"
-#include "qpushbutton.h"
 #include <QMenu>
 WatchDialog::WatchDialog(IEC104Driver* pDriver, QWidget *parent) :
     QDialog(parent),

@@ -2,7 +2,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTime>
-#include <qlist>
+#include <QList>
 
 static char testAct[] = {0x68, 0x04, 0x43, 0x00, 0x00, 0x00};
 static char testFrCon[] = {0x68, 0x04,(char)0x83, 0x00, 0x00, 0x00};
@@ -196,7 +196,7 @@ void IEC104Driver::SetSettings(QSettings *settings)
     {
         settings->beginGroup("driver");
         this->settings = new CSetting(
-            settings->value("IP").toString(),
+            settings->value("ip").toString(),
             settings->value("asdu").toInt(),
             settings->value("port").toInt()
         );

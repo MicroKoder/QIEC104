@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <csetting.h>
-#include <qstring>
+#include <QString>
 #include <qsettings.h>
 namespace Ui {
 class SettingsDialog;
