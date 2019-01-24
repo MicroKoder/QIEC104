@@ -17,9 +17,12 @@ IEC104Driver::IEC104Driver():
     N_R = 0;
     N_T = 0;
     testTimer = new QTimer();
-
     testTimer->setSingleShot(false);
     connect(testTimer, SIGNAL(timeout()),this,SLOT(OnTestTimer()));
+
+    conTimer = new QTimer();
+    conTimer->setSingleShot(true);
+    connect(conTimer, SIGNAL(timeout()),this,SLOT(OnConnectionTimer()));
 
     connect(sock,SIGNAL(connected()),this,SLOT(OnConnected()));
     connect(sock,SIGNAL(disconnected()),this, SLOT(OnDisconnected()));
@@ -28,6 +31,11 @@ IEC104Driver::IEC104Driver():
   //  in.setDevice(sock);
 }
 
+void IEC104Driver::OnConnectionTimer()
+{
+    emit Message("Нет ответа от сервера в течение таймаута t1");
+    OnDisconnected();
+}
 ///
 /// \brief IEC104Driver::SendFullRequest - general interrogation command
 /// \param ASDU
@@ -73,6 +81,9 @@ void IEC104Driver::SendSyncTime()
 
 void IEC104Driver::OnTestTimer()
 {
+    if (lastAPCICount != N_R)
+        Send_ConfirmPacks();
+    else
         SendTestAct();
 }
 
@@ -200,9 +211,9 @@ void IEC104Driver::SetSettings(QSettings *settings)
             settings->value("asdu").toInt(),
             settings->value("port").toInt()
         );
-        this->settings->t0 = settings->value("t0").toInt();
+        //this->settings->t0 = settings->value("t0").toInt();
         this->settings->t1 = settings->value("t1").toInt();
-        this->settings->t2 = settings->value("t2").toInt();
+     //   this->settings->t2 = settings->value("t2").toInt();
         this->settings->t3 = settings->value("t3").toInt();
         this->settings->k = settings->value("k").toInt();
         this->settings->w = settings->value("w").toInt();
@@ -241,7 +252,12 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
         N_R = 0;
         N_T = 0;
 
+        conTimer->setInterval(settings->t1*1000);
+        conTimer->start();
+
     }
+
+
 
     return;
 }
@@ -428,6 +444,9 @@ void IEC104Driver::OnSockReadyRead()
     testTimer->stop();
     testTimer->start();
 
+    conTimer->stop();
+    conTimer->start();
+
     //----------------------------------- processing format U packages ---------------
     if (buf.count()==6 && ((buf[2]&0x3) == 0x3)){
         if (isTestAct(buf))
@@ -473,7 +492,7 @@ void IEC104Driver::OnSockReadyRead()
 
     //send confirmation
     //2.. хрен знает зачем, но подтверждение надо отправлять раньше чем через w пакетов
-   if ((N_R - lastAPCICount + 2u)>=(settings->w)){
+   if ((N_R - lastAPCICount)>=(settings->w)){
        Send_ConfirmPacks();
     }
 }

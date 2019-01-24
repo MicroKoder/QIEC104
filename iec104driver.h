@@ -25,6 +25,7 @@ class IEC104Driver:public QObject
     Q_OBJECT
 private:
     QTimer *testTimer=nullptr;  //таймер отправки тестового пакета
+    QTimer *conTimer=nullptr;
     QTcpSocket *sock=nullptr;
     uint count;
     uint lastAPCICount;
@@ -93,6 +94,7 @@ private slots:
     void OnSockReadyRead();
     void displayError(QAbstractSocket::SocketError);
     void OnTestTimer();
+    void OnConnectionTimer();
 public slots:
     void OpenConnection(CSetting *_settings=NULL);
     void Interrogation();

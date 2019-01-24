@@ -108,7 +108,7 @@ void CmdDialog::OnTypeChanged(int index)
     }
 
 }
-void CmdDialog::FilterCommands(int type)
+void CmdDialog::FilterCommands(uint type)
 {
     filteredList.clear();
     ui->comboBox_selectCMD->clear();

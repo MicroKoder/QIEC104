@@ -17,18 +17,18 @@ public:
     ///
     /// \brief t0
     /// time in seconds
-    quint16 t0;
+ //   quint16 t0;
     ///
     /// \brief t1
-    /// time in seconds
+    /// таймаут контроля связи в сек
     quint16 t1;
     ///
     /// \brief t2
     ///time in seconds
-    quint16 t2;
+//    quint16 t2;
     ///
     /// \brief t3
-    /// time in seconds
+    /// таймаут отправки тестовых пакетов в сек
     quint16 t3;
     ///
     /// \brief k
