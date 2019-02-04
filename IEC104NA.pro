@@ -7,10 +7,11 @@
 QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += network
+RC_FILE = icon.rc
 
 win32:QT += axcontainer
 
-TARGET = IEC104NA
+TARGET = Q104
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use

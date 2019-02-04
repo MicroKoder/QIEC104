@@ -21,19 +21,26 @@ int TableModel::columnCount(const QModelIndex &parent = QModelIndex()) const{
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const{
-    int row = index.row();
-    if ((role == Qt::DisplayRole)&&(mData.count()>row)&& row>=0){
+  int row = index.row();
+  int col = index.column();
 
-    //    QString data = "row: "+QString::number(index.row())+" col: "+QString::number(index.column());
-        CIECSignal item = mData[row];
+  if ((row>=mData.count()) || (row<0))
+          return QVariant();
+
+  CIECSignal item = mData[row];
+
+  if ((role == Qt::CheckStateRole)&& col ==3 )
+    {
+             if ((item.GetType()==1)||(item.GetType()==30))
+                 return item.value == 1? Qt::Checked: Qt::Unchecked;
+    }
+  else
+    if ((role == Qt::DisplayRole)){
         QVariant result = QVariant("");
-
-      //  if (pSignalModel->pSignal==NULL) return result;
-
-        switch (index.column()){
+        switch (col){
             case 0:
                 result =  QVariant(item.GetAddress());
-                break;  //адрес
+                break;  //адрес IOA
             case 1:
 
                     result =  QVariant(item.description);
@@ -44,14 +51,9 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 
             case 3:
             //TODO: подправить для 33 типа мэк
-                /*if (pSignal.GetType()==30)
-                    result = QVariant(pSignal.value == 1 ? "true" : "false");
-                else
-                    result =  pSignal.value;
-        */
                 switch (item.GetType())
                 {
-                case 1 : result = QVariant(item.value == 1 ? "ON" : "OFF");break;
+              //  case 1 : result = QVariant(item.value == 1 ? "ON" : "OFF");break;
                 case 3 : if (item.value.toUInt() == 0)
                             result = QVariant("Intransit(0)");
                          else if (item.value.toUInt() == 1)
@@ -61,7 +63,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                          else result = QVariant("Invalid(3)");
                         break;
 
-                case 30:result = QVariant(item.value == 1 ? "ON" : "OFF");break;
+            //    case 30:result = QVariant(item.value == 1 ? "ON" : "OFF");break;
                 case 31 : if (item.value == 0)
                             result = QVariant("Intransit(0)");
                          else if (item.value == 1)
@@ -120,6 +122,8 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
 }
 
 ///обновить существующий сигнал
+///
+
 void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate, bool isImported)
 {
     CIECSignal* item;
