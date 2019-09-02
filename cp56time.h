@@ -19,6 +19,12 @@ class CP56Time{
     char GetYear();
     QString GetTimeString();
     bool IsValid();
+
+    ///
+    /// \brief GetTimestamp - возвращает метку времени с текущим временем (для команд)
+    /// \return
+    ///
+    static QByteArray GetTimestamp();
 private:
     char rawData[7];
 };
