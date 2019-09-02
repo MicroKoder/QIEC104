@@ -277,24 +277,35 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
 {
     qDebug() << "sending command "<< type << " " << ioa << " "<< value ;
     quint16 ASDU = settings->asdu;
-    //char requestDescription = 0;
-    char temp[] = {0x68, 0xE,
-                   char(N_T<<1), char(N_T>>7),
-                   char(N_R<<1), char(N_R>>7),
-                   char(type), 0x01,
-                   0x06,0x00,    //причина передачи - активация
-                   char(ASDU&0xFF), char((ASDU>>8)&0xFF),
-                   char(ioa&0xFF),char(((ioa)>>8)&0xff),char(((ioa)>>16)&0xff),
-                   char(value)
-                  };
 
-   QByteArray buf = QByteArray(temp, 16);
-    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
-        sock->write(buf,16);
-        emit Message("<-- Однопозиционная команда");
-        N_T ++;
-        emit Message(IEC104Tools::BytesToString(&buf));
-    }
+
+
+        char temp[] = {0x68, 0xE,
+                       char(N_T<<1), char(N_T>>7),
+                       char(N_R<<1), char(N_R>>7),
+                       char(type), 0x01,
+                       0x06,0x00,    //причина передачи - активация
+                       char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                       char(ioa&0xFF),char(((ioa)>>8)&0xff),char(((ioa)>>16)&0xff),
+                       char(value)
+                      };
+
+       QByteArray buf = QByteArray(temp, 16);
+
+       if (type>=58)
+       {
+            buf.append(CP56Time::GetTimestamp());
+       }
+
+        buf[1] = (char)buf.length()-2;
+
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,buf.length());
+            emit Message("<-- Однопозиционная команда");
+            N_T ++;
+            emit Message(IEC104Tools::BytesToString(&buf));
+        }
+
 
 }
 
@@ -323,6 +334,14 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
                       };
 
         QByteArray buf = QByteArray(temp, sizeof(temp));
+
+
+        if (type==61)
+        {
+            buf.append(CP56Time::GetTimestamp());
+        }
+
+       buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, нормализованное значение");
@@ -344,7 +363,15 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
                        char(ivalue&0xff),char((ivalue>>8)&0xff),0x00
                       };
 
+
+
         QByteArray buf = QByteArray(temp, sizeof(temp));
+
+        if (type==62)
+        {
+            buf.append(CP56Time::GetTimestamp());
+        }
+        buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, масштабированное значение");
@@ -369,10 +396,14 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
 
 
         QByteArray buf = QByteArray(temp, 20);
-
+        if (type==63)
+        {
+            buf.append(CP56Time::GetTimestamp());
+        }
+        buf[1] = (char)buf.length()-2;
         qDebug() << temp;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
-            sock->write(buf,20);
+            sock->write(buf,buf.count());
             emit Message("<-- Команда уставки с плавающей точкой");
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
@@ -393,6 +424,12 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
                       };
 
         QByteArray buf = QByteArray(temp, sizeof(temp));
+
+        if (type==64)
+        {
+            buf.append(CP56Time::GetTimestamp());
+        }
+        buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message("<-- Команда уставки, строка 32 бит");

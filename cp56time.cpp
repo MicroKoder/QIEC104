@@ -1,5 +1,5 @@
 #include "cp56time.h"
-
+#include <QDateTime>
 CP56Time::CP56Time()
 {
     for (int i=0; i<7; i++)
@@ -50,4 +50,22 @@ QString CP56Time::GetTimeString()
             QString::number(GetHour())+":"+
             QString::number(GetMinute())+":"+
             QString::number((float)GetMS()/1000.f);
+}
+
+QByteArray CP56Time::GetTimestamp()
+{
+    QDateTime currentDT =  QDateTime::currentDateTime();
+    char data[7];
+
+    data[6] = currentDT.date().year()-2000;
+    data[5] = currentDT.date().month();
+    data[4] = currentDT.date().day();
+    data[3] = currentDT.time().hour();
+    data[2] = currentDT.time().minute();
+
+    int msec = currentDT.time().msec() + currentDT.time().second()*1000;
+    data[1] = msec >> 8;
+    data[0] = msec & 0xff;
+
+    return QByteArray(data,7);
 }
