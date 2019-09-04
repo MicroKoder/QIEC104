@@ -73,8 +73,13 @@ public slots:
     void OnGIPressed(void); //general interrogation
     void OnCMDPressed(void); //открыть диалог с командами
     void OnContextMenuRequested(QPoint);
-    void OnAddWatch(bool);
+
     void AddCommand(CIECSignal);
+
+     //команды контекстного меню
+    void OnAddWatch(bool);
+    void OnRead(bool);
+
 };
 
 #endif // MAINWINDOW_H

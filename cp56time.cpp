@@ -19,7 +19,7 @@ CP56Time::CP56Time(QByteArray data, int offset=0){
     }
 }
 quint16 CP56Time::GetMS(){
-    return (quint16(rawData[0])<<8)+rawData[1];
+    return (quint16(rawData[1])<<8)+rawData[0];
 
 }
 
