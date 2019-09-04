@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionWatch,SIGNAL(triggered(bool)),this,SLOT(OnShowWatchTriggered(bool)));
     connect(ui->actionAbout, SIGNAL(triggered(bool)),this,SLOT(OnAboutTriggered(bool)));
 
+    connect(ui->actionTS, SIGNAL(triggered(bool)),pDriver, SLOT(ClockSynch(void)));
+
 
     connect(ui->actionCMD,SIGNAL(triggered(bool)),this,SLOT(OnCMDPressed()));
     //создаем статус сообщение
@@ -89,7 +91,14 @@ void MainWindow::OnContextMenuRequested(QPoint pos)
     QMenu *contextMenu= new QMenu(this);
     QAction *addWatch=new QAction("Добавить в просмотр",this);
     connect(addWatch,SIGNAL(triggered(bool)), this, SLOT(OnAddWatch(bool)));
+
+    QAction *read= new QAction("Запросить",this);
+    connect(read, SIGNAL(triggered(bool)),this, SLOT(OnRead(bool)));
+
+
     contextMenu->addAction(addWatch);
+    contextMenu->addAction(read);
+
     contextMenu->popup(mapToParent(pos)+QPoint(10,120));
     //contextMenu->show()
 }
@@ -106,6 +115,17 @@ void MainWindow::OnAddWatch(bool)
          CIECSignal s =tabmodel->mData[index.row()];
          watch->AddWatch(s);
      }
+}
+
+void MainWindow::OnRead(bool)
+{
+    QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
+    QModelIndexList indexes= pSelection->selectedIndexes();
+    foreach(QModelIndex index, indexes)
+    {
+        CIECSignal s =tabmodel->mData[index.row()];
+        pDriver->ReadIOA(s.GetAddress());
+    }
 }
 MainWindow::~MainWindow()
 {

@@ -74,10 +74,6 @@ void IEC104Driver::SendRequestSingle()
 
 }
 
-void IEC104Driver::SendSyncTime()
-{
-
-}
 
 void IEC104Driver::OnTestTimer()
 {
@@ -540,12 +536,52 @@ void IEC104Driver::displayError(QAbstractSocket::SocketError)
     OnDisconnected();
 }
 
-void IEC104Driver::Interrogation()
-{
-
-}
-
 void IEC104Driver::ClockSynch()
 {
+    quint16 ASDU = settings->asdu;
 
+    char temp[] = {0x68, 0xE,
+                   char(N_T<<1), char(N_T>>7),
+                   char(N_R<<1), char(N_R>>7),
+                   0x67, 0x01,
+                   0x06,0x00,    //причина передачи - активация
+                   char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                   0x00,0x00,0x00,
+
+                  };
+
+   QByteArray buf = QByteArray(temp, sizeof(temp));
+
+
+   buf.append(CP56Time::GetTimestamp());
+   buf[1] = buf.length()-2;
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,buf.length());
+        emit Message("<-- Команда синхронизации времени");
+        N_T ++;
+    }
+}
+
+void IEC104Driver::ReadIOA(quint32 ioa)
+{
+    quint16 ASDU = settings->asdu;
+
+    char temp[] = {0x68, 0xE,
+                   char(N_T<<1), char(N_T>>7),
+                   char(N_R<<1), char(N_R>>7),
+                   0x66, 0x01,
+                   0x05,0x00,    //причина передачи - запрос
+                   char(ASDU&0xFF), char((ASDU>>8)&0xFF),
+                   char(ioa&0xff),char((ioa>>8)&0xff),char((ioa>>16)&0xff),
+
+                  };
+
+   QByteArray buf = QByteArray(temp, sizeof(temp));
+
+   buf[1] = buf.length()-2;
+    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+        sock->write(buf,buf.length());
+        emit Message("<-- Команда чтения");
+        N_T ++;
+    }
 }

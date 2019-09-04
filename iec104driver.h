@@ -51,7 +51,6 @@ private:
 
     void SendRequestCounter();  //101
     void SendRequestSingle();   //
-    void SendSyncTime();        //103
     void SendTestAct();
     void SendTestCon();
     void Send_ConfirmPacks();
@@ -64,23 +63,22 @@ private:
     bool isTestCon(QByteArray data);
 
 public:
-    void SendFullRequest(quint8 requestDescription); //general interrogation [100]
+    // команда общего опроса, requestDescription - описатель общего опроса
+    void SendFullRequest(quint8 requestDescription);
     static IEC104Driver* GetInstance();
-    //void SetSettings(CSetting* settings);
     void SetSettings(QSettings* settings);
     CSetting* GetSettings();
     void CloseConnection();
 
-    ///
-    /// \brief SendCommand
-    /// \param type
-    /// \param ioa
-    /// \param value
-    ///
+    //отправить команду (одно- или двухпозиционную)
     void SendCommand(quint16 type, quint32 ioa, quint8 value);
+    //отправить уставку (INT16, UINT16, FLOAT)
     void SetPoint(quint16 type, quint32 ioa, QVariant value);
+
 signals:
+    //соединение установлено
     void Connected();
+    //соединение разорвано
     void Disconnected();
 
     ///вывод сообщения в лог
@@ -96,9 +94,15 @@ private slots:
     void OnTestTimer();
     void OnConnectionTimer();
 public slots:
+
+    //подключиться
     void OpenConnection(CSetting *_settings=NULL);
-    void Interrogation();
+
+    // отправить команду синхронизации времени (102)
     void ClockSynch();
+
+    //отправить команду чтения
+    void ReadIOA(quint32 ioa);
 
 };
 
