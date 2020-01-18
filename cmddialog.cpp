@@ -21,6 +21,7 @@ CmdDialog::CmdDialog(IEC104Driver *pDriver,QSettings *pSettings,TableModel *cmdT
         pSettings->endGroup();
     }
     connect(ui->pushButton,SIGNAL(pressed()),this,SLOT(OnActivateCommand()));
+    connect(ui->pushButton_deactivate,SIGNAL(pressed()),this,SLOT(OnDeactivateCommand()));
     connect(ui->comboBox_type, SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged(int)));
     connect(ui->comboBox_selectCMD, SIGNAL(currentIndexChanged(int)),this, SLOT(OnCommandSelected(int)));
 
@@ -50,19 +51,25 @@ void CmdDialog::OnTypeChanged(int index)
     switch(ui->comboBox_type->currentIndex())
     {
     case 0:
-            ui->groupBox_setcommand->show();
             ui->groupBox_setpoint->hide();
             ui->comboBox_cmdValue->clear();
+            ui->pushButton_deactivate->show();
 
-            ui->comboBox_cmdValue->addItem("0:Выкл");
-            ui->comboBox_cmdValue->addItem("1:Вкл");
+            ui->comboBox_cmdValue->hide();
+
+            //ui->comboBox_cmdValue->addItem("0:Выкл");
+            //ui->comboBox_cmdValue->addItem("1:Вкл");
 
             FilterCommands(45);
         break;
     case 1:
+        ui->comboBox_cmdValue->show();
         ui->groupBox_setcommand->show();
         ui->groupBox_setpoint->hide();
         ui->comboBox_cmdValue->clear();
+
+        ui->pushButton_deactivate->hide();
+
 
         ui->comboBox_cmdValue->addItem("0:Не разрешено");
         ui->comboBox_cmdValue->addItem("1:Выкл");
@@ -76,6 +83,8 @@ void CmdDialog::OnTypeChanged(int index)
         ui->groupBox_setcommand->show();
         ui->groupBox_setpoint->hide();
         ui->comboBox_cmdValue->clear();
+        ui->pushButton_deactivate->hide();
+        ui->comboBox_cmdValue->show();
 
         ui->comboBox_cmdValue->addItem("0:Не разрешено");
         ui->comboBox_cmdValue->addItem("1:Шаг вниз");
@@ -88,21 +97,25 @@ void CmdDialog::OnTypeChanged(int index)
     case 3:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
+        ui->pushButton_deactivate->hide();
         FilterCommands(48);
         break;
     case 4:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
+        ui->pushButton_deactivate->hide();
         FilterCommands(49);
         break;
     case 5:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
+        ui->pushButton_deactivate->hide();
         FilterCommands(50);
         break;
     case 6:
         ui->groupBox_setcommand->hide();
         ui->groupBox_setpoint->show();
+        ui->pushButton_deactivate->hide();
         FilterCommands(51);
         break;
     }
@@ -148,7 +161,7 @@ void CmdDialog::reject()
     QDialog::reject();
 }
 
-void CmdDialog::OnActivateCommand()
+void CmdDialog::SendCommand( bool isActivate)
 {
     bool ok=0;
     quint8 CO; //Command Object
@@ -166,18 +179,18 @@ void CmdDialog::OnActivateCommand()
         switch(ui->comboBox_type->currentIndex())
         {
            case 0:
-            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+            CO=(isActivate? 1:0) + (ui->comboBox_SCType->currentIndex()<<2);
 
             pDriver->SendCommand(45 + correctType ,ui->spinBox_ioa->value(),CO);
             break;
            case 1:
-            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+            CO=(ui->comboBox_cmdValue->currentIndex()) + (ui->comboBox_SCType->currentIndex()<<2);
 
             pDriver->SendCommand(46 + correctType ,ui->spinBox_ioa->value(),CO);
             break;
 
           case 2:
-            CO=ui->comboBox_cmdValue->currentIndex() + (ui->comboBox_SCType->currentIndex()<<2);
+            CO=(ui->comboBox_cmdValue->currentIndex()) + (ui->comboBox_SCType->currentIndex()<<2);
 
            pDriver->SendCommand(47 + correctType ,ui->spinBox_ioa->value(),CO);
          break;
@@ -214,8 +227,19 @@ void CmdDialog::OnActivateCommand()
             break;
         }
   }
-
 }
+
+void CmdDialog::OnDeactivateCommand()
+{
+    SendCommand(false);
+}
+
+
+void CmdDialog::OnActivateCommand()
+{
+    SendCommand(true);
+}
+
 void CmdDialog::ShowWarning()
 {
     QMessageBox::warning(this,"Ошибка","Недопустимое значение уставки");

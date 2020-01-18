@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>429</width>
-    <height>303</height>
+    <height>358</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -35,7 +35,39 @@
       <string>Выбор команды</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="5" rowspan="2">
+      <item row="1" column="0" rowspan="2" colspan="4">
+       <widget class="QComboBox" name="comboBox_selectCMD"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>IOA</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="checkBox_timestamp">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>С меткой времени</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" rowspan="2">
        <widget class="QPushButton" name="pushButton_listCMD">
         <property name="maximumSize">
          <size>
@@ -48,10 +80,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" rowspan="2" colspan="5">
-       <widget class="QComboBox" name="comboBox_selectCMD"/>
-      </item>
-      <item row="0" column="0" colspan="5">
+      <item row="0" column="0" colspan="4">
        <widget class="QComboBox" name="comboBox_type">
         <item>
          <property name="text">
@@ -90,39 +119,10 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>IOA</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="spinBox_ioa">
         <property name="maximum">
          <number>16777215</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QCheckBox" name="checkBox_timestamp">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>С меткой времени</string>
         </property>
        </widget>
       </item>
@@ -259,8 +259,27 @@
    </item>
    <item>
     <widget class="QPushButton" name="pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="text">
       <string>Активировать</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_deactivate">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Деактивировать</string>
      </property>
     </widget>
    </item>

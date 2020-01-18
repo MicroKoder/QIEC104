@@ -25,9 +25,11 @@ private:
     QList<CIECSignal> filteredList;
     TableModel *cmdTable=nullptr;
     void FilterCommands(uint type);
+    void SendCommand(bool isActivate);
 public slots:
     void reject();
     void OnActivateCommand();
+    void OnDeactivateCommand();
     void OnTypeChanged(int);
     void OnCommandSelected(int);
     void OnEditCommandList();
