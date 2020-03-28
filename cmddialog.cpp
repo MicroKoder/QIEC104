@@ -195,7 +195,21 @@ void CmdDialog::SendCommand( bool isActivate)
            pDriver->SendCommand(47 + correctType ,ui->spinBox_ioa->value(),CO);
          break;
            case 3:
-            uvalue = ui->lineEdit_value->text().toUInt(&ok);
+            fValue = ui->lineEdit_value->text().toFloat(&ok);
+            uvalue = 0;
+            if (fValue>0)
+            {
+                uvalue = quint16(fValue * 32767);
+            }
+            if (fValue<0)
+            {
+                uvalue = quint16(fValue * 32768 + 65536);
+            }
+            if (fValue>1.0f || fValue<-1.0f)
+            {
+                ok=false;
+            }
+
             if (ok)
                 pDriver->SetPoint(48+ correctType, ui->spinBox_ioa->value(),QVariant(uvalue));
             else

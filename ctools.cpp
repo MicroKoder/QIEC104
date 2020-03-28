@@ -83,7 +83,7 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
 
     uchar typeID = uchar(data[6]);
 
-    uchar count = data[7]&0x7F; //достаем количество элементов
+    uchar count = ((unsigned char)data[7])&0x7F; //достаем количество элементов
 
     if (count == 0)
         return result;    //нет элементов, можно не продолжать
@@ -524,10 +524,12 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count){
     QList<CIECSignal>* result = new QList<CIECSignal>();
 
 
-    if (lostBytes.length()>0){
+   /* if (lostBytes.length()>0){
         data.insert(0,lostBytes);
         lostBytes.clear();
-    }
+    }*/
+    if ((uchar)data[0]!=0x68)
+        return result;
 
     //длина APCI = APDU + 2
     uint APCILength = (uchar)data[1]+2;
