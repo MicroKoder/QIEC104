@@ -41,7 +41,7 @@ private:
      QLabel *pConnectionStatusLabel=nullptr;
      addSignalDialog *pAddSignalDialog=nullptr;
      ConnectionSettingsDialog *pConnectionDialog=nullptr;
-     CmdDialog *pDialog=nullptr;
+     QList<CmdDialog*> pDialogs;
      QFile *logFile=nullptr;
      QTextStream *logStream=nullptr;
      ProxyModel *proxyModel=nullptr;
@@ -72,6 +72,7 @@ public slots:
     void OnShowWatchTriggered(bool);
     void OnGIPressed(void); //general interrogation
     void OnCMDPressed(void); //открыть диалог с командами
+
     void OnContextMenuRequested(QPoint);
 
     void AddCommand(CIECSignal);

@@ -374,11 +374,10 @@ void MainWindow::OnLoadBaseTriggered(bool val)
 
 void MainWindow::OnCMDPressed()
 {
-    if (pDialog)
-        delete pDialog;
+    CmdDialog *d = new CmdDialog(pDriver, qsettings, cmdTableModel,this);
 
-    pDialog = new CmdDialog(pDriver, qsettings, cmdTableModel,this);
-    pDialog->show();
+    d->setAttribute(Qt::WA_DeleteOnClose);
+    d->show();
 }
 
 void MainWindow::OnAboutTriggered(bool)

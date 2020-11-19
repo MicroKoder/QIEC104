@@ -25,6 +25,8 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
     ui->edit_asdu->setText(QString::number(settings->asdu));
 
     ui->AutoCreate_checkBox->setChecked(settings->autoCreateTags);
+    ui->checkBox_sendGI->setChecked(settings->SendGIOnStart);
+    ui->checkBox_sendTC->setChecked(settings->SendTCOnStart);
 
    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
  //connect(ui->buttonBox,SIGNAL(rejected()), this, SLOT(reject());
@@ -52,6 +54,8 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset):
         ui->edit_asdu->setText(qset->value("asdu", "1").toString());
         ui->AutoCreate_checkBox->setChecked(qset->value("autoCreate","false").toBool());
         ui->checkBox_newLog->setChecked(qset->value("log","false").toBool());
+        ui->checkBox_sendGI->setChecked(qset->value("SendGIOnStart","true").toBool());
+        ui->checkBox_sendTC->setChecked(qset->value("SendTCOnStart","true").toBool());
         qset->endGroup();
     }
     connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(AcceptSettings()));
@@ -76,6 +80,8 @@ void ConnectionSettingsDialog::AcceptSettings()
      settings->w = ui->edit_w->text().toUInt();
      settings->asdu = ui->edit_asdu->text().toUInt();
      settings->autoCreateTags = ui->AutoCreate_checkBox->isChecked();
+     settings->SendGIOnStart = ui->checkBox_sendGI->isChecked();
+     settings->SendTCOnStart = ui->checkBox_sendTC->isChecked();
     }
 
     if (qset != NULL)
@@ -92,6 +98,8 @@ void ConnectionSettingsDialog::AcceptSettings()
      qset->setValue("asdu", ui->edit_asdu->text());
      qset->setValue("autoCreate", ui->AutoCreate_checkBox->isChecked());
      qset->setValue("log",  ui->checkBox_newLog->isChecked());
+     qset->setValue("SendGIOnStart", ui->checkBox_sendGI->isChecked());
+     qset->setValue("SendTCOnStart", ui->checkBox_sendTC->isChecked());
      qset->endGroup();
     }
     qDebug() << "Connection Settings accepted";

@@ -40,7 +40,11 @@ public:
     quint16 w;
     quint16 asdu;
 
+
+
     bool autoCreateTags;
+    bool SendGIOnStart;
+    bool SendTCOnStart;
     CSetting();
     CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false);
 };

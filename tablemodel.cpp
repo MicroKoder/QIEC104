@@ -35,7 +35,8 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                  return item.value == 1? Qt::Checked: Qt::Unchecked;
     }
   else
-    if ((role == Qt::DisplayRole)){
+  {
+    if (role == Qt::DisplayRole){
         QVariant result = QVariant("");
         switch (col){
             case 0:
@@ -118,6 +119,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
         };
         return result;
     }
+  }
     return QVariant();
 }
 

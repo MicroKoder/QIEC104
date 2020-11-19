@@ -11,6 +11,9 @@ static char StartDTAct[] ={0x68, 0x04, 0x07, 0x00, 0x00, 0x00};
 
 IEC104Driver* IEC104Driver::instance = NULL;
 
+bool needSendTC = false;
+bool needSendGI = false;
+
 IEC104Driver::IEC104Driver():
     sock(new QTcpSocket())
 {
@@ -230,12 +233,12 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
         return;
 
     //use new settings if got it
-    if (_settings != NULL)
+    if (_settings != nullptr)
     {
         this->settings = _settings;
     }
 
-    if (settings != NULL)
+    if (settings != nullptr)
     {
         sock->open(QIODevice::ReadWrite);
         //setup connection
@@ -250,6 +253,9 @@ void IEC104Driver::OpenConnection(CSetting *_settings)
 
         conTimer->setInterval(settings->t1*1000);
         conTimer->start();
+
+        needSendGI = settings->SendGIOnStart;
+        needSendTC = settings->SendTCOnStart;
 
     }
 
@@ -468,9 +474,8 @@ Format I:
 void IEC104Driver::OnSockReadyRead()
 {
     QByteArray buf= sock->readAll();
+
     QString str =QTime::currentTime().toString()+" -->[";
-
-
     emit Message(QTime::currentTime().toString()+" -->" + IEC104Tools::BytesToString(&buf));
 
     // reset timer when any package received
@@ -497,6 +502,18 @@ void IEC104Driver::OnSockReadyRead()
         if(isStartCon(buf))
         {
             emit Message("--> StartCon");
+
+            if (needSendGI)
+            {
+                needSendGI = false;
+                SendFullRequest(20);
+            }
+
+            if (needSendTC)
+            {
+                needSendTC = false;
+             //   SendCommand(103);
+            }
             return;
         }
     }//if count 6

@@ -34,6 +34,8 @@ public slots:
     void OnCommandSelected(int);
     void OnEditCommandList();
 
+
+
 };
 
 #endif // CMDDIALOG_H
