@@ -565,9 +565,11 @@ void IEC104Driver::ClockSynch()
                    char(ASDU&0xFF), char((ASDU>>8)&0xFF),
                    0x00,0x00,0x00,
 
+
                   };
 
    QByteArray buf = QByteArray(temp, sizeof(temp));
+
 
 
    buf.append(CP56Time::GetTimestamp());
@@ -592,6 +594,7 @@ void IEC104Driver::ReadIOA(quint32 ioa)
                    char(ioa&0xff),char((ioa>>8)&0xff),char((ioa>>16)&0xff),
 
                   };
+
 
    QByteArray buf = QByteArray(temp, sizeof(temp));
 
