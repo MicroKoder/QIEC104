@@ -319,44 +319,62 @@ void MainWindow::OnSaveBaseTriggered(bool)
     delete fileDialog;
 }
 
+void MainWindow::loadBase(QString filename)
+{
+    QString key;
+    QString descr;
+    if (filename.length()>0)
+    {
+        QFile *file= new QFile(filename);
+        file->open(QIODevice::ReadOnly);
+        QTextStream in(file);
+
+        //commandList = new QList<CIECSignal>();
+        while(!in.atEnd())
+        {
+          QString line = in.readLine();
+          qDebug() << line;
+          QStringList words= line.split('\\');
+          key = words[0];
+
+          CIECSignal sig;
+          sig.SetKey( key.toUInt());
+          sig.description = words[1];
+
+          if (sig.GetType()>=45)
+              cmdTableModel->updateSignal(sig,true,true);
+          else
+              tabmodel->updateSignal(sig,true,true);
+        }
+
+        file->close();
+        delete file;
+
+    }
+}
+
 void MainWindow::OnLoadFileTriggered(bool)
 {
   QFileDialog *fileDialog = new QFileDialog();
 
 
   QString filename = fileDialog->getOpenFileName(this,"Открытие",QString(),QString("*.dat"));
-  QString key;
-  QString descr;
-  if (filename.length()>0)
-  {
-      QFile *file= new QFile(filename);
-      file->open(QIODevice::ReadOnly);
-      QTextStream in(file);
 
-      //commandList = new QList<CIECSignal>();
-      while(!in.atEnd())
-      {
-        QString line = in.readLine();
-        qDebug() << line;
-        QStringList words= line.split('\\');
-        key = words[0];
-
-        CIECSignal sig;
-        sig.SetKey( key.toUInt());
-        sig.description = words[1];
-
-        if (sig.GetType()>=45)
-            cmdTableModel->updateSignal(sig,true,true);
-        else
-            tabmodel->updateSignal(sig,true,true);
-      }
-
-      file->close();
-      delete file;
-
-  }
+  MainWindow::loadBase(filename);
 
   delete fileDialog;
+}
+
+void MainWindow::autoLoad(char *argv)
+{
+    QString filename;
+    char c=argv[0];
+    for(int i=0; argv[i]!='\0';i++)
+    {
+        c=argv[i];
+        filename+=c;
+    }
+  MainWindow::loadBase(filename);
 }
 
 void MainWindow::OnLoadBaseTriggered(bool val)
