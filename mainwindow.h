@@ -36,6 +36,7 @@ public:
     ~MainWindow();
 
     void AddMSignal(CIECSignal* tag, QString description=QString());
+    void autoLoad(char *argv);
 private:
     Ui::MainWindow *ui;
      QLabel *pConnectionStatusLabel=nullptr;
@@ -46,6 +47,7 @@ private:
      QTextStream *logStream=nullptr;
      ProxyModel *proxyModel=nullptr;
      WatchDialog *watch=nullptr;
+     void loadBase(QString filename);
   //  QList<CIECSignal> *commandList=nullptr;
 
 public slots:

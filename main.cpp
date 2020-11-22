@@ -12,5 +12,10 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
+    if (argc>1)
+    {
+        w.autoLoad(argv[1]);
+    }
+
     return a.exec();
 }
