@@ -216,6 +216,8 @@ void IEC104Driver::SetSettings(QSettings *settings)
         this->settings->t3 = settings->value("t3").toInt();
         this->settings->k = settings->value("k").toInt();
         this->settings->w = settings->value("w").toInt();
+        this->settings->SendGIOnStart = settings->value("SendGIOnStart").toBool();
+        this->settings->SendTCOnStart = settings->value("SendTCOnStart").toBool();
         settings->endGroup();
     }
 }
@@ -226,18 +228,18 @@ CSetting* IEC104Driver::GetSettings()
 }
 
 
-void IEC104Driver::OpenConnection(CSetting *_settings)
+void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 {
     //still open? exit
     if (sock->isOpen())
         return;
 
     //use new settings if got it
-    if (_settings != nullptr)
+   /* if (_settings != nullptr)
     {
         this->settings = _settings;
     }
-
+*/
     if (settings != nullptr)
     {
         sock->open(QIODevice::ReadWrite);

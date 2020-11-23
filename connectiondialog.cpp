@@ -27,6 +27,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(CSetting *settings):
     ui->AutoCreate_checkBox->setChecked(settings->autoCreateTags);
     ui->checkBox_sendGI->setChecked(settings->SendGIOnStart);
     ui->checkBox_sendTC->setChecked(settings->SendTCOnStart);
+    ui->checkBox_autoStart->setChecked(settings->autoStart);
 
    connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(Accepted()));
  //connect(ui->buttonBox,SIGNAL(rejected()), this, SLOT(reject());
@@ -56,6 +57,7 @@ ConnectionSettingsDialog::ConnectionSettingsDialog(QSettings *_qset):
         ui->checkBox_newLog->setChecked(qset->value("log","false").toBool());
         ui->checkBox_sendGI->setChecked(qset->value("SendGIOnStart","true").toBool());
         ui->checkBox_sendTC->setChecked(qset->value("SendTCOnStart","true").toBool());
+        ui->checkBox_autoStart->setChecked(qset->value("autoStart","false").toBool());
         qset->endGroup();
     }
     connect(ui->buttonBox,SIGNAL(accepted()), this, SLOT(AcceptSettings()));
@@ -82,6 +84,7 @@ void ConnectionSettingsDialog::AcceptSettings()
      settings->autoCreateTags = ui->AutoCreate_checkBox->isChecked();
      settings->SendGIOnStart = ui->checkBox_sendGI->isChecked();
      settings->SendTCOnStart = ui->checkBox_sendTC->isChecked();
+     settings->autoStart = ui->checkBox_autoStart->isChecked();
     }
 
     if (qset != NULL)
@@ -100,6 +103,7 @@ void ConnectionSettingsDialog::AcceptSettings()
      qset->setValue("log",  ui->checkBox_newLog->isChecked());
      qset->setValue("SendGIOnStart", ui->checkBox_sendGI->isChecked());
      qset->setValue("SendTCOnStart", ui->checkBox_sendTC->isChecked());
+     qset->setValue("autoStart",ui->checkBox_autoStart->isChecked());
      qset->endGroup();
     }
     qDebug() << "Connection Settings accepted";

@@ -84,6 +84,16 @@ MainWindow::MainWindow(QWidget *parent) :
     cmdTableModel = new TableModel();
     cmdTableModel->isShortTable = true;
 
+    qsettings->beginGroup("driver");
+    bool go = qsettings->value("autoStart",false).toBool();
+    qsettings->endGroup();
+   if (go)
+   {
+
+       OnConnectionDialogFinished();
+   }
+
+
 }
 void MainWindow::OnContextMenuRequested(QPoint pos)
 {

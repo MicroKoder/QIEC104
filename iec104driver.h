@@ -96,7 +96,7 @@ private slots:
 public slots:
 
     //подключиться
-    void OpenConnection(CSetting *_settings=NULL);
+    void OpenConnection(/*CSetting *_settings=NULL*/);
 
     // отправить команду синхронизации времени (102)
     void ClockSynch();

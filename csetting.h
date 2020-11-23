@@ -45,8 +45,9 @@ public:
     bool autoCreateTags;
     bool SendGIOnStart;
     bool SendTCOnStart;
+    bool autoStart;
     CSetting();
-    CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false);
+    CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false, bool _autoStart=false);
 };
 
 #endif // CSETTING_H
