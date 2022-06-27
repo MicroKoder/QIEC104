@@ -160,7 +160,15 @@ void CmdDialog::reject()
 
     QDialog::reject();
 }
-
+enum{
+    CMD_SINGLE,
+    CMD_DOUBLE,
+    CMD_STEPREG,
+    CMD_SETPOINT_NORMAL,
+    CMD_SETPOINT_SCALED,
+    CMD_SETPOINT_FLOAT,
+    CMD_SETPOINT_DWORD
+}E_CMD_TYPES;
 void CmdDialog::SendCommand( bool isActivate)
 {
     bool ok=0;
@@ -175,26 +183,27 @@ void CmdDialog::SendCommand( bool isActivate)
         quint16 correctType = ui->checkBox_timestamp->isChecked() ? 13:0;
 
 
-
+        CO = ui->comboBox_SCType->currentIndex()<<2;
+        CO += ui->comboBox_SE->currentIndex() <<7;
         switch(ui->comboBox_type->currentIndex())
         {
-           case 0:
-            CO=(isActivate? 1:0) + (ui->comboBox_SCType->currentIndex()<<2);
+           case CMD_SINGLE:
+            CO +=(isActivate? 1:0);
 
             pDriver->SendCommand(45 + correctType ,ui->spinBox_ioa->value(),CO);
             break;
-           case 1:
-            CO=(ui->comboBox_cmdValue->currentIndex()) + (ui->comboBox_SCType->currentIndex()<<2);
+           case CMD_DOUBLE:
+            CO +=(ui->comboBox_cmdValue->currentIndex());
 
             pDriver->SendCommand(46 + correctType ,ui->spinBox_ioa->value(),CO);
             break;
 
-          case 2:
-            CO=(ui->comboBox_cmdValue->currentIndex()) + (ui->comboBox_SCType->currentIndex()<<2);
+          case CMD_STEPREG:
+            CO +=(ui->comboBox_cmdValue->currentIndex());
 
            pDriver->SendCommand(47 + correctType ,ui->spinBox_ioa->value(),CO);
          break;
-           case 3:
+           case CMD_SETPOINT_NORMAL:
             fValue = ui->lineEdit_value->text().toFloat(&ok);
             uvalue = 0;
             if (fValue>0)
@@ -217,14 +226,14 @@ void CmdDialog::SendCommand( bool isActivate)
 
             break;
 
-           case 4:
+           case CMD_SETPOINT_SCALED:
             ivalue = ui->lineEdit_value->text().toInt(&ok);
             if (ok)
                 pDriver->SetPoint(49+correctType, ui->spinBox_ioa->value(),QVariant(ivalue));
             else
                 ShowWarning();
             break;
-           case 5:
+           case CMD_SETPOINT_FLOAT:
             fValue = ui->lineEdit_value->text().toFloat(&ok);
             if (ok)
                 pDriver->SetPoint(50+correctType, ui->spinBox_ioa->value(),QVariant(fValue));
@@ -232,7 +241,7 @@ void CmdDialog::SendCommand( bool isActivate)
                 ShowWarning();
 
             break;
-           case 6:
+           case CMD_SETPOINT_DWORD:
             dvalue = ui->lineEdit_value->text().toUInt(&ok);
             if (ok)
                 pDriver->SetPoint(51+correctType, ui->spinBox_ioa->value(),QVariant(dvalue));

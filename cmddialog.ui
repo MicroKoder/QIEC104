@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
+    <width>472</width>
     <height>358</height>
    </rect>
   </property>
@@ -195,7 +195,7 @@
        <rect>
         <x>12</x>
         <y>29</y>
-        <width>358</width>
+        <width>436</width>
         <height>24</height>
        </rect>
       </property>
@@ -204,7 +204,7 @@
         <widget class="QComboBox" name="comboBox_cmdValue">
          <property name="minimumSize">
           <size>
-           <width>150</width>
+           <width>50</width>
            <height>0</height>
           </size>
          </property>
@@ -227,7 +227,7 @@
         <widget class="QComboBox" name="comboBox_SCType">
          <property name="minimumSize">
           <size>
-           <width>200</width>
+           <width>50</width>
            <height>0</height>
           </size>
          </property>
@@ -249,6 +249,26 @@
          <item>
           <property name="text">
            <string>Постоянный выход</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox_SE">
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>0</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>Исполнение</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Выбор</string>
           </property>
          </item>
         </widget>
