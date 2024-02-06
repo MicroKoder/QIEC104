@@ -306,13 +306,14 @@ void MainWindow::OnSaveBaseTriggered(bool)
 {
     QFileDialog *fileDialog = new QFileDialog();
 
-    QString filename = fileDialog->getSaveFileName(this,tr("Save file"),QString(),QString("*.dat")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
+    QString filename = fileDialog->getSaveFileName(this,tr("Save file"),QString(),QString("*.csv")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
 
     if (filename.length()>0)
     {
         QFile *file = new QFile(filename);
         file->open(QIODevice::WriteOnly);
         QTextStream stream(file);
+        stream << "type,IOA,description, value\n";
         foreach(CIECSignal signal, tabmodel->mData)
         {
             stream << signal.GetType() << ',' << signal.GetAddress() << ',' << signal.description << ',' << signal.value.toString() << '\n';
@@ -342,6 +343,7 @@ void MainWindow::loadBase(QString filename)
         QTextStream in(file);
 
         //commandList = new QList<CIECSignal>();
+        in.readLine();  //skip headers
         while(!in.atEnd())
         {
           QString line = in.readLine();
@@ -360,9 +362,10 @@ void MainWindow::loadBase(QString filename)
 
 
           // get value from file
-          QString strval = words[3];
-          if (words.count()>2)
+
+          if (words.count()>3)
           {
+              QString strval = words[3];
               if (strval=="true")
                   sig.value = true;
               else if (strval=="false")
@@ -396,7 +399,7 @@ void MainWindow::OnLoadFileTriggered(bool)
   QFileDialog *fileDialog = new QFileDialog();
 
 
-  QString filename = fileDialog->getOpenFileName(this,tr("Open file"),QString(),QString("*.dat"));
+  QString filename = fileDialog->getOpenFileName(this,tr("Open file"),QString(),QString("*.csv"));
 
   MainWindow::loadBase(filename);
 

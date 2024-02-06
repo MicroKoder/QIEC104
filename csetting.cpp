@@ -22,6 +22,7 @@ CSetting::CSetting(QString _ip, quint16 _asdu, quint16 _port, bool autoCreate, b
     IP = _ip;
     Port = _port;
     asdu = _asdu;
+    autoStart = _autoStart;
 
  //   t0 = 10;
     t1 = 15;
