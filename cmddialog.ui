@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Команды и уставки</string>
+   <string>Commands</string>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -32,7 +32,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Выбор команды</string>
+      <string>Select command</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="0" rowspan="2" colspan="4">
@@ -53,7 +53,7 @@
          </size>
         </property>
         <property name="text">
-         <string>IOA</string>
+         <string notr="true">IOA</string>
         </property>
        </widget>
       </item>
@@ -63,7 +63,7 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>С меткой времени</string>
+         <string>With time tag</string>
         </property>
        </widget>
       </item>
@@ -76,7 +76,7 @@
          </size>
         </property>
         <property name="text">
-         <string>...</string>
+         <string notr="true">...</string>
         </property>
        </widget>
       </item>
@@ -84,37 +84,37 @@
        <widget class="QComboBox" name="comboBox_type">
         <item>
          <property name="text">
-          <string>Одноэлементная команда (45, 58)</string>
+          <string>Single point command (45, 58)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Двухэлементная команда (46, 59)</string>
+          <string>Double point command (46, 59)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Команда пошагового регулирования (47, 60)</string>
+          <string>Regulating step command (47, 60)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Команда уставки, нормализованное значение (48, 61)</string>
+          <string>Setpoint command, normalized value (48, 61)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Команда уставки, масштабированное значение (49, 62)</string>
+          <string>Setpoint command, scaled value (49, 62)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Команда уставки, короткое число с плавающей точкой (50, 63)</string>
+          <string>Setpoint command, floating point value (50, 63)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Строка из 32 битов (51, 64)</string>
+          <string>Bit string 32 bit (51, 64)</string>
          </property>
         </item>
        </widget>
@@ -138,7 +138,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_setpoint">
      <property name="title">
-      <string>Параметры уставки</string>
+      <string>Setpoint parameters</string>
      </property>
      <property name="flat">
       <bool>false</bool>
@@ -159,7 +159,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Значение</string>
+         <string>Value</string>
         </property>
        </widget>
       </item>
@@ -188,7 +188,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_setcommand">
      <property name="title">
-      <string>Параметры команды</string>
+      <string>Command parameters</string>
      </property>
      <widget class="QWidget" name="horizontalLayoutWidget_3">
       <property name="geometry">
@@ -196,7 +196,7 @@
         <x>12</x>
         <y>29</y>
         <width>436</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -209,16 +209,16 @@
           </size>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <item>
           <property name="text">
-           <string>ОТКЛ</string>
+           <string>OFF</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>ВКЛ</string>
+           <string>ON</string>
           </property>
          </item>
         </widget>
@@ -233,22 +233,22 @@
          </property>
          <item>
           <property name="text">
-           <string>Нет</string>
+           <string>NO</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Короткий импульс</string>
+           <string>Short pulse</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Длинный импульс</string>
+           <string>Long pulse</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Постоянный выход</string>
+           <string>Persistent output</string>
           </property>
          </item>
         </widget>
@@ -263,12 +263,12 @@
          </property>
          <item>
           <property name="text">
-           <string>Исполнение</string>
+           <string>Execute</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Выбор</string>
+           <string>Select</string>
           </property>
          </item>
         </widget>
@@ -286,7 +286,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Активировать</string>
+      <string>Activate</string>
      </property>
     </widget>
    </item>
@@ -299,7 +299,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Деактивировать</string>
+      <string>Deactivate</string>
      </property>
     </widget>
    </item>

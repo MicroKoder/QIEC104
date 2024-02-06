@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Настройки соединения</string>
+   <string>Connection settings</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -45,7 +45,7 @@
       </font>
      </property>
      <property name="title">
-      <string>Настройки соединения</string>
+      <string>Connection settings</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -87,7 +87,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>T1</string>
+           <string notr="true">T1</string>
           </property>
          </widget>
         </item>
@@ -104,7 +104,7 @@
         <item row="1" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>T3</string>
+           <string notr="true">T3</string>
           </property>
          </widget>
         </item>
@@ -118,7 +118,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>k</string>
+           <string notr="true">k</string>
           </property>
          </widget>
         </item>
@@ -128,7 +128,7 @@
         <item row="4" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>w</string>
+           <string notr="true">w</string>
           </property>
          </widget>
         </item>
@@ -138,7 +138,7 @@
         <item row="5" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
-           <string>ASDU</string>
+           <string notr="true">ASDU</string>
           </property>
          </widget>
         </item>
@@ -147,29 +147,32 @@
         </item>
         <item row="6" column="1">
          <widget class="QCheckBox" name="AutoCreate_checkBox">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
+          </property>
           <property name="text">
-           <string>Автоматически добавлять тэги</string>
+           <string>Add new tags automatically</string>
           </property>
          </widget>
         </item>
         <item row="8" column="1">
          <widget class="QCheckBox" name="checkBox_sendGI">
           <property name="text">
-           <string>Команда опроса при подключении</string>
+           <string>General interrogation on connect</string>
           </property>
          </widget>
         </item>
         <item row="9" column="1">
          <widget class="QCheckBox" name="checkBox_sendTC">
           <property name="text">
-           <string>Команда синхронизации времени при подключении</string>
+           <string>Sync time on connect</string>
           </property>
          </widget>
         </item>
         <item row="11" column="1">
          <widget class="QCheckBox" name="checkBox_fullLog">
           <property name="text">
-           <string>Подробный лог</string>
+           <string>Extended log</string>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -179,14 +182,14 @@
         <item row="10" column="1">
          <widget class="QCheckBox" name="checkBox_newLog">
           <property name="text">
-           <string>Писать лог файл</string>
+           <string>Write log</string>
           </property>
          </widget>
         </item>
         <item row="12" column="1">
          <widget class="QCheckBox" name="checkBox_autoStart">
           <property name="text">
-           <string>Автоматичкски подключаться при запуске</string>
+           <string>Autoconnect on start</string>
           </property>
           <property name="tristate">
            <bool>false</bool>
@@ -213,6 +216,9 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="locale">
+      <locale language="Russian" country="Russia"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

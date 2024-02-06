@@ -179,7 +179,7 @@ void ImportDialog::On_OpenDialogPressed()
 
 
         QMessageBox msg;
-        msg.setText("Прочитано сигналов: " + QString::number(parsedRows));
+        msg.setText(tr("Tags read: ") + QString::number(parsedRows));
         msg.show();
 
 

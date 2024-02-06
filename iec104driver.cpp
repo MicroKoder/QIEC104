@@ -36,7 +36,7 @@ IEC104Driver::IEC104Driver():
 
 void IEC104Driver::OnConnectionTimer()
 {
-    emit Message("Нет ответа от сервера в течение таймаута t1");
+    emit Message(tr("No answer from server, t1 elapsed"));
     OnDisconnected();
 }
 ///
@@ -305,7 +305,7 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
 
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.length());
-            emit Message("<-- Однопозиционная команда");
+            emit Message(tr("<-- command"));
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
@@ -348,7 +348,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
        buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
-            emit Message("<-- Команда уставки, нормализованное значение");
+            emit Message(tr("<-- Set point command, normalized value"));
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
@@ -378,7 +378,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
-            emit Message("<-- Команда уставки, масштабированное значение");
+            emit Message(tr("<-- Set point command, scaled value"));
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
@@ -408,7 +408,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         qDebug() << temp;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
-            emit Message("<-- Команда уставки с плавающей точкой");
+            emit Message(tr("<-- Set point command with floating point value"));
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
@@ -436,7 +436,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         buf[1] = (char)buf.length()-2;
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
-            emit Message("<-- Команда уставки, строка 32 бит");
+            emit Message(tr("<-- Set point command, bit string 32 bit"));
             N_T ++;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
@@ -578,7 +578,7 @@ void IEC104Driver::ClockSynch()
    buf[1] = buf.length()-2;
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,buf.length());
-        emit Message("<-- Команда синхронизации времени");
+        emit Message(tr("<-- Time sync command"));
         N_T ++;
     }
 }
@@ -603,7 +603,7 @@ void IEC104Driver::ReadIOA(quint32 ioa)
    buf[1] = buf.length()-2;
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,buf.length());
-        emit Message("<-- Команда чтения");
+        emit Message(tr("<-- Read command"));
         N_T ++;
     }
 }

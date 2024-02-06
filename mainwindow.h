@@ -74,7 +74,7 @@ public slots:
     void OnShowWatchTriggered(bool);
     void OnGIPressed(void); //general interrogation
     void OnCMDPressed(void); //открыть диалог с командами
-
+    void OnLogVisibleToggled(bool);
     void OnContextMenuRequested(QPoint);
 
     void AddCommand(CIECSignal);

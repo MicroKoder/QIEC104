@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionWatch,SIGNAL(triggered(bool)),this,SLOT(OnShowWatchTriggered(bool)));
     connect(ui->actionAbout, SIGNAL(triggered(bool)),this,SLOT(OnAboutTriggered(bool)));
 
+    connect(ui->action_3, SIGNAL(toggled(bool)), this,SLOT(OnLogVisibleToggled(bool)));
+
     connect(ui->actionTS, SIGNAL(triggered(bool)),pDriver, SLOT(ClockSynch(void)));
 
 
@@ -54,11 +56,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->lineEdit_nameFilter,SIGNAL(textChanged(QString)),proxyModel,SLOT(setFilter(QString)));
     tabmodel->setHeaderData(0,Qt::Horizontal,QVariant("IOA"));
-    tabmodel->setHeaderData(1,Qt::Horizontal,QVariant("Название"));
-    tabmodel->setHeaderData(2,Qt::Horizontal,QVariant("Значение"));
-    tabmodel->setHeaderData(3,Qt::Horizontal,QVariant("Тип"));
-    tabmodel->setHeaderData(4,Qt::Horizontal,QVariant("Качество"));
-    tabmodel->setHeaderData(5,Qt::Horizontal,QVariant("Время"));
+    tabmodel->setHeaderData(1,Qt::Horizontal,QVariant(tr("Description")));
+    tabmodel->setHeaderData(2,Qt::Horizontal,QVariant(tr("Value")));
+    tabmodel->setHeaderData(3,Qt::Horizontal,QVariant(tr("Type")));
+    tabmodel->setHeaderData(4,Qt::Horizontal,QVariant(tr("Quality")));
+    tabmodel->setHeaderData(5,Qt::Horizontal,QVariant(tr("Time tag")));
 
     emit tabmodel->headerDataChanged(Qt::Horizontal,0,5);
     connect(tabmodel,SIGNAL(rowsInserted(QModelIndex,int,int)),ui->MTable,SLOT(rowsInserted(QModelIndex,int,int)));
@@ -99,10 +101,10 @@ void MainWindow::OnContextMenuRequested(QPoint pos)
 {
     qDebug() << "context menu requsted";
     QMenu *contextMenu= new QMenu(this);
-    QAction *addWatch=new QAction("Добавить в просмотр",this);
+    QAction *addWatch=new QAction(tr("Add to watch"),this);
     connect(addWatch,SIGNAL(triggered(bool)), this, SLOT(OnAddWatch(bool)));
 
-    QAction *read= new QAction("Запросить",this);
+    QAction *read= new QAction(tr("Single request"),this);
     connect(read, SIGNAL(triggered(bool)),this, SLOT(OnRead(bool)));
 
 
@@ -225,7 +227,7 @@ void MainWindow::OnDisconnected()
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
 
-    ui->log->append("Соединение разорвано");
+    ui->log->append(tr("Connection closed"));
 }
 
 ///получено текстовое сообщение от драйвера
@@ -267,7 +269,7 @@ void MainWindow::MToolAdd_Pressed()
 
 void MainWindow::MToolRemove_Pressed()
 {
-    ui->log->append("remove pressed");
+    ui->log->append(tr("remove pressed"));
     QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
 
     tabmodel->removeRows(pSelection);
@@ -304,7 +306,7 @@ void MainWindow::OnSaveBaseTriggered(bool)
 {
     QFileDialog *fileDialog = new QFileDialog();
 
-    QString filename = fileDialog->getSaveFileName(this,"Сохранение",QString(),QString("*.dat")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
+    QString filename = fileDialog->getSaveFileName(this,tr("Save file"),QString(),QString("*.dat")); //fileDialog->getOpenFileName(this,"Открытие файла",QString(),QString("*.xls *.xlsx"));
 
     if (filename.length()>0)
     {
@@ -313,13 +315,13 @@ void MainWindow::OnSaveBaseTriggered(bool)
         QTextStream stream(file);
         foreach(CIECSignal signal, tabmodel->mData)
         {
-            stream << signal.GetKey() << '\\' << signal.description << '\n';
+            stream << signal.GetType() << ',' << signal.GetAddress() << ',' << signal.description << ',' << signal.value.toString() << '\n';
 
         }
 
         foreach(CIECSignal signal, cmdTableModel->mData)
         {
-            stream << signal.GetKey() << '\\' << signal.description << '\n';
+            stream << signal.GetType() << ',' << signal.GetAddress() << ',' << signal.description << ',' << signal.value.toString() << '\n';
 
         }
         file->close();
@@ -331,7 +333,7 @@ void MainWindow::OnSaveBaseTriggered(bool)
 
 void MainWindow::loadBase(QString filename)
 {
-    QString key;
+
     QString descr;
     if (filename.length()>0)
     {
@@ -344,17 +346,43 @@ void MainWindow::loadBase(QString filename)
         {
           QString line = in.readLine();
           qDebug() << line;
-          QStringList words= line.split('\\');
-          key = words[0];
+          QStringList words= line.split(',');
+          uint type = words[0].toUInt();
+          uint ioa = words[1].toUInt();
+          uint key = (type<<24) + ioa;
+
 
           CIECSignal sig;
-          sig.SetKey( key.toUInt());
-          sig.description = words[1];
+
+          sig.SetKey( key);
+          sig.description = words[2];
+
+
+
+          // get value from file
+          QString strval = words[3];
+          if (words.count()>2)
+          {
+              if (strval=="true")
+                  sig.value = true;
+              else if (strval=="false")
+                  sig.value = false;
+              else
+              {
+                  bool ok;
+                  sig.value = strval.toInt(&ok);
+
+                  if (!ok)
+                      sig.value = strval.toFloat(&ok);
+              }
+
+          }
 
           if (sig.GetType()>=45)
               cmdTableModel->updateSignal(sig,true,true);
           else
               tabmodel->updateSignal(sig,true,true);
+
         }
 
         file->close();
@@ -368,7 +396,7 @@ void MainWindow::OnLoadFileTriggered(bool)
   QFileDialog *fileDialog = new QFileDialog();
 
 
-  QString filename = fileDialog->getOpenFileName(this,"Открытие",QString(),QString("*.dat"));
+  QString filename = fileDialog->getOpenFileName(this,tr("Open file"),QString(),QString("*.dat"));
 
   MainWindow::loadBase(filename);
 
@@ -406,6 +434,11 @@ void MainWindow::OnCMDPressed()
 
     d->setAttribute(Qt::WA_DeleteOnClose);
     d->show();
+}
+
+void MainWindow::OnLogVisibleToggled(bool a)
+{
+    ui->dockWidget->setVisible(a);
 }
 
 void MainWindow::OnAboutTriggered(bool)

@@ -43,6 +43,7 @@ void CmdDialog::OnEditCommandList()
 {
     EditCMDdialog dialog(cmdTable,this);
     dialog.exec();
+    OnTypeChanged(ui->comboBox_type->currentIndex());
 }
 
 void CmdDialog::OnTypeChanged(int index)
@@ -265,5 +266,5 @@ void CmdDialog::OnActivateCommand()
 
 void CmdDialog::ShowWarning()
 {
-    QMessageBox::warning(this,"Ошибка","Недопустимое значение уставки");
+    QMessageBox::warning(this,tr("Error"),tr("Wrong value"));
 }

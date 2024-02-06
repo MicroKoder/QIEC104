@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>136</height>
+    <width>679</width>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Добавление сигнала</string>
+   <string>Add tag</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Добавление сигнала</string>
+      <string>Add tag</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="1">
@@ -37,107 +37,107 @@
        <widget class="QComboBox" name="comboBox">
         <item>
          <property name="text">
-          <string>Одноэлементная информация (M_SP_NA)</string>
+          <string>Single point information (M_SP_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Двухэлементная информация (M_DP_NA)</string>
+          <string>Double point information (M_DP_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Информация о положении отпаек (M_ST_NA)</string>
+          <string>Step position information (M_ST_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Строка из 32 битов (M_BO_NA)</string>
+          <string>Bit string of 32 bit (M_BO_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, нормализованное значение (M_ME_NA)</string>
+          <string>Measured value, normalized value (M_ME_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, масштабированное значение (M_ME_NB)</string>
+          <string>Measured value, scaled value (M_ME_NB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, с плавающей точкой (M_ME_NC)</string>
+          <string>Measured value, floating point (M_ME_NC)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Интегральные суммы (M_IT_NA)</string>
+          <string>Integrated totals (M_IT_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Упакованная одноэлементная информация (M_PS_NA)</string>
+          <string>Packed single-point information (M_PS_NA)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Значение измеряемой величины, нормализованное значение без качества (M_ME_ND)</string>
+          <string>Measured value, normalized value without quality descriptor (M_ME_ND)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Одноэлементная информация с меткой времени (M_SP_TB)</string>
+          <string>Single point information with time tag (M_SP_TB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Двухэлементная информация с меткой времени  (M_DP_TB)</string>
+          <string>Double point information with time tag  (M_DP_TB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Информация о положении отпаек с меткой времени (M_ST_TB)</string>
+          <string>Step position with time tag (M_ST_TB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Строка из 32 битов с меткой времени (M_BO_TB)</string>
+          <string>Bit string of 32 bit with time tag (M_BO_TB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, нормализованное значение с меткой времени (M_ME_TD)</string>
+          <string>Measured value, normalized value with time tag (M_ME_TD)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, масштабированное значение с меткой времени (M_ME_TE)</string>
+          <string>Measured value, scaled value with time tag (M_ME_TE)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Измеряемая величина, FLOAT с меткой времени (M_ME_TF)</string>
+          <string>Measured value, floating point with time tag (M_ME_TF)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Интегральная сумма с меткой времени (M_IT_TB)</string>
+          <string>Integrated totals with time tag (M_IT_TB)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Информация о работе релейной защиты с меткой времени (M_EP_TD)</string>
+          <string>Event of protection equipment with time tag (M_EP_TD)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Упакованная информация о срабатывании пусковых органов защиты с меткой времени (M_EP_TE)</string>
+          <string>Packed start events of protection equipment with time tag (M_EP_TE)</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Упакованная информация о срабатывании выходных цепей защиты (M_EP_TF)</string>
+          <string>Packed output circuit information of protection equipment with time tag (M_EP_TF)</string>
          </property>
         </item>
        </widget>
@@ -152,7 +152,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_type">
         <property name="text">
-         <string>Тип</string>
+         <string>type</string>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_desc">
         <property name="text">
-         <string>Описание</string>
+         <string>Description</string>
         </property>
        </widget>
       </item>

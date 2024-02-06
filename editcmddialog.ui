@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Add command</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -29,9 +29,12 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Добавить команду</string>
+      <string>Add command</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="lineEdit_IOA"/>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -39,28 +42,25 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit_IOA"/>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="lineEdit_desc"/>
       </item>
-      <item row="1" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>ТИП</string>
+         <string>Type</string>
         </property>
        </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="comboBox_type"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Описание</string>
+         <string>Description</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit_desc"/>
+      <item row="3" column="2">
+       <widget class="QComboBox" name="comboBox_type"/>
       </item>
      </layout>
     </widget>
@@ -70,14 +70,14 @@
      <item>
       <widget class="QPushButton" name="pushButton_add">
        <property name="text">
-        <string>Добавить</string>
+        <string>Add</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_remove">
        <property name="text">
-        <string>Удалить</string>
+        <string>Remove</string>
        </property>
       </widget>
      </item>

@@ -9,6 +9,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 QT += network
 RC_FILE = icon.rc
 
+TRANSLATIONS += QtLanguage_ru.ts
 win32:QT += axcontainer
 
 TARGET = Q104

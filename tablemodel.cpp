@@ -36,7 +36,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
     }
   else
   {
-    if (role == Qt::DisplayRole){
+    if (role == Qt::DisplayRole || role == Qt::EditRole){
         QVariant result = QVariant("");
         switch (col){
             case 0:
@@ -44,7 +44,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                 break;  //адрес IOA
             case 1:
 
-                    result =  QVariant(item.description);
+                    result =  QVariant(item.description.replace(',','_'));
                 break;  //название
             case 2:
                 result =  QVariant(item.GetType());
@@ -201,22 +201,22 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
     if (orientation == Qt::Horizontal) {
         switch (section) {
             case 0:
-                return tr("IOA");
+                return "IOA";
 
             case 1:
-                return tr("Описание");
+                return tr("Description");
 
             case 2:
-                return tr("Тип");
+                return tr("Type");
 
             case 3:
-                return tr("Значение");
+                return tr("Value");
 
             case 4:
-                return tr("Качество");
+                return tr("Quality");
 
             case 5:
-                return tr("Время");
+                return tr("Time tag");
 
         default:
                 return QVariant();
@@ -297,7 +297,7 @@ bool TableModel::removeRows(QItemSelectionModel *pSelection)
 
 Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
 {
-    //только столбец 1 (наименования) доступен для редактирования
+    //only column 1 enable for editing
     if (!index.isValid() || index.column()!=1)
         return  Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     else

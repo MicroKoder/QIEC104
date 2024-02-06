@@ -16,13 +16,13 @@ EditCMDdialog::EditCMDdialog(TableModel *cmdTable, QWidget *parent) :
     QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->tableView);
     connect(shortcut, SIGNAL(activated()), this, SLOT(Remove()));
 
-    ui->comboBox_type->addItem("45 Одноэлементная команда");
-    ui->comboBox_type->addItem("46 Двухэлементная команда");
-    ui->comboBox_type->addItem("47 Команда пошагового регулирования");
-    ui->comboBox_type->addItem("48 Команда уставки нормализованное значение");
-    ui->comboBox_type->addItem("49 Команда уставки масштабированное значение");
-    ui->comboBox_type->addItem("50 Команда уставки значение с плавающей точкой");
-    ui->comboBox_type->addItem("51 Команда уставки строка 32 бит");
+    ui->comboBox_type->addItem(tr("45 Single point command"));
+    ui->comboBox_type->addItem(tr("46 Double point command"));
+    ui->comboBox_type->addItem(tr("47 Regulating step command"));
+    ui->comboBox_type->addItem(tr("48 Setpoint command, normalized value"));
+    ui->comboBox_type->addItem(tr("49 Setpoint command, scaled value"));
+    ui->comboBox_type->addItem(tr("50 Setpoint command, short floating point value"));
+    ui->comboBox_type->addItem(tr("51 Bit string 32 bit"));
 }
 
 EditCMDdialog::~EditCMDdialog()

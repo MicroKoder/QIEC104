@@ -13,18 +13,18 @@ WatchDialog::WatchDialog(IEC104Driver* pDriver, QWidget *parent) :
 
    // ui->tableWidget->setCellWidget(1,1,new QPushButton());
     ui->tableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("IOA"));
-    ui->tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("Описание"));
-    ui->tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem("Тип"));
-    ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem("Значение"));
-    ui->tableWidget->setHorizontalHeaderItem(4,new QTableWidgetItem("Качество"));
-    ui->tableWidget->setHorizontalHeaderItem(5,new QTableWidgetItem("Метка времени"));
+    ui->tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem(tr("Description")));
+    ui->tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem(tr("Type")));
+    ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(tr("Value")));
+    ui->tableWidget->setHorizontalHeaderItem(4,new QTableWidgetItem(tr("Quality")));
+    ui->tableWidget->setHorizontalHeaderItem(5,new QTableWidgetItem(tr("Time tag")));
 
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ContextMenuRequested(QPoint)));
 }
 void WatchDialog::ContextMenuRequested(QPoint pos)
 {
     QMenu *contextMenu= new QMenu(this);
-    QAction *remove=new QAction("Удалить",this);
+    QAction *remove=new QAction(tr("Delete"),this);
     connect(remove,SIGNAL(triggered(bool)), this, SLOT(OnRowRemove()));
     contextMenu->addAction(remove);
     contextMenu->popup(mapToParent(pos)+QPoint(10,10));
