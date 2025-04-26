@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
+ * SPDX-License-Identifier: CC0-1.0
+ * See LICENSE file for details.
+ */
 #ifndef IEC104DRIVER_H
 #define IEC104DRIVER_H
 #include <QObject>
