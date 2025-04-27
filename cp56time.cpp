@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #include "cp56time.h"
 #include <QDateTime>
 CP56Time::CP56Time()

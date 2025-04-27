@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #ifndef CSETTING_H
 #define CSETTING_H
 #include <QString>
@@ -51,8 +46,10 @@ public:
     bool SendGIOnStart;
     bool SendTCOnStart;
     bool autoStart;
+
+    bool autoReconnect;
     CSetting();
-    CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false, bool _autoStart=false);
+    CSetting(QString _ip, quint16 _asdu=1, quint16 _port=2404, bool autoCreate=false, bool _autoStart=false, bool _autoReconnect=false);
 };
 
 #endif // CSETTING_H

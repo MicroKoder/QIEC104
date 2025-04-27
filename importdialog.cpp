@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #include "importdialog.h"
 #include "ui_importdialog.h"
 #include <QFileDialog>

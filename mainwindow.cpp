@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
@@ -18,18 +13,28 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qsettings = new QSettings("Settings.ini",QSettings::IniFormat);
    //настройка драйвера для работы с МЭК
-   // settings = new CSetting();
     pDriver = IEC104Driver::GetInstance();
 
 
-    //driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
-   //                               qsettings->value("asdu").toInt(),
-   //                               qsettings->value("port").toInt()
-   //                                     ));
-   // qsettings->endGroup();
     pDriver->SetSettings(qsettings);
 
     connect(pDriver,SIGNAL(Connected()),this,SLOT(OnConnected()));
+
+    pConnectionStatusLabel= new QLabel();
+    statusBar()->addWidget(pConnectionStatusLabel);
+
+    pConnectionStatusLabel->setText("Disconnected");
+
+    pConnectionStatusLabel->setStyleSheet("color: red;");
+
+
+    connect(pDriver, &IEC104Driver::Connecting, [this](){
+        pConnectionStatusLabel->setText("Connecting");
+        pConnectionStatusLabel->setStyleSheet("color: orange;");
+        ui->actionConnect->setEnabled(false);
+        ui->actionDisconnect->setEnabled(true);
+    });
+
     connect(pDriver,SIGNAL(Disconnected()),this,SLOT(OnDisconnected()));
     connect(pDriver,SIGNAL(Message(QString)),this,SLOT(LogReceived(QString)));
     connect(pDriver, SIGNAL(IECSignalReceived(CIECSignal)),this,SLOT(IECReceived(CIECSignal)));
@@ -47,8 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionCMD,SIGNAL(triggered(bool)),this,SLOT(OnCMDPressed()));
     //создаем статус сообщение
-    pConnectionStatusLabel= new QLabel();
-    statusBar()->addWidget(pConnectionStatusLabel);
+
 
     //настройка таблицы сигналов контроля
     tabmodel = new TableModel();
@@ -166,13 +170,7 @@ void MainWindow::OnConnectPressed(void)
 //
 void MainWindow::OnConnectAck(void)
 {
-   /* qsettings->beginGroup("driver");
-    driver->SetSettings(new CSetting( qsettings->value("IP").toString(),
-                                  qsettings->value("asdu").toInt(),
-                                  qsettings->value("port").toInt()
-                                        ));
-    qsettings->endGroup();
-*/
+
     pDriver->SetSettings(qsettings);
 
 }
@@ -220,15 +218,16 @@ void MainWindow::OnSettingsPressed(void)
 ///в случае успешного подключения драйвера
 void MainWindow::OnConnected()
 {
-    pConnectionStatusLabel->setText("connected: "/*+settings->IP*/);
-    ui->actionConnect->setEnabled(false);
-    ui->actionDisconnect->setEnabled(true);
+    pConnectionStatusLabel->setText("Connected");
+    pConnectionStatusLabel->setStyleSheet("color: green;");
+
 }
 
 ///при разрыве соединения драйвера
 void MainWindow::OnDisconnected()
 {
-    pConnectionStatusLabel->setText("disconnected");
+    pConnectionStatusLabel->setText("Disconnected");
+    pConnectionStatusLabel->setStyleSheet("color: red;");
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
 

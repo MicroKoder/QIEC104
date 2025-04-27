@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #include "iec104driver.h"
 #include <QMessageBox>
 #include <QDebug>
@@ -22,6 +17,7 @@ bool needSendGI = false;
 IEC104Driver::IEC104Driver():
     sock(new QTcpSocket())
 {
+
     N_R = 0;
     N_T = 0;
     testTimer = new QTimer();
@@ -35,14 +31,19 @@ IEC104Driver::IEC104Driver():
     connect(sock,SIGNAL(connected()),this,SLOT(OnConnected()));
     connect(sock,SIGNAL(disconnected()),this, SLOT(OnDisconnected()));
     connect(sock,SIGNAL(readyRead()), this, SLOT(OnSockReadyRead()));
-    connect(sock,SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
+  //  connect(sock,SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
   //  in.setDevice(sock);
 }
 
 void IEC104Driver::OnConnectionTimer()
 {
     emit Message(tr("No answer from server, t1 elapsed"));
+    if (sock->state() == QAbstractSocket::ConnectingState)
+    {
+        sock->abort();
+    }
     OnDisconnected();
+
 }
 ///
 /// \brief IEC104Driver::SendFullRequest - general interrogation command
@@ -210,6 +211,9 @@ void IEC104Driver::SetSettings(QSettings *settings)
     if (settings != NULL)
     {
         settings->beginGroup("driver");
+        if (this->settings)
+            delete this->settings;
+
         this->settings = new CSetting(
             settings->value("ip").toString(),
             settings->value("asdu").toInt(),
@@ -223,6 +227,7 @@ void IEC104Driver::SetSettings(QSettings *settings)
         this->settings->w = settings->value("w").toInt();
         this->settings->SendGIOnStart = settings->value("SendGIOnStart").toBool();
         this->settings->SendTCOnStart = settings->value("SendTCOnStart").toBool();
+        this->settings->autoReconnect = settings->value("autoReconnect").toBool();
         settings->endGroup();
     }
 }
@@ -247,6 +252,8 @@ void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 */
     if (settings != nullptr)
     {
+        emit Connecting();
+        emit Message("Connecting...");
         sock->open(QIODevice::ReadWrite);
         //setup connection
         qDebug()<< settings->IP;
@@ -273,7 +280,24 @@ void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 
 void IEC104Driver::CloseConnection()
 {
-    sock->disconnectFromHost();
+    settings->autoReconnect = false;
+    qDebug() <<"sock state: " << sock->state();
+    switch(sock->state())
+    {
+    case QAbstractSocket::UnconnectedState: break;
+        case QAbstractSocket::HostLookupState: break;
+        case QAbstractSocket::ConnectingState:
+            sock->abort();
+            conTimer->stop();
+            OnDisconnected();
+            break;
+        case QAbstractSocket::ConnectedState:
+            sock->disconnectFromHost();
+            break;
+        case QAbstractSocket::BoundState: break;
+        case QAbstractSocket::ListeningState: break;
+        case QAbstractSocket::ClosingState: break;
+    }
 }
 
 ///
@@ -460,10 +484,13 @@ void IEC104Driver::OnConnected()
 
 void IEC104Driver::OnDisconnected()
 {
-    //sock->disconnectFromHost();
+    emit Message(tr("disconnected"));
     sock->close();
     testTimer->stop();
-    emit Disconnected();
+    if (settings->autoReconnect)
+        OpenConnection();
+    else
+        emit Disconnected();
 }
 
 /*===================================================================================

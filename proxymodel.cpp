@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2025 Zayrullin Azat / zayruaz@gmail.com
- * SPDX-License-Identifier: CC0-1.0
- * See LICENSE file for details.
- */
 #include "proxymodel.h"
 
 ProxyModel::ProxyModel(QObject* parent):QSortFilterProxyModel(parent),textFilter(QString())

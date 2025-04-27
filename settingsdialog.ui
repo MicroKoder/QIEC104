@@ -196,6 +196,16 @@
           </property>
          </widget>
         </item>
+        <item row="13" column="1">
+         <widget class="QCheckBox" name="checkBox_autoReconnect">
+          <property name="text">
+           <string>Auto reconnect</string>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
