@@ -6,7 +6,8 @@
 #include <QVariant>
 #include "ciecsignal.h"
 #include <QItemSelectionModel>
-#include <QStringListModel.h>
+
+#include <qstringlistmodel.h>
 
 ///
 /// \brief Отображаемый элемент таблицы сигналов

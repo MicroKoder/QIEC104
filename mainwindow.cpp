@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tabmodel->setHeaderData(2,Qt::Horizontal,QVariant(tr("Value")));
     tabmodel->setHeaderData(3,Qt::Horizontal,QVariant(tr("Type")));
     tabmodel->setHeaderData(4,Qt::Horizontal,QVariant(tr("Quality")));
-    tabmodel->setHeaderData(5,Qt::Horizontal,QVariant(tr("Time tag")));
+    tabmodel->setHeaderData(5,Qt::Horizontal,QVariant(tr("Timestamp")));
 
     emit tabmodel->headerDataChanged(Qt::Horizontal,0,5);
     connect(tabmodel,SIGNAL(rowsInserted(QModelIndex,int,int)),ui->MTable,SLOT(rowsInserted(QModelIndex,int,int)));
@@ -428,10 +428,10 @@ void MainWindow::OnLoadBaseTriggered(bool val)
   //  QMessageBox::warning(this,"load base","load base");
   // if (val)
   // {
-       ImportDialog *id = new ImportDialog(qsettings);
-       id->SetModel(this->tabmodel);
-       connect(id, SIGNAL(AddCommand(CIECSignal)),this,SLOT(AddCommand(CIECSignal)));
-       id->exec();
+      // ImportDialog *id = new ImportDialog(qsettings);
+       //id->SetModel(this->tabmodel);
+       //connect(id, SIGNAL(AddCommand(CIECSignal)),this,SLOT(AddCommand(CIECSignal)));
+       //id->exec();
   // }
 }
 

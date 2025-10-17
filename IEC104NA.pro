@@ -4,13 +4,11 @@
 #
 #-------------------------------------------------
 #define LINUXBUILD
-QT       += core gui sql
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += core gui sql widgets
 QT += network
 RC_FILE = icon.rc
 
 TRANSLATIONS += QtLanguage_ru.ts
-win32:QT += axcontainer
 
 TARGET = Q104
 TEMPLATE = app
@@ -25,7 +23,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-//CONFIG  += axcontainer
 
 SOURCES += \
         main.cpp \
@@ -36,7 +33,6 @@ SOURCES += \
     tablemodel.cpp \
     cp56time.cpp \
     ciecsignal.cpp \
-    importdialog.cpp \
     addsignaldialog.cpp \
     connectiondialog.cpp \
     cmddialog.cpp \
@@ -53,7 +49,6 @@ HEADERS += \
     tablemodel.h \
     cp56time.h \
     ciecsignal.h \
-    importdialog.h \
     addsignaldialog.h \
     connectiondialog.h \
     cmddialog.h \
@@ -65,7 +60,6 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
     settingsdialog.ui \
-    importdialog.ui \
     addsignaldialog.ui \
     cmddialog.ui \
     aboutdialog.ui \

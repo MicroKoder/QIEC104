@@ -11,7 +11,6 @@
 #include <QLabel>
 #include <addsignaldialog.h>
 #include <connectiondialog.h>
-#include "importdialog.h"
 #include "cmddialog.h"
 #include "aboutdialog.h"
 #include <QFileDialog>

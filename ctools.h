@@ -1,7 +1,7 @@
 #ifndef CTOOLS_H
 #define CTOOLS_H
 
-#include <QString.h>
+#include "qstring.h"
 #include "ciecsignal.h"
 #include "cp56time.h"
 

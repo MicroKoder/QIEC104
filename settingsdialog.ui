@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>414</width>
-    <height>457</height>
+    <width>500</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -51,39 +51,59 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>IP</string>
+         <string>IP/port</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox_ip">
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QComboBox" name="comboBox_ip">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_port">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <property name="currentText">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Port</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="comboBox_port">
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QFormLayout" name="formLayout">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="edit_t1">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;T1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="inputMethodHints">
+           <set>Qt::ImhDigitsOnly</set>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string notr="true">k</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
@@ -91,13 +111,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="edit_t1">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhDigitsOnly</set>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string notr="true">w</string>
           </property>
          </widget>
         </item>
@@ -108,6 +125,12 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="3">
+         <widget class="QLineEdit" name="edit_w"/>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="edit_k"/>
+        </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="edit_t3">
           <property name="inputMethodHints">
@@ -115,61 +138,28 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string notr="true">k</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="edit_k"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string notr="true">w</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="edit_w"/>
-        </item>
-        <item row="5" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string notr="true">ASDU</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="2" column="1">
          <widget class="QLineEdit" name="edit_asdu"/>
         </item>
-        <item row="6" column="1">
-         <widget class="QCheckBox" name="AutoCreate_checkBox">
-          <property name="locale">
-           <locale language="English" country="UnitedStates"/>
-          </property>
-          <property name="text">
-           <string>Add new tags automatically</string>
-          </property>
-         </widget>
-        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
         <item row="8" column="1">
-         <widget class="QCheckBox" name="checkBox_sendGI">
-          <property name="text">
-           <string>General interrogation on connect</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
          <widget class="QCheckBox" name="checkBox_sendTC">
           <property name="text">
            <string>Sync time on connect</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
+        <item row="10" column="1">
          <widget class="QCheckBox" name="checkBox_fullLog">
           <property name="text">
            <string>Extended log</string>
@@ -179,14 +169,31 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
+        <item row="12" column="1">
+         <widget class="QCheckBox" name="checkBox_autoReconnect">
+          <property name="text">
+           <string>Auto reconnect</string>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
          <widget class="QCheckBox" name="checkBox_newLog">
           <property name="text">
            <string>Write log</string>
           </property>
          </widget>
         </item>
-        <item row="12" column="1">
+        <item row="7" column="1">
+         <widget class="QCheckBox" name="checkBox_sendGI">
+          <property name="text">
+           <string>General interrogation on connect</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
          <widget class="QCheckBox" name="checkBox_autoStart">
           <property name="text">
            <string>Autoconnect on start</string>
@@ -196,13 +203,13 @@
           </property>
          </widget>
         </item>
-        <item row="13" column="1">
-         <widget class="QCheckBox" name="checkBox_autoReconnect">
-          <property name="text">
-           <string>Auto reconnect</string>
+        <item row="6" column="1">
+         <widget class="QCheckBox" name="AutoCreate_checkBox">
+          <property name="locale">
+           <locale language="English" country="UnitedStates"/>
           </property>
-          <property name="tristate">
-           <bool>false</bool>
+          <property name="text">
+           <string>Add new tags automatically</string>
           </property>
          </widget>
         </item>

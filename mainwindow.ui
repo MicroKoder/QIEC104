@@ -143,7 +143,7 @@
      <x>0</x>
      <y>0</y>
      <width>973</width>
-     <height>21</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -152,7 +152,6 @@
     </property>
     <addaction name="action_SaveBase"/>
     <addaction name="action_LoadFile"/>
-    <addaction name="action_LoadBase"/>
    </widget>
    <widget class="QMenu" name="menu_about">
     <property name="title">

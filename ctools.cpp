@@ -1,5 +1,5 @@
 #include "ctools.h"
-#include "QDebug.h"
+#include "QDebug"
 IEC104Tools::IEC104Tools()
 {
 

@@ -2,11 +2,11 @@
 #define IEC104DRIVER_H
 #include <QObject>
 #include <QTcpSocket>
-#include <QTImer>
 #include <QDataStream>
 #include <csetting.h>
 #include <QSettings>
 #include <ctools.h>
+#include <QTimer>
 
 namespace IEC104
 {
