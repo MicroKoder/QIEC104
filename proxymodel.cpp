@@ -16,9 +16,16 @@ void ProxyModel::setFilter(QString textFilter)
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    QModelIndex ind= sourceModel()->index(source_row,1,source_parent);
+    if (textFilter.isEmpty())
+        return true;
 
-    if (sourceModel()->data(ind).toString().contains(textFilter))
+    // Match description or IOA
+    QModelIndex descIndex = sourceModel()->index(source_row, 1, source_parent);
+    QModelIndex ioaIndex = sourceModel()->index(source_row, 0, source_parent);
+
+    if (sourceModel()->data(descIndex).toString().contains(textFilter, Qt::CaseInsensitive))
+        return true;
+    if (sourceModel()->data(ioaIndex).toString().contains(textFilter, Qt::CaseInsensitive))
         return true;
     return false;
 }

@@ -65,11 +65,11 @@ void IEC104Driver::SendFullRequest(quint8 requestDescription)
                   };
 
    QByteArray buf = QByteArray(temp, 16);
-    if (sock->state() == QTcpSocket::SocketState::ConnectedState){
-        sock->write(buf,16);
-        emit Message("<-- Команда опроса");
-        N_T ++;
-    }
+        if (sock->state() == QTcpSocket::SocketState::ConnectedState){
+            sock->write(buf,16);
+            emit Message("<-- Команда опроса");
+            N_T = (N_T + 1) & 0x7FFF;
+        }
 
 }
 
@@ -240,8 +240,8 @@ CSetting* IEC104Driver::GetSettings()
 
 void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 {
-    //still open? exit
-    if (sock->isOpen())
+    // Already connecting or connected
+    if (sock->state() != QAbstractSocket::UnconnectedState)
         return;
 
     //use new settings if got it
@@ -254,8 +254,7 @@ void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
     {
         emit Connecting();
         emit Message("Connecting...");
-        sock->open(QIODevice::ReadWrite);
-        //setup connection
+        // connectToHost opens the socket; do not call open() beforehand
         qDebug()<< settings->IP;
         sock->connectToHost(settings->IP,settings->Port);
 
@@ -264,6 +263,7 @@ void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 
         N_R = 0;
         N_T = 0;
+        lastAPCICount = 0;
 
         conTimer->setInterval(settings->t1*1000);
         conTimer->start();
@@ -280,7 +280,8 @@ void IEC104Driver::OpenConnection(/*CSetting *_settings*/)
 
 void IEC104Driver::CloseConnection()
 {
-    settings->autoReconnect = false;
+    if (settings)
+        settings->autoReconnect = false;
     qDebug() <<"sock state: " << sock->state();
     switch(sock->state())
     {
@@ -335,7 +336,7 @@ void IEC104Driver::SendCommand(quint16 type, quint32 ioa, quint8 value)
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.length());
             emit Message(tr("<-- command"));
-            N_T ++;
+            N_T = (N_T + 1) & 0x7FFF;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
 
@@ -378,7 +379,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message(tr("<-- Set point command, normalized value"));
-            N_T ++;
+            N_T = (N_T + 1) & 0x7FFF;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
@@ -408,7 +409,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message(tr("<-- Set point command, scaled value"));
-            N_T ++;
+            N_T = (N_T + 1) & 0x7FFF;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
@@ -438,7 +439,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message(tr("<-- Set point command with floating point value"));
-            N_T ++;
+            N_T = (N_T + 1) & 0x7FFF;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
@@ -466,7 +467,7 @@ void IEC104Driver::SetPoint(quint16 type, quint32 ioa, QVariant value)
         if (sock->state() == QTcpSocket::SocketState::ConnectedState){
             sock->write(buf,buf.count());
             emit Message(tr("<-- Set point command, bit string 32 bit"));
-            N_T ++;
+            N_T = (N_T + 1) & 0x7FFF;
             emit Message(IEC104Tools::BytesToString(&buf));
         }
         return;
@@ -487,7 +488,8 @@ void IEC104Driver::OnDisconnected()
     emit Message(tr("disconnected"));
     sock->close();
     testTimer->stop();
-    if (settings->autoReconnect)
+    conTimer->stop();
+    if (settings && settings->autoReconnect)
         OpenConnection();
     else
         emit Disconnected();
@@ -546,7 +548,7 @@ void IEC104Driver::OnSockReadyRead()
             if (needSendTC)
             {
                 needSendTC = false;
-             //   SendCommand(103);
+                ClockSynch();
             }
             return;
         }
@@ -611,7 +613,7 @@ void IEC104Driver::ClockSynch()
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,buf.length());
         emit Message(tr("<-- Time sync command"));
-        N_T ++;
+        N_T = (N_T + 1) & 0x7FFF;
     }
 }
 
@@ -636,6 +638,6 @@ void IEC104Driver::ReadIOA(quint32 ioa)
     if (sock->state() == QTcpSocket::SocketState::ConnectedState){
         sock->write(buf,buf.length());
         emit Message(tr("<-- Read command"));
-        N_T ++;
+        N_T = (N_T + 1) & 0x7FFF;
     }
 }

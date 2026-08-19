@@ -39,8 +39,9 @@ void CIECSignal::SetAddress(quint32 ioa)
 void CIECSignal::SetType(uchar type)
 {
     typeID = type;
-    key &=0x00FFFFu;
-    key |= type<<24;
+    // Keep 24-bit IOA; previous mask 0x00FFFF truncated high address byte
+    key &= 0x00FFFFFFu;
+    key |= (uint(type) << 24);
 }
 
 QString CIECSignal::GetValueString()
@@ -51,17 +52,38 @@ QString CIECSignal::GetValueString()
 
     switch (typeID)
     {
-    case 3: result += value.toUInt(); break;
-    case 30: result += (value==1) ? "true" : "false"; break;
-    case 31: result += value.toUInt(); break;
-    case 32: result += QString::number(value.toUInt());break;
-    case 33: result += QString::number( value.toUInt());break;
-    case 34: result += QString::number(value.toUInt());break;
-    case 35: result += QString::number(value.toInt());break;
-    case 36: result += QString::number(value.toFloat());break;
-
+    case 1:
+    case 30:
+        result += (value.toUInt() == 1) ? "true" : "false";
+        break;
+    case 3:
+    case 31:
+        result += QString::number(value.toUInt());
+        break;
+    case 5:
+    case 32:
+        result += QString::number(value.toUInt());
+        break;
+    case 7:
+    case 33:
+        result += QString::number(value.toUInt());
+        break;
+    case 9:
+    case 34:
+        result += QString::number(value.toUInt());
+        break;
+    case 11:
+    case 35:
+        result += QString::number(value.toInt());
+        break;
+    case 13:
+    case 36:
+        result += QString::number(value.toFloat());
+        break;
+    default:
+        result += value.toString();
+        break;
     }
-    //QString::number(this->value);
 
     result += " type: " + QString::number(this->typeID)+
             " quality: " + QString::number(this->quality) +

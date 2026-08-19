@@ -80,6 +80,7 @@ void ConnectionSettingsDialog::AcceptSettings()
      settings->SendGIOnStart = ui->checkBox_sendGI->isChecked();
      settings->SendTCOnStart = ui->checkBox_sendTC->isChecked();
      settings->autoStart = ui->checkBox_autoStart->isChecked();
+     settings->autoReconnect = ui->checkBox_autoReconnect->isChecked();
     }
 
     if (qset != NULL)

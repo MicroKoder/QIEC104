@@ -27,8 +27,7 @@ private:
     QTimer *testTimer=nullptr;  //таймер отправки тестового пакета
     QTimer *conTimer=nullptr;
     QTcpSocket *sock=nullptr;
-    uint count;
-    uint lastAPCICount;
+    uint lastAPCICount = 0;
     ///
     /// \brief N_R
     /// count of recieved packeges from server

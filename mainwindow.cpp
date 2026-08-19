@@ -4,6 +4,8 @@
 #include <QShortcut>
 #include <QDebug>
 #include <QDateTime>
+#include <QSet>
+#include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -110,30 +112,36 @@ void MainWindow::OnContextMenuRequested(QPoint pos)
 {
     qDebug() << "context menu requsted";
     QMenu *contextMenu= new QMenu(this);
+    contextMenu->setAttribute(Qt::WA_DeleteOnClose);
     QAction *addWatch=new QAction(tr("Add to watch"),this);
     connect(addWatch,SIGNAL(triggered(bool)), this, SLOT(OnAddWatch(bool)));
 
     QAction *read= new QAction(tr("Single request"),this);
-    connect(read, SIGNAL(triggered(bool)),this, SLOT(OnRead(bool)));
+    connect(read, SIGNAL(triggered(bool)), this, SLOT(OnRead(bool)));
 
 
     contextMenu->addAction(addWatch);
     contextMenu->addAction(read);
 
-    contextMenu->popup(mapToParent(pos)+QPoint(10,120));
-    //contextMenu->show()
+    contextMenu->popup(ui->MTable->viewport()->mapToGlobal(pos));
 }
 void MainWindow::OnAddWatch(bool)
 {
     if (!watch)
         return; //no watch window, exiting
 
-  //  qDebug() << "Add to watch";
      QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
      QModelIndexList indexes= pSelection->selectedIndexes();
+     QSet<int> doneRows;
      foreach(QModelIndex index, indexes)
      {
-         CIECSignal s =tabmodel->mData[index.row()];
+         QModelIndex sourceIndex = proxyModel->mapToSource(index);
+         if (doneRows.contains(sourceIndex.row()))
+             continue;
+         doneRows.insert(sourceIndex.row());
+         if (sourceIndex.row() < 0 || sourceIndex.row() >= tabmodel->mData.count())
+             continue;
+         CIECSignal s =tabmodel->mData[sourceIndex.row()];
          watch->AddWatch(s);
      }
 }
@@ -142,14 +150,27 @@ void MainWindow::OnRead(bool)
 {
     QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
     QModelIndexList indexes= pSelection->selectedIndexes();
+    QSet<int> doneRows;
     foreach(QModelIndex index, indexes)
     {
-        CIECSignal s =tabmodel->mData[index.row()];
+        QModelIndex sourceIndex = proxyModel->mapToSource(index);
+        if (doneRows.contains(sourceIndex.row()))
+            continue;
+        doneRows.insert(sourceIndex.row());
+        if (sourceIndex.row() < 0 || sourceIndex.row() >= tabmodel->mData.count())
+            continue;
+        CIECSignal s =tabmodel->mData[sourceIndex.row()];
         pDriver->ReadIOA(s.GetAddress());
     }
 }
 MainWindow::~MainWindow()
 {
+    if (logFile)
+    {
+        logFile->close();
+        delete logFile;
+        logFile = nullptr;
+    }
     delete ui;
 }
 
@@ -212,6 +233,7 @@ void MainWindow::OnDisconnectPressed(void)
 void MainWindow::OnSettingsPressed(void)
 {
     ConnectionSettingsDialog *cdialog = new ConnectionSettingsDialog(qsettings);
+    cdialog->setAttribute(Qt::WA_DeleteOnClose);
     cdialog->show();
 }
 
@@ -276,12 +298,18 @@ void MainWindow::MToolRemove_Pressed()
     ui->log->append(tr("remove pressed"));
     QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
 
-    tabmodel->removeRows(pSelection);
-
-  //  ui->MTable->setModel(0);
-   // ui->MTable->setModel(tabmodel);
-  //  tabmodel->redraw();
-  //  ui->MTable->resizeRowsToContents();
+    // Selection indexes are in proxy space; map to source before removing
+    QModelIndexList proxyIndexes = pSelection->selectedIndexes();
+    QList<int> sourceRows;
+    foreach (QModelIndex proxyIndex, proxyIndexes)
+    {
+        QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
+        if (sourceIndex.isValid() && !sourceRows.contains(sourceIndex.row()))
+            sourceRows.append(sourceIndex.row());
+    }
+    std::sort(sourceRows.begin(), sourceRows.end());
+    for (int i = sourceRows.count() - 1; i >= 0; --i)
+        tabmodel->removeRow(sourceRows[i]);
 }
 
 ///добавление нового сигнала в список
@@ -343,7 +371,11 @@ void MainWindow::loadBase(QString filename)
     if (filename.length()>0)
     {
         QFile *file= new QFile(filename);
-        file->open(QIODevice::ReadOnly);
+        if (!file->open(QIODevice::ReadOnly))
+        {
+            delete file;
+            return;
+        }
         QTextStream in(file);
 
         //commandList = new QList<CIECSignal>();
@@ -351,8 +383,12 @@ void MainWindow::loadBase(QString filename)
         while(!in.atEnd())
         {
           QString line = in.readLine();
+          if (line.trimmed().isEmpty())
+              continue;
           qDebug() << line;
           QStringList words= line.split(',');
+          if (words.count() < 3)
+              continue;
           uint type = words[0].toUInt();
           uint ioa = words[1].toUInt();
           uint key = (type<<24) + ioa;
@@ -451,8 +487,8 @@ void MainWindow::OnLogVisibleToggled(bool a)
 void MainWindow::OnAboutTriggered(bool)
 {
     aboutDialog *dialog = new aboutDialog();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
-    //delete dialog;
 }
 
 void MainWindow::OnShowWatchTriggered(bool)
