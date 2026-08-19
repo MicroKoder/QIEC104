@@ -1,6 +1,5 @@
 #include "editcmddialog.h"
 #include "ui_editcmddialog.h"
-#include <QShortcut>
 #include <QAction>
 #include <QAbstractItemView>
 #include <QApplication>
@@ -20,15 +19,12 @@ EditCMDdialog::EditCMDdialog(TableModel *cmdTable, QWidget *parent) :
     connect(ui->pushButton_add,SIGNAL(pressed()),this,SLOT(Append()));
     connect(ui->pushButton_remove,SIGNAL(pressed()),this,SLOT(Remove()));
 
-    QAction *deleteAction = new QAction(tr("Delete"), ui->tableView);
+    // Single QAction for Delete — do not also add QShortcut (Ambiguous shortcut overload)
+    QAction *deleteAction = new QAction(tr("Delete"), this);
     deleteAction->setShortcut(QKeySequence::Delete);
     deleteAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     ui->tableView->addAction(deleteAction);
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(Remove()));
-
-    QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->tableView);
-    shortcut->setContext(Qt::WidgetWithChildrenShortcut);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(Remove()));
 
     ui->comboBox_type->addItem(tr("45 Single point command"));
     ui->comboBox_type->addItem(tr("46 Double point command"));

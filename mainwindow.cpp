@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-#include <QShortcut>
 #include <QDebug>
 #include <QDateTime>
 #include <QSet>
@@ -11,6 +10,7 @@
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QApplication>
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -89,17 +89,12 @@ MainWindow::MainWindow(QWidget *parent) :
         tabmodel->updateSignal(new CIECSignal(i,30,"test"));
 #endif
 
-    // Delete key must remove selected rows (QAction is more reliable than QShortcut→button click)
-    QAction *deleteAction = new QAction(tr("Delete"), ui->MTable);
-    deleteAction->setShortcut(QKeySequence::Delete);
-    deleteAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-    ui->MTable->addAction(deleteAction);
-    connect(deleteAction, SIGNAL(triggered()), this, SLOT(MToolRemove_Pressed()));
-
-    // Also keep shortcut as a fallback for focus inside viewport
-    QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->MTable);
-    shortcut->setContext(Qt::WidgetWithChildrenShortcut);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(MToolRemove_Pressed()));
+    // Delete key: single QAction only (QShortcut + QAction caused Ambiguous shortcut overload)
+    removeAction = new QAction(tr("Delete"), this);
+    removeAction->setShortcut(QKeySequence::Delete);
+    removeAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    ui->MTable->addAction(removeAction);
+    connect(removeAction, SIGNAL(triggered()), this, SLOT(MToolRemove_Pressed()));
 
 
 
@@ -122,18 +117,22 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 void MainWindow::OnContextMenuRequested(QPoint pos)
 {
-    qDebug() << "context menu requsted";
     QMenu *contextMenu= new QMenu(this);
     contextMenu->setAttribute(Qt::WA_DeleteOnClose);
-    QAction *addWatch=new QAction(tr("Add to watch"),this);
+
+    QAction *addWatch=new QAction(tr("Add to watch"), contextMenu);
     connect(addWatch,SIGNAL(triggered(bool)), this, SLOT(OnAddWatch(bool)));
 
-    QAction *read= new QAction(tr("Single request"),this);
+    QAction *read= new QAction(tr("Single request"), contextMenu);
     connect(read, SIGNAL(triggered(bool)), this, SLOT(OnRead(bool)));
 
+    QAction *remove = new QAction(tr("Delete"), contextMenu);
+    connect(remove, SIGNAL(triggered()), this, SLOT(MToolRemove_Pressed()));
 
     contextMenu->addAction(addWatch);
     contextMenu->addAction(read);
+    contextMenu->addSeparator();
+    contextMenu->addAction(remove);
 
     contextMenu->popup(ui->MTable->viewport()->mapToGlobal(pos));
 }
