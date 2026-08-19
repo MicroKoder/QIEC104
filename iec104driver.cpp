@@ -39,8 +39,13 @@ IEC104Driver::IEC104Driver():
     connect(sock,SIGNAL(connected()),this,SLOT(OnConnected()));
     connect(sock,SIGNAL(disconnected()),this, SLOT(OnDisconnected()));
     connect(sock,SIGNAL(readyRead()), this, SLOT(OnSockReadyRead()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(sock, &QAbstractSocket::errorOccurred,
+            this, &IEC104Driver::displayError);
+#else
     connect(sock, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(displayError(QAbstractSocket::SocketError)));
+#endif
 }
 
 void IEC104Driver::OnConnectionTimer()
