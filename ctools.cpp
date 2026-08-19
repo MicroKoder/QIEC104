@@ -70,26 +70,27 @@ QString IEC104Tools::BytesToString(char *bytes, quint16 len)
 
 ///Обработка целого фрейма, должен быть валидный пакет данных
 QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
-    QList<CIECSignal> result;//=new QList<CIECSignal>();
+    QList<CIECSignal> result;
+
+    // Minimum I-format: APCI(6) + type + vsq + cot(2) + asdu(2) = 12
+    if (data.size() < 12)
+        return result;
 
     if (R_Count !=0)
     {
-        (*R_Count) = (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7));
+        // Store next expected N(R) = received N(S) + 1
+        const quint16 ns = (((unsigned char)data[2]>>1) + (((unsigned char)data[3])<<7)) & 0x7FFF;
+        (*R_Count) = (ns + 1) & 0x7FFF;
     }
-
-//    if (T_Count !=0)
-//    {
-//        (*T_Count) = ((unsigned char)data[4]>>1) + ((unsigned char)data[5]<<7);
-//    }
 
     uchar typeID = uchar(data[6]);
 
-    uchar count = ((unsigned char)data[7])&0x7F; //достаем количество элементов
+    uchar count = ((unsigned char)data[7])&0x7F;
 
     if (count == 0)
-        return result;    //нет элементов, можно не продолжать
+        return result;
 
-    bool isSequence = (data[7]&0x80)>0; //последовательность или одиночный элемент.
+    bool isSequence = (data[7]&0x80)>0;
 
 
     QVariant value;
@@ -99,14 +100,15 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
     //------------------------------------------------------- SQ = 1  ----------------------------
     if (isSequence)
     {
+        if (data.size() < 15)
+            return result;
 
-        //addr = data[12] | ((((uint)data[13]&0xFF)<<8)&0xFF00) | (((((uint)data[14])&0xFF)<<16)&0xFF0000);
         uint32_t LB = (uchar)data[12];
         uint32_t MB = (uchar)data[13];
         uint32_t HB = (uchar)data[14];
         addr = LB + (MB<<8) + (HB<<16);
         qDebug() << "got IOA: " << QString::number(addr);
-        uint val_u32;   //буфер для вычисления значения
+        uint val_u32;
         for (int i=0; i<count; i++)
         {            
             CIECSignal signal;
@@ -117,8 +119,25 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
             addr++;
 
             signal.SetType(typeID);
-            offset=15;//номер байта с которого начинаются значения
+            offset=15;
             stride=0;
+
+            // Pre-check element fits in buffer
+            switch (typeID)
+            {
+                case 1: case 3: stride = 1; break;
+                case 5: stride = 2; break;
+                case 7: stride = 5; break;
+                case 9: case 11: stride = 3; break;
+                case 13: stride = 5; break;
+                case 30: case 31: stride = 8; break;
+                case 32: stride = 9; break;
+                case 33: case 36: stride = 12; break;
+                case 34: case 35: stride = 10; break;
+                default: stride = 0; break;
+            }
+            if (stride > 0 && (offset + (i + 1) * stride) > data.size())
+                break;
 
             switch (typeID)
             {
@@ -321,6 +340,23 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
             signal.bNeverUpdated = false;
             signal.SetType(typeID);
 
+            int expectedStride = 0;
+            switch (typeID)
+            {
+                case 1: case 3: expectedStride = 4; break;
+                case 5: expectedStride = 5; break;
+                case 7: expectedStride = 8; break;
+                case 9: case 11: expectedStride = 6; break;
+                case 13: expectedStride = 8; break;
+                case 30: case 31: expectedStride = 11; break;
+                case 32: expectedStride = 12; break;
+                case 33: case 36: expectedStride = 15; break;
+                case 34: case 35: expectedStride = 13; break;
+                default: expectedStride = 4; break;
+            }
+            if ((offset + (i + 1) * expectedStride) > data.size())
+                break;
+
             switch (typeID)
             {
                 case 1:
@@ -357,7 +393,21 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
                     }
                 break;
                 //32-bit string (dword)
-                case 7: break;
+                case 7:
+                    {
+                        stride = 8;
+                        if ((offset + (i + 1) * stride) > data.size())
+                            break;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        val_u32 = (uchar)data[offset+i*stride+3] +
+                                ((uchar)data[offset+i*stride+4]<<8) +
+                                ((uchar)data[offset+i*stride+5]<<16) +
+                                ((uchar)data[offset+i*stride+6]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+7];
+                        result.append(signal);
+                    } break;
                 //uint
                 case 9:
                     {
@@ -572,6 +622,11 @@ QList<CIECSignal>* IEC104Tools::ParseData(QByteArray &data, quint16 *R_Count){
   if (R_Count)
       qDebug() <<"APCI: "<< (*R_Count);
     return result;
+}
+
+void IEC104Tools::ClearLostBytes()
+{
+    lostBytes.clear();
 }
 
 

@@ -30,6 +30,9 @@ public:
     static QList<CIECSignal>* ParseData(QByteArray &data, quint16 *APCInum);
 
     static QString GetQualityString(uchar quality);
+
+    /// Clear leftover bytes from a previous incomplete APDU
+    static void ClearLostBytes();
 };
 
 #endif // CTOOLS_H

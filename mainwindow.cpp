@@ -6,6 +6,10 @@
 #include <QDateTime>
 #include <QSet>
 #include <algorithm>
+#include <QAction>
+#include <QAbstractItemView>
+#include <QTextDocument>
+#include <QTextCursor>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -66,18 +70,16 @@ MainWindow::MainWindow(QWidget *parent) :
    // ui->MTable->setModel(tabmodel);
 
     connect(ui->lineEdit_nameFilter,SIGNAL(textChanged(QString)),proxyModel,SLOT(setFilter(QString)));
-    tabmodel->setHeaderData(0,Qt::Horizontal,QVariant("IOA"));
-    tabmodel->setHeaderData(1,Qt::Horizontal,QVariant(tr("Description")));
-    tabmodel->setHeaderData(2,Qt::Horizontal,QVariant(tr("Value")));
-    tabmodel->setHeaderData(3,Qt::Horizontal,QVariant(tr("Type")));
-    tabmodel->setHeaderData(4,Qt::Horizontal,QVariant(tr("Quality")));
-    tabmodel->setHeaderData(5,Qt::Horizontal,QVariant(tr("Timestamp")));
 
+    // Headers come from TableModel::headerData (IOA, Description, Type, Value, Quality, Time)
     emit tabmodel->headerDataChanged(Qt::Horizontal,0,5);
     connect(tabmodel,SIGNAL(rowsInserted(QModelIndex,int,int)),ui->MTable,SLOT(rowsInserted(QModelIndex,int,int)));
     connect(tabmodel,SIGNAL(rowsRemoved(QModelIndex,int,int)),ui->MTable, SLOT(rowsAboutToBeRemoved(QModelIndex,int,int)));
 
     ui->MTable->verticalHeader()->setDefaultSectionSize(20);
+    ui->MTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->MTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->MTable->setSortingEnabled(true);
 
     connect(ui->MTable, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(OnContextMenuRequested(QPoint)));
 
@@ -86,8 +88,17 @@ MainWindow::MainWindow(QWidget *parent) :
         tabmodel->updateSignal(new CIECSignal(i,30,"test"));
 #endif
 
+    // Delete key must remove selected rows (QAction is more reliable than QShortcut→button click)
+    QAction *deleteAction = new QAction(tr("Delete"), ui->MTable);
+    deleteAction->setShortcut(QKeySequence::Delete);
+    deleteAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    ui->MTable->addAction(deleteAction);
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(MToolRemove_Pressed()));
+
+    // Also keep shortcut as a fallback for focus inside viewport
     QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->MTable);
-    connect(shortcut, SIGNAL(activated()), ui->MTool_remove, SLOT(click()));
+    shortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(MToolRemove_Pressed()));
 
 
 
@@ -210,13 +221,12 @@ void MainWindow::OnConnectionDialogFinished(/*int result*/)
 
      if (createLog)
      {
-         QString logFileName(QDateTime::currentDateTime().toString() + ".txt");
-         logFileName= logFileName.replace(':','_');
+         QString logFileName = QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd_HH-mm-ss")) + QStringLiteral(".txt");
 
          logFile = new QFile(logFileName);
 
          qDebug() << "New log: " << logFileName;
-         logFile->open(QIODevice::ReadWrite | QIODevice::Text);
+         logFile->open(QIODevice::WriteOnly | QIODevice::Text);
      }
 }
 
@@ -265,7 +275,18 @@ void MainWindow::LogReceived(QString text)
       logStream << text << '\n';
     }
     ui->log->append(text);
-   //qDebug() << text;
+
+    // Cap on-screen log to avoid UI freezes on long sessions
+    const int maxBlocks = 2000;
+    QTextDocument *doc = ui->log->document();
+    if (doc && doc->blockCount() > maxBlocks)
+    {
+        QTextCursor cursor(doc);
+        cursor.movePosition(QTextCursor::Start);
+        cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor,
+                            doc->blockCount() - maxBlocks);
+        cursor.removeSelectedText();
+    }
 }
 
 
@@ -295,11 +316,21 @@ void MainWindow::MToolAdd_Pressed()
 
 void MainWindow::MToolRemove_Pressed()
 {
-    ui->log->append(tr("remove pressed"));
-    QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
+    // Don't delete a row while the user is editing a cell (Delete should edit text)
+    if (ui->MTable->state() == QAbstractItemView::EditingState)
+        return;
 
-    // Selection indexes are in proxy space; map to source before removing
-    QModelIndexList proxyIndexes = pSelection->selectedIndexes();
+    QItemSelectionModel *pSelection =  ui->MTable->selectionModel();
+    if (!pSelection)
+        return;
+
+    // Prefer whole-row selection; fall back to any selected cells / current index
+    QModelIndexList proxyIndexes = pSelection->selectedRows();
+    if (proxyIndexes.isEmpty())
+        proxyIndexes = pSelection->selectedIndexes();
+    if (proxyIndexes.isEmpty() && pSelection->currentIndex().isValid())
+        proxyIndexes.append(pSelection->currentIndex());
+
     QList<int> sourceRows;
     foreach (QModelIndex proxyIndex, proxyIndexes)
     {
@@ -307,6 +338,9 @@ void MainWindow::MToolRemove_Pressed()
         if (sourceIndex.isValid() && !sourceRows.contains(sourceIndex.row()))
             sourceRows.append(sourceIndex.row());
     }
+    if (sourceRows.isEmpty())
+        return;
+
     std::sort(sourceRows.begin(), sourceRows.end());
     for (int i = sourceRows.count() - 1; i >= 0; --i)
         tabmodel->removeRow(sourceRows[i]);
@@ -461,14 +495,8 @@ void MainWindow::autoLoad(char *argv)
 void MainWindow::OnLoadBaseTriggered(bool val)
 {
     Q_UNUSED(val);
-  //  QMessageBox::warning(this,"load base","load base");
-  // if (val)
-  // {
-      // ImportDialog *id = new ImportDialog(qsettings);
-       //id->SetModel(this->tabmodel);
-       //connect(id, SIGNAL(AddCommand(CIECSignal)),this,SLOT(AddCommand(CIECSignal)));
-       //id->exec();
-  // }
+    // Excel import was removed; reuse CSV loader
+    OnLoadFileTriggered(false);
 }
 
 void MainWindow::OnCMDPressed()
