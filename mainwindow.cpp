@@ -10,6 +10,7 @@
 #include <QAbstractItemView>
 #include <QTextDocument>
 #include <QTextCursor>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -316,8 +317,9 @@ void MainWindow::MToolAdd_Pressed()
 
 void MainWindow::MToolRemove_Pressed()
 {
-    // Don't delete a row while the user is editing a cell (Delete should edit text)
-    if (ui->MTable->state() == QAbstractItemView::EditingState)
+    // Qt6: QAbstractItemView::state() is protected — detect in-cell editor via focus
+    QWidget *fw = QApplication::focusWidget();
+    if (fw && fw != ui->MTable && ui->MTable->isAncestorOf(fw))
         return;
 
     QItemSelectionModel *pSelection =  ui->MTable->selectionModel();

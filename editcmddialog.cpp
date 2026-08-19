@@ -3,6 +3,7 @@
 #include <QShortcut>
 #include <QAction>
 #include <QAbstractItemView>
+#include <QApplication>
 #include <algorithm>
 
 EditCMDdialog::EditCMDdialog(TableModel *cmdTable, QWidget *parent) :
@@ -54,7 +55,9 @@ void EditCMDdialog::Append()
 
 void EditCMDdialog::Remove()
 {
-    if (ui->tableView->state() == QAbstractItemView::EditingState)
+    // Qt6: QAbstractItemView::state() is protected — detect in-cell editor via focus
+    QWidget *fw = QApplication::focusWidget();
+    if (fw && fw != ui->tableView && ui->tableView->isAncestorOf(fw))
         return;
 
     QItemSelectionModel *pSelection =  ui->tableView->selectionModel();
