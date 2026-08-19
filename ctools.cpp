@@ -127,13 +127,16 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
             {
                 case 1: case 3: stride = 1; break;
                 case 5: stride = 2; break;
-                case 7: stride = 5; break;
+                case 7: case 15: case 20: stride = 5; break;
                 case 9: case 11: stride = 3; break;
                 case 13: stride = 5; break;
+                case 21: stride = 2; break;
                 case 30: case 31: stride = 8; break;
                 case 32: stride = 9; break;
                 case 33: case 36: stride = 12; break;
                 case 34: case 35: stride = 10; break;
+                case 37: stride = 12; break;
+                case 38: case 39: case 40: stride = 11; break;
                 default: stride = 0; break;
             }
             if (stride > 0 && (offset + (i + 1) * stride) > data.size())
@@ -227,12 +230,42 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
                         result.append(signal);
                     }
                 break;
-                //integral sum
-                case 15:break;
-                //sp packed
-                case 20:break;
-                //uint without quality
-                case 21:break;
+                // M_IT_NA_1 integrated totals (BCR: 4-byte counter + seq/quality)
+                case 15:
+                    {
+                        stride = 5;
+                        val_u32 = (uchar)data[offset+i*stride] +
+                                ((uchar)data[offset+i*stride+1]<<8) +
+                                ((uchar)data[offset+i*stride+2]<<16) +
+                                ((uchar)data[offset+i*stride+3]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+4];
+                        result.append(signal);
+                    }
+                break;
+                // M_PS_NA_1 packed single-point with status change detection (SCD 4 + QDS 1)
+                case 20:
+                    {
+                        stride = 5;
+                        val_u32 = (uchar)data[offset+i*stride] +
+                                ((uchar)data[offset+i*stride+1]<<8) +
+                                ((uchar)data[offset+i*stride+2]<<16) +
+                                ((uchar)data[offset+i*stride+3]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+4];
+                        result.append(signal);
+                    }
+                break;
+                // M_ME_ND_1 normalized value without quality descriptor
+                case 21:
+                    {
+                        stride = 2;
+                        uint uiValue = (uchar)data[offset+i*stride] + (((uchar)data[offset+i*stride+1])<<8);
+                        signal.value = QVariant(uiValue);
+                        signal.quality = 0;
+                        result.append(signal);
+                    }
+                break;
 
                 //single point + timestamp
                 case 30:
@@ -319,6 +352,31 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
 
                     result.append(signal);
                 }; break;
+                // M_IT_TB_1 integrated totals + CP56Time2a
+                case 37:
+                {
+                    stride = 12;
+                    val_u32 = (uchar)data[offset+i*stride] +
+                            ((uchar)data[offset+i*stride+1]<<8) +
+                            ((uchar)data[offset+i*stride+2]<<16) +
+                            ((uchar)data[offset+i*stride+3]<<24);
+                    signal.value = QVariant(val_u32);
+                    signal.quality = (uchar)data[offset+i*stride+4];
+                    signal.timestamp = CP56Time(data, offset + i*stride + 5);
+                    result.append(signal);
+                }; break;
+                // M_EP_TD_1 / M_EP_TE_1 / M_EP_TF_1: SEP|SPE|OCI + QDP + CP16 + CP56
+                case 38:
+                case 39:
+                case 40:
+                {
+                    stride = 11;
+                    signal.value = QVariant((uchar)data[offset+i*stride]);
+                    signal.quality = (uchar)data[offset+i*stride+1];
+                    // bytes +2,+3 = CP16Time2a elapsed (ms), skipped in value
+                    signal.timestamp = CP56Time(data, offset + i*stride + 4);
+                    result.append(signal);
+                }; break;
             }
 
             //signal.value = value;
@@ -345,13 +403,16 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
             {
                 case 1: case 3: expectedStride = 4; break;
                 case 5: expectedStride = 5; break;
-                case 7: expectedStride = 8; break;
+                case 7: case 15: case 20: expectedStride = 8; break;
                 case 9: case 11: expectedStride = 6; break;
                 case 13: expectedStride = 8; break;
+                case 21: expectedStride = 5; break;
                 case 30: case 31: expectedStride = 11; break;
                 case 32: expectedStride = 12; break;
                 case 33: case 36: expectedStride = 15; break;
                 case 34: case 35: expectedStride = 13; break;
+                case 37: expectedStride = 15; break;
+                case 38: case 39: case 40: expectedStride = 14; break;
                 default: expectedStride = 4; break;
             }
             if ((offset + (i + 1) * expectedStride) > data.size())
@@ -451,9 +512,44 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
 
                         result.append(signal);
                     }break;
-                case 15: break;
-                case 20: break;
-                case 21: break;
+                // M_IT_NA_1 integrated totals
+                case 15:
+                    {
+                        stride = 8;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        val_u32 = (uchar)data[offset+i*stride+3] +
+                                ((uchar)data[offset+i*stride+4]<<8) +
+                                ((uchar)data[offset+i*stride+5]<<16) +
+                                ((uchar)data[offset+i*stride+6]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+7];
+                        result.append(signal);
+                    }break;
+                // M_PS_NA_1 packed SP + SCD
+                case 20:
+                    {
+                        stride = 8;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        val_u32 = (uchar)data[offset+i*stride+3] +
+                                ((uchar)data[offset+i*stride+4]<<8) +
+                                ((uchar)data[offset+i*stride+5]<<16) +
+                                ((uchar)data[offset+i*stride+6]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+7];
+                        result.append(signal);
+                    }break;
+                // M_ME_ND_1 normalized without quality
+                case 21:
+                    {
+                        stride = 5;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        signal.value = QVariant(uint((uchar)data[offset + i*stride + 3] + ((uchar)data[offset + i*stride + 4]<<8)));
+                        signal.quality = 0;
+                        result.append(signal);
+                    }break;
                 case 30:
                     {
                         stride = 11;
@@ -557,10 +653,37 @@ QList<CIECSignal> IEC104Tools::ParseFrame(QByteArray &data, quint16 *R_Count){
                         result.append(signal);
                     };
                 break;
-                case 37:break;
-                case 38:break;
-                case 39:break;
-                case 40:break;
+                // M_IT_TB_1 integrated totals + CP56
+                case 37:
+                    {
+                        stride = 15;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        val_u32 = (uchar)data[offset+i*stride+3] +
+                                ((uchar)data[offset+i*stride+4]<<8) +
+                                ((uchar)data[offset+i*stride+5]<<16) +
+                                ((uchar)data[offset+i*stride+6]<<24);
+                        signal.value = QVariant(val_u32);
+                        signal.quality = (uchar)data[offset+i*stride+7];
+                        signal.timestamp = CP56Time(data, offset + i*stride + 8);
+                        result.append(signal);
+                    };
+                break;
+                // M_EP_TD_1 / M_EP_TE_1 / M_EP_TF_1
+                case 38:
+                case 39:
+                case 40:
+                    {
+                        stride = 14;
+                        addr = GetIOA(data[offset + i*stride], data[offset + i*stride +1],data[offset+ i*stride +2]);
+                        signal.SetAddress(addr);
+                        signal.value = QVariant((uchar)data[offset+i*stride+3]);
+                        signal.quality = (uchar)data[offset+i*stride+4];
+                        // +5,+6 = CP16Time2a elapsed
+                        signal.timestamp = CP56Time(data, offset + i*stride + 7);
+                        result.append(signal);
+                    };
+                break;
             }
 
 

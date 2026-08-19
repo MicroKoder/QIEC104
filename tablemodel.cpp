@@ -73,6 +73,13 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                             result = QVariant("ON(2)");
                          else result = QVariant("Invalid(3)");
                         break;
+                case 20:
+                case 38:
+                case 39:
+                case 40:
+                    result = QVariant(QStringLiteral("0x") +
+                                      QString::number(item.value.toUInt(), 16).toUpper());
+                    break;
                 default:
                     result = item.value;
 

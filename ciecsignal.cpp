@@ -80,6 +80,21 @@ QString CIECSignal::GetValueString()
     case 36:
         result += QString::number(value.toFloat());
         break;
+    case 15:
+    case 37:
+        result += QString::number(value.toUInt());
+        break;
+    case 20:
+        result += QStringLiteral("0x") + QString::number(value.toUInt(), 16).toUpper();
+        break;
+    case 21:
+        result += QString::number(value.toUInt());
+        break;
+    case 38:
+    case 39:
+    case 40:
+        result += QStringLiteral("0x") + QString::number(value.toUInt(), 16).toUpper();
+        break;
     default:
         result += value.toString();
         break;
