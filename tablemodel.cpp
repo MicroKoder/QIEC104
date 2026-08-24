@@ -73,6 +73,13 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
                             result = QVariant("ON(2)");
                          else result = QVariant("Invalid(3)");
                         break;
+                case 20:
+                case 38:
+                case 39:
+                case 40:
+                    result = QVariant(QStringLiteral("0x") +
+                                      QString::number(item.value.toUInt(), 16).toUpper());
+                    break;
                 default:
                     result = item.value;
 
@@ -147,12 +154,7 @@ void TableModel::updateSignal(CIECSignal pSignal, bool autoCreate, bool isImport
                     item->bNeverUpdated = false;
                 }
 
-
-                //delete (*mData)[i].pSignal->bNeverUpdated = false;
-               // emit dataChanged(index(i,0),index(i,6),{Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole, Qt::EditRole});
-                setData(index(i,3), QVariant(pSignal.value));
-                setData(index(i,4), QVariant(pSignal.quality));
-                setData(index(i,5), QVariant(pSignal.timestamp.GetTimeString()));
+                emit dataChanged(index(i, 0), index(i, columnCount(QModelIndex()) - 1));
                 return;
             }
         }
@@ -257,15 +259,16 @@ bool TableModel::removeRow(int row, const QModelIndex &parent)
 
 bool TableModel::removeRows(int row, int count, const QModelIndex &parent)
 {
+    if (count <= 0 || row < 0 || row >= mData.count())
+        return false;
+
+    if (row + count > mData.count())
+        count = mData.count() - row;
+
     beginRemoveRows(parent,row,row+count-1);
-  //  QList<unsigned int> keys = mData->keys();
-
-        for (int i= row; i< row+count;i++)
-        {
-            mData.removeAt(i);
-        }
-
-
+    // Always remove at `row`: each removeAt shifts subsequent items down
+    for (int i = 0; i < count; ++i)
+        mData.removeAt(row);
     endRemoveRows();
     return true;
 }
@@ -284,9 +287,11 @@ bool TableModel::removeRows(QItemSelectionModel *pSelection)
     QList<int> rowList;
 
     foreach (QModelIndex index, selectedRowsList)
-        rowList.append(index.row());
+    {
+        if (!rowList.contains(index.row()))
+            rowList.append(index.row());
+    }
 
-    //qSort(rowList);
     std::sort(rowList.begin(),rowList.end());
 
     for (int i=rowList.count()-1; i>=0; i--)

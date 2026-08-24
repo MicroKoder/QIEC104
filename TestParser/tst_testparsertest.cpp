@@ -1,9 +1,9 @@
 #include <QString>
 #include <QtTest>
 
-#include "..\ciecsignal.h"
-#include "..\cp56time.h"
-#include "..\ctools.h"
+#include "../ciecsignal.h"
+#include "../cp56time.h"
+#include "../ctools.h"
 class TestParserTest : public QObject
 {
     Q_OBJECT
@@ -47,9 +47,8 @@ void TestParserTest::testCase1()
     QFETCH(int, count);
 
     QList<CIECSignal> *result = IEC104Tools::ParseData(rawData,0);
-    //QCOMPARE(true,true);
     QCOMPARE(result->count(),count);
-    //QVERIFY2(true, "Failure");
+    delete result;
 }
 void TestParserTest::testCaseIOA_data()
 {
@@ -72,9 +71,11 @@ void TestParserTest::testCaseIOA()
     QFETCH(quint32, IOA);
 
     QList<CIECSignal> *result = IEC104Tools::ParseData(rawData,0);
+    QVERIFY(result->count() > 0);
     CIECSignal signal = result->at(0);
 
     QCOMPARE(signal.GetAddress(), IOA);
+    delete result;
 }
 
 void TestParserTest::testCaseFloat_data()
@@ -93,9 +94,11 @@ void TestParserTest::testCaseFloat()
     QFETCH(float, value);
 
     QList<CIECSignal> *result = IEC104Tools::ParseData(rawData,0);
+    QVERIFY(result->count() > 0);
     CIECSignal signal = result->at(0);
 
     QCOMPARE(signal.value.toFloat(), value);
+    delete result;
 }
 //float 3.14
 //68 12 06 00 02 00 0D 81 14 00 01 00 0C 00 00 C3 F5 48 40 00

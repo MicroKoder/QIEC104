@@ -1,6 +1,10 @@
 #include "editcmddialog.h"
 #include "ui_editcmddialog.h"
-#include <QShortcut>
+#include <QAction>
+#include <QAbstractItemView>
+#include <QApplication>
+#include <algorithm>
+
 EditCMDdialog::EditCMDdialog(TableModel *cmdTable, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::EditCMDdialog)
@@ -9,12 +13,18 @@ EditCMDdialog::EditCMDdialog(TableModel *cmdTable, QWidget *parent) :
 
     this->cmdTable = cmdTable;
     ui->tableView->setModel(cmdTable);
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     connect(ui->pushButton_add,SIGNAL(pressed()),this,SLOT(Append()));
     connect(ui->pushButton_remove,SIGNAL(pressed()),this,SLOT(Remove()));
 
-    QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Delete), ui->tableView);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(Remove()));
+    // Single QAction for Delete — do not also add QShortcut (Ambiguous shortcut overload)
+    QAction *deleteAction = new QAction(tr("Delete"), this);
+    deleteAction->setShortcut(QKeySequence::Delete);
+    deleteAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    ui->tableView->addAction(deleteAction);
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(Remove()));
 
     ui->comboBox_type->addItem(tr("45 Single point command"));
     ui->comboBox_type->addItem(tr("46 Double point command"));
@@ -41,7 +51,28 @@ void EditCMDdialog::Append()
 
 void EditCMDdialog::Remove()
 {
-    QItemSelectionModel *pSelection =  ui->tableView->selectionModel();
+    // Qt6: QAbstractItemView::state() is protected — detect in-cell editor via focus
+    QWidget *fw = QApplication::focusWidget();
+    if (fw && fw != ui->tableView && ui->tableView->isAncestorOf(fw))
+        return;
 
-    cmdTable->removeRows(pSelection);
+    QItemSelectionModel *pSelection =  ui->tableView->selectionModel();
+    if (!pSelection)
+        return;
+
+    QModelIndexList indexes = pSelection->selectedRows();
+    if (indexes.isEmpty())
+        indexes = pSelection->selectedIndexes();
+    if (indexes.isEmpty() && pSelection->currentIndex().isValid())
+        indexes.append(pSelection->currentIndex());
+
+    QList<int> rows;
+    foreach (QModelIndex index, indexes)
+    {
+        if (index.isValid() && !rows.contains(index.row()))
+            rows.append(index.row());
+    }
+    std::sort(rows.begin(), rows.end());
+    for (int i = rows.count() - 1; i >= 0; --i)
+        cmdTable->removeRow(rows[i]);
 }

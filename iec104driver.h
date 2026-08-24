@@ -24,20 +24,30 @@ class IEC104Driver:public QObject
 {
     Q_OBJECT
 private:
-    QTimer *testTimer=nullptr;  //таймер отправки тестового пакета
-    QTimer *conTimer=nullptr;
+    QTimer *testTimer=nullptr;  // t3: test / confirm idle timer
+    QTimer *conTimer=nullptr;   // t1: connection / ack timeout
+    QTimer *t2Timer=nullptr;    // t2: delayed S-format confirm
     QTcpSocket *sock=nullptr;
-    uint count;
-    uint lastAPCICount;
+    QByteArray rxBuffer;        // TCP stream reassembly
+
+    /// Last N(R) we already confirmed to the peer (next-expected sequence)
+    quint16 lastConfirmed = 0;
+
+    /// Last N(R) received from peer (how far our sends are acknowledged)
+    quint16 peerAcked = 0;
+
     ///
     /// \brief N_R
-    /// count of recieved packeges from server
+    /// Next expected receive sequence number (IEC N(R))
     quint16 N_R;
 
     ///
     /// \brief N_T
-    ///count of thansfered packages to server
+    /// Next send sequence number (IEC N(S) to use on next I-format)
     quint16 N_T;
+
+    bool needSendGI = false;
+    bool needSendTC = false;
 
     ///
     /// \brief settings
@@ -55,12 +65,18 @@ private:
     void SendTestCon();
     void Send_ConfirmPacks();
 
-
     void SendStart();
     bool isStartAct(QByteArray data);
     bool isStartCon(QByteArray data);
     bool isTestAct(QByteArray data);
     bool isTestCon(QByteArray data);
+
+    bool CanSendIFormat() const;
+    bool SendIFormat(const QByteArray &buf, const QString &logMessage);
+    void UpdatePeerAck(quint16 nr);
+    void ProcessAPDU(const QByteArray &apdu);
+    void ScheduleConfirm();
+    static quint16 SeqDiff(quint16 a, quint16 b);
 
 public:
     // команда общего опроса, requestDescription - описатель общего опроса
@@ -95,6 +111,7 @@ private slots:
     void displayError(QAbstractSocket::SocketError);
     void OnTestTimer();
     void OnConnectionTimer();
+    void OnT2Timer();
 public slots:
 
     //подключиться

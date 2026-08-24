@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 #define LINUXBUILD
-QT       += core gui sql widgets
+QT       += core gui widgets
 QT += network
 RC_FILE = icon.rc
 

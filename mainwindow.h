@@ -17,6 +17,8 @@
 #include "proxymodel.h"
 #include "watchdialog.h"
 
+class QAction;
+
 namespace Ui {
 class MainWindow;
 }
@@ -46,6 +48,7 @@ private:
      QTextStream *logStream=nullptr;
      ProxyModel *proxyModel=nullptr;
      WatchDialog *watch=nullptr;
+     QAction *removeAction=nullptr;
      void loadBase(QString filename);
   //  QList<CIECSignal> *commandList=nullptr;
 

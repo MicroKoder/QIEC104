@@ -104,10 +104,27 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="edit_k"/>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string notr="true">T1</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_t2">
+          <property name="text">
+           <string notr="true">T2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="edit_t2">
+          <property name="inputMethodHints">
+           <set>Qt::ImhDigitsOnly</set>
           </property>
          </widget>
         </item>
@@ -118,34 +135,31 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="3">
+         <widget class="QLineEdit" name="edit_w"/>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string notr="true">T3</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QLineEdit" name="edit_w"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="edit_k"/>
-        </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QLineEdit" name="edit_t3">
           <property name="inputMethodHints">
            <set>Qt::ImhDigitsOnly</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="2" column="2">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string notr="true">ASDU</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="2" column="3">
          <widget class="QLineEdit" name="edit_asdu"/>
         </item>
        </layout>

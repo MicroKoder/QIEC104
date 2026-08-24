@@ -6,6 +6,7 @@ CSetting::CSetting()
     Port = 2404;
 
     t1 = 15;
+    t2 = 10;
     t3 = 5;
 
     k = 12;
@@ -13,6 +14,10 @@ CSetting::CSetting()
 
     asdu = 1;
     autoCreateTags = false;
+    SendGIOnStart = true;
+    SendTCOnStart = true;
+    autoStart = false;
+    autoReconnect = false;
 }
 
 CSetting::CSetting(QString _ip, quint16 _asdu, quint16 _port, bool autoCreate, bool _autoStart, bool _autoReconnect)
@@ -24,10 +29,13 @@ CSetting::CSetting(QString _ip, quint16 _asdu, quint16 _port, bool autoCreate, b
     autoReconnect= _autoReconnect;
 
     t1 = 15;
+    t2 = 10;
     t3 = 5;
 
     k = 12;
     w = 8;
 
     autoCreateTags = autoCreate;
+    SendGIOnStart = true;
+    SendTCOnStart = true;
 }

@@ -15,28 +15,24 @@ public:
     quint16 Port;
 
     ///
-    /// \brief t0
-    /// time in seconds
- //   quint16 t0;
-    ///
     /// \brief t1
     /// таймаут контроля связи в сек
     quint16 t1;
     ///
     /// \brief t2
-    ///time in seconds
-//    quint16 t2;
+    /// таймаут отложенного S-подтверждения в сек (t2 < t1)
+    quint16 t2;
     ///
     /// \brief t3
     /// таймаут отправки тестовых пакетов в сек
     quint16 t3;
     ///
     /// \brief k
-    /// count
+    /// max unacknowledged outgoing I-format APDUs
     quint16 k;
     ///
     /// \brief w
-    /// count
+    /// acknowledge after this many received I-format APDUs
     quint16 w;
     quint16 asdu;
 
